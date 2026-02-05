@@ -26,6 +26,7 @@ const studentLinks = [
   { href: "/student/tasks", label: "Tasks" },
   { href: "/student/portfolio", label: "Portfolio" },
   { href: "/student/alumni", label: "Alumni" },
+   { href: "/student/search", label: "Search" },
 ];
 
 const recruiterLinks = [
