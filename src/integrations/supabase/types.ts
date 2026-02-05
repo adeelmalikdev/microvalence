@@ -716,6 +716,30 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          count: number
+          created_at: string
+          id: string
+          key: string
+          reset_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          id?: string
+          key: string
+          reset_at: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          id?: string
+          key?: string
+          reset_at?: string
+        }
+        Relationships: []
+      }
       student_certifications: {
         Row: {
           created_at: string | null
@@ -1071,6 +1095,7 @@ export type Database = {
     }
     Functions: {
       cancel_account_deletion: { Args: never; Returns: undefined }
+      cleanup_expired_rate_limits: { Args: never; Returns: undefined }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

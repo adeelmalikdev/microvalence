@@ -1,11 +1,43 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// CORS headers with origin validation
+const ALLOWED_ORIGINS = [
+  "https://minterns.lovable.app",
+  "https://id-preview--d79eb762-6c93-4db2-8df9-0d81e6f6bbc1.lovable.app",
+];
+
+const DEV_ORIGIN_PATTERNS = [
+  /^http:\/\/localhost:\d+$/,
+  /^http:\/\/127\.0\.0\.1:\d+$/,
+  /^https:\/\/.*\.lovable\.app$/,
+];
+
+function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
+  let allowedOrigin = ALLOWED_ORIGINS[0];
+  
+  if (requestOrigin) {
+    if (ALLOWED_ORIGINS.includes(requestOrigin)) {
+      allowedOrigin = requestOrigin;
+    } else {
+      for (const pattern of DEV_ORIGIN_PATTERNS) {
+        if (pattern.test(requestOrigin)) {
+          allowedOrigin = requestOrigin;
+          break;
+        }
+      }
+    }
+  }
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
