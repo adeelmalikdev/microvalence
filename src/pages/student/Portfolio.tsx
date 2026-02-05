@@ -1,11 +1,17 @@
 import { Navbar } from "@/components/Navbar";
+import { BackButton } from "@/components/BackButton";
 import { useStudentPortfolio } from "@/hooks/useStudentPortfolio";
+import { useStudentProfile } from "@/features/profile/hooks/useStudentProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ProfileHeader } from "@/features/profile/components/ProfileHeader";
+import { AboutSection } from "@/features/profile/components/AboutSection";
+import { SkillsSection } from "@/features/profile/components/SkillsSection";
+import { ProjectsSection } from "@/features/profile/components/ProjectsSection";
+import { ExperienceSection } from "@/features/profile/components/ExperienceSection";
 import { 
   Award, 
   Briefcase, 
@@ -13,8 +19,7 @@ import {
   Download, 
   Star, 
   CheckCircle2,
-  Trophy,
-  Sparkles
+  Trophy
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -49,7 +54,7 @@ function StatCard({
   value: string | number;
 }) {
   return (
-    <Card>
+    <Card className="border-primary/20 bg-card/80 backdrop-blur">
       <CardContent className="flex items-center gap-4 p-6">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
           <Icon className="h-6 w-6 text-primary" />
@@ -80,7 +85,6 @@ function InternshipCard({
   };
 }) {
   const handleDownloadCertificate = () => {
-    // Create a simple certificate HTML and download as PDF simulation
     const certificateContent = `
       <html>
         <head>
@@ -123,7 +127,7 @@ function InternshipCard({
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden border-primary/20">
       <CardHeader className="bg-muted/30">
         <div className="flex items-start justify-between">
           <div>
@@ -158,7 +162,7 @@ function InternshipCard({
             <p className="text-sm font-medium mb-2">Skills Demonstrated</p>
             <div className="flex flex-wrap gap-2">
               {internship.skills.map((skill) => (
-                <Badge key={skill} variant="skill">
+                <Badge key={skill} variant="secondary">
                   {skill}
                 </Badge>
               ))}
@@ -189,42 +193,46 @@ function InternshipCard({
 }
 
 export default function StudentPortfolio() {
-  const { profile, role } = useAuth();
-  const { data: portfolio, isLoading, error } = useStudentPortfolio();
+  const { role } = useAuth();
+  const { data: portfolio, isLoading: portfolioLoading } = useStudentPortfolio();
+  const {
+    profile,
+    skills,
+    projects,
+    experience,
+    isLoading: profileLoading,
+    isOwnProfile,
+    updateProfile,
+    addSkill,
+    removeSkill,
+    addProject,
+    removeProject,
+    addExperience,
+    removeExperience,
+  } = useStudentProfile();
+
+  const isLoading = portfolioLoading || profileLoading;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navbar userRole={role} />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Back Button */}
+        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+
         {isLoading ? (
           <PortfolioSkeleton />
-        ) : error ? (
-          <Card className="p-8 text-center">
-            <p className="text-destructive">Failed to load portfolio. Please try again.</p>
-          </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {/* Profile Header */}
-            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
-              <Avatar className="h-24 w-24 md:h-32 md:w-32">
-                <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="text-2xl">
-                  {profile?.full_name?.charAt(0) || profile?.email?.charAt(0) || "S"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-center md:text-left">
-                <h1 className="text-3xl font-bold">{profile?.full_name || "Student"}</h1>
-                <p className="text-muted-foreground">{profile?.email}</p>
-                {portfolio && portfolio.internships.length > 0 && (
-                  <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
-                    <Trophy className="h-5 w-5 text-warning" />
-                    <span className="font-medium">
-                      {portfolio.internships.length} Internship{portfolio.internships.length !== 1 ? "s" : ""} Completed
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+            {profile && (
+              <ProfileHeader
+                profile={profile}
+                isOwnProfile={isOwnProfile}
+                onSave={(updates) => updateProfile.mutate(updates)}
+                isSaving={updateProfile.isPending}
+              />
+            )}
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">
@@ -245,29 +253,39 @@ export default function StudentPortfolio() {
               />
             </div>
 
-            {/* Skills Section */}
-            {portfolio?.allSkills && portfolio.allSkills.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    Skills Earned
-                  </CardTitle>
-                  <CardDescription>
-                    Skills demonstrated across all completed internships
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {portfolio.allSkills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-sm py-1 px-3">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+            {/* About Section */}
+            {profile && (
+              <AboutSection
+                aboutMe={profile.about_me}
+                isOwnProfile={isOwnProfile}
+                onSave={(aboutMe) => updateProfile.mutate({ about_me: aboutMe })}
+                isSaving={updateProfile.isPending}
+              />
             )}
+
+            {/* Skills Section */}
+            <SkillsSection
+              skills={skills}
+              isOwnProfile={isOwnProfile}
+              onAdd={(skill) => addSkill.mutate(skill)}
+              onRemove={(skillId) => removeSkill.mutate(skillId)}
+            />
+
+            {/* Projects Section */}
+            <ProjectsSection
+              projects={projects}
+              isOwnProfile={isOwnProfile}
+              onAdd={(project) => addProject.mutate(project)}
+              onRemove={(projectId) => removeProject.mutate(projectId)}
+            />
+
+            {/* Experience Section */}
+            <ExperienceSection
+              experience={experience}
+              isOwnProfile={isOwnProfile}
+              onAdd={(exp) => addExperience.mutate(exp)}
+              onRemove={(expId) => removeExperience.mutate(expId)}
+            />
 
             {/* Internships Section */}
             <div>
@@ -283,7 +301,7 @@ export default function StudentPortfolio() {
                   ))}
                 </div>
               ) : (
-                <Card className="p-8 text-center">
+                <Card className="p-8 text-center border-primary/20">
                   <div className="flex flex-col items-center gap-4">
                     <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
                       <Briefcase className="h-8 w-8 text-muted-foreground" />

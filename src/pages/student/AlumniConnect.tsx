@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { MessageSquare, Users } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BackButton } from "@/components/BackButton";
 import { AlumniFeed } from "@/features/alumni-connect/AlumniFeed";
  
  export default function AlumniConnect() {
@@ -13,6 +14,9 @@ import { AlumniFeed } from "@/features/alumni-connect/AlumniFeed";
      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
        <Navbar />
        <main id="main-content" className="flex-1 container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
           <div className="inline-flex bg-muted/50 rounded-full p-1 gap-1">

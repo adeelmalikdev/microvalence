@@ -134,12 +134,10 @@ export function Navbar({ userRole }: NavbarProps) {
                   {profile?.email}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                {userRole === "student" && (
-                  <DropdownMenuItem onClick={() => navigate("/student/profile")}>
-                    <User className="h-4 w-4 mr-2" />
-                    My Profile
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <User className="h-4 w-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign out
