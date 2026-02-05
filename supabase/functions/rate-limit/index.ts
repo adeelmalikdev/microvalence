@@ -112,6 +112,25 @@ async function checkRateLimit(
   };
 }
 
+// Input validation helpers
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 255;
+}
+
+function isValidIP(ip: string): boolean {
+  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+  return ipv4Regex.test(ip) || ipv6Regex.test(ip);
+}
+
+function isValidIdentifier(identifier: string): boolean {
+  if (!identifier || typeof identifier !== "string") return false;
+  if (identifier.length > 255) return false;
+  // Must be email or IP format
+  return isValidEmail(identifier) || isValidIP(identifier);
+}
+
 serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -122,11 +141,25 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { action, identifier } = await req.json();
-
-    if (!action || !identifier) {
+    // Check content length to prevent DoS
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > 1024) {
       return new Response(
-        JSON.stringify({ error: "Missing action or identifier" }),
+        JSON.stringify({ error: "Request too large" }),
+        {
+          status: 413,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const body = await req.json();
+    const { action, identifier } = body;
+
+    // Validate action
+    if (!action || typeof action !== "string") {
+      return new Response(
+        JSON.stringify({ error: "Missing or invalid action" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -138,6 +171,17 @@ serve(async (req: Request) => {
     if (!["login", "signup", "resend"].includes(action)) {
       return new Response(
         JSON.stringify({ error: "Invalid action type" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Validate identifier format
+    if (!isValidIdentifier(identifier)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid identifier format" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

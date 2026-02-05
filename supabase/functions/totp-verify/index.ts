@@ -108,6 +108,28 @@ async function hashCode(code: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Input validation helpers
+function isValidTOTPCode(code: string): boolean {
+  // TOTP codes are 6 digits
+  return /^\d{6}$/.test(code);
+}
+
+function isValidBackupCode(code: string): boolean {
+  // Backup codes are 8 hex characters
+  return /^[0-9A-Fa-f]{8}$/.test(code);
+}
+
+function isValidCode(code: string): boolean {
+  if (!code || typeof code !== "string") return false;
+  // Must be either 6-digit TOTP or 8-char backup code
+  return isValidTOTPCode(code) || isValidBackupCode(code);
+}
+
+function isValidAction(action: string | undefined): boolean {
+  if (!action) return true; // action is optional
+  return ["enable", "disable", "verify"].includes(action);
+}
+
 serve(async (req) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -117,6 +139,15 @@ serve(async (req) => {
   }
 
   try {
+    // Check content length to prevent DoS
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > 1024) {
+      return new Response(
+        JSON.stringify({ error: "Request too large" }),
+        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
@@ -125,11 +156,21 @@ serve(async (req) => {
       );
     }
 
-    const { code, action } = await req.json();
+    const body = await req.json();
+    const { code, action } = body;
     
-    if (!code || typeof code !== "string") {
+    // Validate code format
+    if (!isValidCode(code)) {
       return new Response(
-        JSON.stringify({ error: "Invalid code" }),
+        JSON.stringify({ error: "Invalid code format. Must be 6 digits for TOTP or 8 hex characters for backup code." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate action if provided
+    if (!isValidAction(action)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid action. Must be 'enable', 'disable', or 'verify'." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

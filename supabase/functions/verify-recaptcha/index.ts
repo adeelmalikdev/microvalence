@@ -34,6 +34,16 @@ function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
   };
 }
 
+// Input validation helper
+function isValidRecaptchaToken(token: string): boolean {
+  if (!token || typeof token !== "string") return false;
+  // reCAPTCHA tokens are typically long alphanumeric strings
+  // Max length is around 4000 characters
+  if (token.length > 5000) return false;
+  // Must be alphanumeric with some special chars (base64-like)
+  return /^[A-Za-z0-9_-]+$/.test(token) || token === "bypass-dev";
+}
+
 serve(async (req) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -44,7 +54,17 @@ serve(async (req) => {
   }
 
   try {
-    const { token } = await req.json();
+    // Check content length to prevent DoS
+    const contentLength = req.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > 10240) {
+      return new Response(
+        JSON.stringify({ verified: false, error: "Request too large" }),
+        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const body = await req.json();
+    const { token } = body;
 
     if (!token) {
       return new Response(
@@ -53,15 +73,33 @@ serve(async (req) => {
       );
     }
 
+    // Validate token format
+    if (!isValidRecaptchaToken(token)) {
+      return new Response(
+        JSON.stringify({ verified: false, error: "Invalid token format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Allow bypass token in development (when no secret key configured)
     const secretKey = Deno.env.get("RECAPTCHA_SECRET_KEY");
 
-    // If no secret key is configured or token is bypass, skip verification in development
-    if (!secretKey || token === "bypass-dev") {
-      console.warn("RECAPTCHA_SECRET_KEY not configured or bypass token used - skipping verification");
+    // If no secret key is configured, skip verification in development
+    // Note: bypass-dev token only works when RECAPTCHA_SECRET_KEY is not set
+    if (!secretKey) {
+      console.warn("RECAPTCHA_SECRET_KEY not configured - skipping verification");
       return new Response(
-        JSON.stringify({ verified: true, score: 1.0, warning: "CAPTCHA not configured or bypassed" }),
+        JSON.stringify({ verified: true, score: 1.0, warning: "CAPTCHA not configured" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // In production (when secret key is set), bypass-dev is not allowed
+    if (token === "bypass-dev") {
+      console.warn("Bypass token rejected in production mode");
+      return new Response(
+        JSON.stringify({ verified: false, error: "Invalid token" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
