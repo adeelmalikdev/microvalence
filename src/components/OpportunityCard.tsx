@@ -24,7 +24,7 @@ export function OpportunityCard({
   onViewDetails,
 }: OpportunityCardProps) {
   return (
-    <Card className="shadow-card hover:shadow-card-hover transition-all">
+    <Card className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-3">
           <div>

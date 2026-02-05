@@ -318,7 +318,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen gradient-hero flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted flex flex-col relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
       <SkipLink href="#login-form" />
       <div className="container py-6">
         <Link to="/">
@@ -327,9 +330,9 @@ export default function Login() {
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 pb-12">
-        <Card className="w-full max-w-md shadow-lg animate-fade-in">
+        <Card className="w-full max-w-md glass-light animate-fade-in relative z-10">
           <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               {isSignUp ? "Create Account" : "Welcome Back"}
             </CardTitle>
             <CardDescription>

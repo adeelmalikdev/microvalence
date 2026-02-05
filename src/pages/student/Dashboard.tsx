@@ -82,15 +82,15 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
       <Navbar userRole="student" />
 
       <main id="main-content" className="container py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 glass-light p-6 rounded-2xl">
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Welcome back, {firstName}! 👋
               </h1>
               <p className="text-muted-foreground">
@@ -102,7 +102,7 @@ export default function StudentDashboard() {
         </div>
  
         {/* XP Progress */}
-        <Card className="mb-8">
+        <Card className="mb-8 glass-light">
           <CardContent className="p-4">
             <XPProgressBar showDetails />
           </CardContent>
@@ -119,7 +119,7 @@ export default function StudentDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Recommended Opportunities */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
                   <CardTitle className="text-lg font-semibold">Recommended Micro-Internships</CardTitle>
@@ -164,7 +164,7 @@ export default function StudentDashboard() {
             </Card>
 
             {/* Ongoing Tasks */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
                   <CardTitle className="text-lg font-semibold">Ongoing Tasks</CardTitle>
@@ -209,9 +209,9 @@ export default function StudentDashboard() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Upcoming Deadlines */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
                   <Clock className="h-4 w-4" />
                   Upcoming Deadlines
                 </CardTitle>
@@ -244,7 +244,7 @@ export default function StudentDashboard() {
             </Card>
 
             {/* Quick Actions */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
               </CardHeader>
@@ -273,7 +273,7 @@ export default function StudentDashboard() {
             </Card>
 
             {/* Performance */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-semibold flex items-center justify-between">
                   <span className="flex items-center gap-2">📈 Performance</span>
@@ -303,9 +303,9 @@ export default function StudentDashboard() {
             </Card>
 
             {/* Achievements Preview */}
-            <Card>
+            <Card className="glass-light">
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
                   <Trophy className="h-4 w-4" />
                   Achievements
                 </CardTitle>

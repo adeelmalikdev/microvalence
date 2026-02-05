@@ -21,7 +21,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-foreground text-background py-16">
+    <footer className="bg-gradient-to-br from-primary via-accent to-secondary text-primary-foreground py-16">
       <div className="container">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div>
