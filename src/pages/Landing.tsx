@@ -60,17 +60,22 @@ const features = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="gradient-hero py-20 lg:py-28">
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        {/* Animated background shapes */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in">
-              <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-6">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
                 Build Your Portfolio with{" "}
-                <span className="text-accent">Micro-Internships</span>
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Micro-Internships</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8 max-w-lg">
                 Connect with industry recruiters, gain real-world experience, and showcase your skills through short-term, impactful projects.
@@ -90,10 +95,10 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="hidden lg:grid grid-cols-2 gap-4 animate-fade-in">
+            <div className="hidden lg:grid grid-cols-2 gap-4">
               {features.map((feature) => (
-                <Card key={feature.label} className="shadow-card hover:shadow-card-hover transition-all">
-                  <CardContent className="p-6 flex flex-col items-center text-center">
+                <Card key={feature.label} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6 flex flex-col items-center text-center backdrop-blur-sm">
                     <feature.icon className="h-8 w-8 text-primary mb-3" />
                     <span className="font-medium text-foreground">{feature.label}</span>
                   </CardContent>
@@ -119,10 +124,10 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20">
+      <section className="py-20 relative">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">How It Works</h2>
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">How It Works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Three simple steps to kickstart your professional journey
             </p>
@@ -130,9 +135,9 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
-              <Card key={item.step} className="shadow-card hover:shadow-card-hover transition-all relative">
+              <Card key={item.step} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1 relative">
                 <div className="absolute -top-3 left-6">
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-destructive text-destructive-foreground text-sm font-bold">
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg">
                     {item.step}
                   </span>
                 </div>
@@ -148,10 +153,11 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-muted/30">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">Why Choose μ-intern?</h2>
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Why Choose μ-intern?</h2>
             <p className="text-muted-foreground">
               Built specifically for IIUI SE/IT/CS students
             </p>
@@ -159,8 +165,8 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="shadow-card">
-                <CardContent className="p-6 text-center">
+              <Card key={index} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+                <CardContent className="p-6 text-center backdrop-blur-sm">
                   <benefit.icon className="h-10 w-10 text-primary mx-auto mb-4" />
                   <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">{benefit.description}</p>
@@ -172,7 +178,9 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="gradient-cta py-20">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-secondary" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
         <div className="container text-center">
           <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             Ready to Gain Real Experience?
