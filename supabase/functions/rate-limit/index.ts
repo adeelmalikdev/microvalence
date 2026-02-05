@@ -1,11 +1,39 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// CORS headers with origin validation
+const ALLOWED_ORIGINS = [
+  "https://minterns.lovable.app",
+  "https://id-preview--d79eb762-6c93-4db2-8df9-0d81e6f6bbc1.lovable.app",
+];
+
+const DEV_ORIGIN_PATTERNS = [
+  /^http:\/\/localhost:\d+$/,
+  /^http:\/\/127\.0\.0\.1:\d+$/,
+  /^https:\/\/.*\.lovable\.app$/,
+];
+
+function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
+  let allowedOrigin = ALLOWED_ORIGINS[0];
+  
+  if (requestOrigin) {
+    if (ALLOWED_ORIGINS.includes(requestOrigin)) {
+      allowedOrigin = requestOrigin;
+    } else {
+      for (const pattern of DEV_ORIGIN_PATTERNS) {
+        if (pattern.test(requestOrigin)) {
+          allowedOrigin = requestOrigin;
+          break;
+        }
+      }
+    }
+  }
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
 
 // Rate limit configuration
 const RATE_LIMITS = {
@@ -14,28 +42,47 @@ const RATE_LIMITS = {
   resend: { maxAttempts: 3, windowMs: 60 * 60 * 1000 }, // 3 attempts per hour
 };
 
-// In-memory store for rate limiting (resets on function cold start)
-// In production, you'd use Redis or a database table
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(
+async function checkRateLimit(
+  supabase: ReturnType<typeof createClient>,
   key: string,
   action: keyof typeof RATE_LIMITS
-): { allowed: boolean; remaining: number; resetAt: number } {
+): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
   const config = RATE_LIMITS[action];
   const now = Date.now();
   const storeKey = `${action}:${key}`;
 
-  const existing = rateLimitStore.get(storeKey);
+  // Try to get existing record
+  const { data: existing, error: selectError } = await supabase
+    .from("rate_limits")
+    .select("count, reset_at")
+    .eq("key", storeKey)
+    .maybeSingle();
 
-  // If no existing record or window has passed, reset
-  if (!existing || now > existing.resetAt) {
-    const newRecord = { count: 1, resetAt: now + config.windowMs };
-    rateLimitStore.set(storeKey, newRecord);
+  if (selectError) {
+    console.error("Rate limit select error:", selectError);
+    // Fail open on database errors
+    return { allowed: true, remaining: config.maxAttempts - 1, resetAt: now + config.windowMs };
+  }
+
+  const resetAt = now + config.windowMs;
+
+  // If no existing record or window has passed, create/reset
+  if (!existing || new Date(existing.reset_at).getTime() < now) {
+    const { error: upsertError } = await supabase
+      .from("rate_limits")
+      .upsert(
+        { key: storeKey, count: 1, reset_at: new Date(resetAt).toISOString() },
+        { onConflict: "key" }
+      );
+
+    if (upsertError) {
+      console.error("Rate limit upsert error:", upsertError);
+    }
+
     return {
       allowed: true,
       remaining: config.maxAttempts - 1,
-      resetAt: newRecord.resetAt,
+      resetAt,
     };
   }
 
@@ -44,22 +91,31 @@ function checkRateLimit(
     return {
       allowed: false,
       remaining: 0,
-      resetAt: existing.resetAt,
+      resetAt: new Date(existing.reset_at).getTime(),
     };
   }
 
   // Increment counter
-  existing.count += 1;
-  rateLimitStore.set(storeKey, existing);
+  const { error: updateError } = await supabase
+    .from("rate_limits")
+    .update({ count: existing.count + 1 })
+    .eq("key", storeKey);
+
+  if (updateError) {
+    console.error("Rate limit update error:", updateError);
+  }
 
   return {
     allowed: true,
-    remaining: config.maxAttempts - existing.count,
-    resetAt: existing.resetAt,
+    remaining: config.maxAttempts - existing.count - 1,
+    resetAt: new Date(existing.reset_at).getTime(),
   };
 }
 
 serve(async (req: Request) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -89,7 +145,13 @@ serve(async (req: Request) => {
       );
     }
 
-    const result = checkRateLimit(identifier, action as keyof typeof RATE_LIMITS);
+    // Create Supabase client with service role for rate_limits table access
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const result = await checkRateLimit(supabase, identifier, action as keyof typeof RATE_LIMITS);
 
     const headers = {
       ...corsHeaders,
@@ -102,6 +164,7 @@ serve(async (req: Request) => {
       const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
       return new Response(
         JSON.stringify({
+          allowed: false,
           error: "Too many attempts",
           message: `Too many ${action} attempts. Please try again in ${Math.ceil(
             retryAfter / 60
