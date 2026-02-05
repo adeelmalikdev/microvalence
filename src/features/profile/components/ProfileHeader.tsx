@@ -61,8 +61,8 @@
  
    return (
      <GlassContainer className="overflow-hidden">
-       {/* Centered Profile Image Section */}
-       <div className="relative pt-8 pb-6">
+      {/* Profile Image Section - Left Aligned */}
+      <div className="relative p-6">
          {/* Edit Button - Top Right */}
          {isOwnProfile && (
            <div className="absolute top-4 right-4 flex gap-2">
@@ -85,10 +85,11 @@
            </div>
          )}
  
-         {/* Centered Round Profile Image */}
-         <div className="flex flex-col items-center">
-           <div className="relative">
-             <Avatar className="h-32 w-32 border-4 border-primary/20 shadow-xl ring-4 ring-background">
+        {/* Left-Aligned Profile Layout */}
+        <div className="flex flex-col md:flex-row md:items-start gap-6">
+          {/* Round Profile Image */}
+          <div className="relative flex-shrink-0">
+            <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-primary/20 shadow-xl ring-4 ring-background">
                <AvatarImage 
                  src={profile.avatar_url || undefined} 
                  alt={profile.full_name || "Profile"} 
@@ -100,7 +101,7 @@
              </Avatar>
              {isEditing && (
                <motion.button
-                 className="absolute bottom-0 right-0 p-2 rounded-full bg-primary text-primary-foreground shadow-lg"
+                className="absolute bottom-1 right-1 p-2 rounded-full bg-primary text-primary-foreground shadow-lg"
                  whileHover={{ scale: 1.1 }}
                  whileTap={{ scale: 0.9 }}
                >
@@ -109,44 +110,43 @@
              )}
            </div>
  
-           {/* Name and Bio */}
-           <div className="mt-4 text-center">
+          {/* Profile Info */}
+          <div className="flex-1">
+            {/* Name and Bio */}
              {isEditing ? (
-               <div className="space-y-3 max-w-md mx-auto">
+              <div className="space-y-3">
                  <Input
                    value={editData.full_name}
                    onChange={(e) => setEditData({ ...editData, full_name: e.target.value })}
                    placeholder="Full Name"
-                   className="text-center text-xl font-bold"
+                  className="text-xl font-bold"
                  />
                  <Input
                    value={editData.bio}
                    onChange={(e) => setEditData({ ...editData, bio: e.target.value })}
                    placeholder="Headline (e.g., Software Engineer | Full-Stack Developer)"
-                   className="text-center"
                  />
                </div>
              ) : (
                <>
-                 <h1 className="text-2xl font-bold text-foreground">
+                <h1 className="text-2xl font-bold text-foreground mb-1">
                    {profile.full_name || "Add your name"}
                  </h1>
-                 <p className="text-muted-foreground mt-1">
+                <p className="text-muted-foreground">
                    {profile.bio || "Add a headline"}
                  </p>
                  {profile.status && (
-                   <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium capitalize">
+                  <span className="inline-block mt-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium capitalize">
                      {profile.status}
                    </span>
                  )}
                </>
              )}
-           </div>
  
-           {/* Academic Info */}
-           <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+            {/* Academic Info */}
+            <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
              {isEditing ? (
-               <div className="w-full max-w-2xl space-y-3 px-4">
+              <div className="w-full space-y-3">
                  <div className="grid grid-cols-2 gap-3">
                    <Input
                      value={editData.university}
@@ -254,17 +254,17 @@
                  )}
                </>
              )}
-           </div>
+            </div>
  
-           {/* Social Links */}
-           {!isEditing && (
-             <div className="flex gap-4 mt-4">
+            {/* Social Links */}
+            {!isEditing && (
+              <div className="flex gap-3 mt-3">
                {profile.github_url && (
                  <a
                    href={profile.github_url}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                  >
                    <Github className="h-5 w-5" />
                  </a>
@@ -274,7 +274,7 @@
                    href={profile.portfolio_url}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                  >
                    <Globe className="h-5 w-5" />
                  </a>
@@ -284,7 +284,7 @@
                    href={profile.website}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                  >
                    <Link className="h-5 w-5" />
                  </a>
@@ -294,13 +294,14 @@
                    href={profile.resume_url}
                    target="_blank"
                    rel="noopener noreferrer"
-                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                  className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
                  >
                    <FileText className="h-5 w-5" />
                  </a>
                )}
-             </div>
-           )}
+              </div>
+            )}
+          </div>
          </div>
        </div>
      </GlassContainer>
