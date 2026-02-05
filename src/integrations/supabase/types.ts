@@ -631,45 +631,213 @@ export type Database = {
       }
       profiles: {
         Row: {
+          about_me: string | null
           avatar_url: string | null
+          bio: string | null
+          cover_image: string | null
           created_at: string
           deletion_requested_at: string | null
           deletion_scheduled_for: string | null
           email: string
           full_name: string | null
+          github_url: string | null
+          gpa: number | null
+          graduation_year: number | null
           id: string
           is_deactivated: boolean | null
           language_preference: string | null
+          location: string | null
+          major: string | null
+          portfolio_url: string | null
           theme_preference: string | null
+          university: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          about_me?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          cover_image?: string | null
           created_at?: string
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email: string
           full_name?: string | null
+          github_url?: string | null
+          gpa?: number | null
+          graduation_year?: number | null
           id?: string
           is_deactivated?: boolean | null
           language_preference?: string | null
+          location?: string | null
+          major?: string | null
+          portfolio_url?: string | null
           theme_preference?: string | null
+          university?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          about_me?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          cover_image?: string | null
           created_at?: string
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email?: string
           full_name?: string | null
+          github_url?: string | null
+          gpa?: number | null
+          graduation_year?: number | null
           id?: string
           is_deactivated?: boolean | null
           language_preference?: string | null
+          location?: string | null
+          major?: string | null
+          portfolio_url?: string | null
           theme_preference?: string | null
+          university?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_certifications: {
+        Row: {
+          created_at: string | null
+          credential_url: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string
+          issuer: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credential_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date: string
+          issuer: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credential_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string
+          issuer?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_experience: {
+        Row: {
+          company: string
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          location: string | null
+          position: string
+          start_date: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          location?: string | null
+          position: string
+          start_date: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          location?: string | null
+          position?: string
+          start_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_projects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          github_url: string | null
+          id: string
+          image_url: string | null
+          project_url: string | null
+          start_date: string | null
+          tech_stack: string[] | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          project_url?: string | null
+          start_date?: string | null
+          tech_stack?: string[] | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string | null
+          github_url?: string | null
+          id?: string
+          image_url?: string | null
+          project_url?: string | null
+          start_date?: string | null
+          tech_stack?: string[] | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_skills: {
+        Row: {
+          created_at: string | null
+          id: string
+          proficiency: Database["public"]["Enums"]["skill_proficiency"] | null
+          skill_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          proficiency?: Database["public"]["Enums"]["skill_proficiency"] | null
+          skill_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          proficiency?: Database["public"]["Enums"]["skill_proficiency"] | null
+          skill_name?: string
           user_id?: string
         }
         Relationships: []
@@ -924,6 +1092,7 @@ export type Database = {
       mentorship_status: "pending" | "accepted" | "declined"
       opportunity_level: "beginner" | "intermediate" | "advanced"
       opportunity_status: "draft" | "published" | "closed"
+      skill_proficiency: "beginner" | "intermediate" | "advanced" | "expert"
       submission_status: "pending" | "approved" | "needs_revision"
     }
     CompositeTypes: {
@@ -1074,6 +1243,7 @@ export const Constants = {
       mentorship_status: ["pending", "accepted", "declined"],
       opportunity_level: ["beginner", "intermediate", "advanced"],
       opportunity_status: ["draft", "published", "closed"],
+      skill_proficiency: ["beginner", "intermediate", "advanced", "expert"],
       submission_status: ["pending", "approved", "needs_revision"],
     },
   },
