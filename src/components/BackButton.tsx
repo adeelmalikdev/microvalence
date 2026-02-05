@@ -1,5 +1,5 @@
  import { ArrowLeft } from "lucide-react";
- import { useNavigate } from "react-router-dom";
+ import { useNavigate, useLocation } from "react-router-dom";
  import { motion } from "framer-motion";
  import { Button } from "@/components/ui/button";
  
@@ -10,9 +10,14 @@
  
  export function BackButton({ fallbackPath, className }: BackButtonProps) {
    const navigate = useNavigate();
+   const location = useLocation();
  
    const handleBack = () => {
-     if (window.history.length > 2) {
+     // Check if we have navigation history (state from previous route)
+     // or if history length indicates we can go back
+     const canGoBack = window.history.state?.idx > 0;
+     
+     if (canGoBack) {
        navigate(-1);
      } else if (fallbackPath) {
        navigate(fallbackPath);
