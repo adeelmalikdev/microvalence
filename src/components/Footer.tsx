@@ -21,9 +21,9 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-primary via-accent to-secondary text-primary-foreground py-16">
+    <footer className="bg-gradient-to-br from-primary via-accent to-secondary text-primary-foreground py-10">
       <div className="container">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
+        <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="text-xl font-bold mb-4">μ-intern</h3>
             <p className="text-sm text-background/70">
@@ -75,7 +75,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-background/20 pt-8 text-center text-sm text-background/60">
+        <div className="border-t border-background/20 pt-6 text-center text-sm text-background/60">
           © 2026 μ-intern Platform | All Rights Reserved
         </div>
       </div>
