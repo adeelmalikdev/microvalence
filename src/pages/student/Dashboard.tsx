@@ -1,4 +1,5 @@
-import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2 } from "lucide-react";
+ import { useEffect } from "react";
+ import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { StatCard } from "@/components/StatCard";
@@ -11,6 +12,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStudentStats } from "@/hooks/useStudentStats";
 import { useRecommendedOpportunities } from "@/hooks/useRecommendedOpportunities";
 import { useStudentTasks, useDeadlines } from "@/hooks/useStudentTasks";
+ import { useGamification } from "@/hooks/useGamification";
+ import { XPProgressBar } from "@/components/gamification/XPProgressBar";
+ import { AchievementGrid } from "@/components/gamification/AchievementGrid";
+ import { UserLevelBadge } from "@/components/gamification/UserLevelBadge";
 import { format } from "date-fns";
 
 export default function StudentDashboard() {
@@ -22,6 +27,20 @@ export default function StudentDashboard() {
   const { data: opportunities, isLoading: oppsLoading } = useRecommendedOpportunities(3);
   const { data: tasks, isLoading: tasksLoading } = useStudentTasks();
   const { data: deadlines, isLoading: deadlinesLoading } = useDeadlines();
+   const { checkAchievements, stats: gamificationStats } = useGamification();
+ 
+   // Check achievements when stats change
+   useEffect(() => {
+     if (stats) {
+       checkAchievements({
+         applications_count: stats.applicationCount,
+         completed_count: stats.completedCount,
+        tasks_completed: stats.activeTasksCount || 0,
+         profile_complete: !!profile?.full_name && !!profile?.avatar_url,
+         has_avatar: !!profile?.avatar_url,
+       });
+     }
+   }, [stats, profile]);
 
   // Build stats array from real data
   const statsData = [
@@ -69,13 +88,25 @@ export default function StudentDashboard() {
       <main id="main-content" className="container py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {firstName}! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Track your micro-internship journey at IIUI SE/IT/CS.
-          </p>
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Welcome back, {firstName}! 👋
+              </h1>
+              <p className="text-muted-foreground">
+                Track your micro-internship journey at IIUI SE/IT/CS.
+              </p>
+            </div>
+            <UserLevelBadge size="lg" showTitle />
+          </div>
         </div>
+ 
+        {/* XP Progress */}
+        <Card className="mb-8">
+          <CardContent className="p-4">
+            <XPProgressBar showDetails />
+          </CardContent>
+        </Card>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -244,8 +275,8 @@ export default function StudentDashboard() {
             {/* Performance */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  📈 Performance
+                <CardTitle className="text-base font-semibold flex items-center justify-between">
+                  <span className="flex items-center gap-2">📈 Performance</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -268,6 +299,19 @@ export default function StudentDashboard() {
                     </div>
                   ))
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Achievements Preview */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AchievementGrid showFilters={false} maxItems={8} />
               </CardContent>
             </Card>
           </div>
