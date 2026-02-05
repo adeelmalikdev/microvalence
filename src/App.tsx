@@ -22,6 +22,7 @@ import StudentPortfolio from "./pages/student/Portfolio";
 import StudentTasks from "./pages/student/Tasks";
 import StudentMessages from "./pages/student/Messages";
 import StudentNotifications from "./pages/student/Notifications";
+import StudentAlumniConnect from "./pages/student/AlumniConnect";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import RecruiterPostOpportunity from "./pages/recruiter/PostOpportunity";
 import RecruiterManageApplicants from "./pages/recruiter/ManageApplicants";
@@ -147,6 +148,14 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute allowedRoles={["student"]}>
           <StudentNotifications />
+        </ProtectedRoute>
+      } 
+    />
+    <Route 
+      path="/student/alumni" 
+      element={
+        <ProtectedRoute allowedRoles={["student"]}>
+          <StudentAlumniConnect />
         </ProtectedRoute>
       } 
     />
