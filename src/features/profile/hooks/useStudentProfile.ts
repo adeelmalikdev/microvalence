@@ -65,6 +65,10 @@
    location: string | null;
    github_url: string | null;
    portfolio_url: string | null;
+ status: "freshman" | "sophomore" | "junior" | "senior" | "graduated" | "alumni" | null;
+ semester: number | null;
+ website: string | null;
+ resume_url: string | null;
  }
  
  export function useStudentProfile(userId?: string) {
