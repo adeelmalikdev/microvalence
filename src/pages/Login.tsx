@@ -56,6 +56,12 @@ const roleConfig = {
   },
 };
 
+// Check if we're on a development/preview domain (reCAPTCHA may not be configured for these)
+const isProductionDomain = () => {
+  const hostname = window.location.hostname;
+  return hostname === "minterns.lovable.app";
+};
+
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -76,6 +82,9 @@ export default function Login() {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
+  
+  // Skip reCAPTCHA on non-production domains
+  const requiresCaptcha = isProductionDomain();
 
   // Callback when reCAPTCHA v2 checkbox is verified
   const onRecaptchaVerify = useCallback((token: string) => {
@@ -83,8 +92,14 @@ export default function Login() {
     setRecaptchaError(null);
   }, []);
 
-  // Load reCAPTCHA script and render widget
+  // Load reCAPTCHA script and render widget (only on production)
   useEffect(() => {
+    // Skip reCAPTCHA on non-production domains
+    if (!requiresCaptcha) {
+      setRecaptchaLoaded(true);
+      return;
+    }
+    
     const renderRecaptcha = () => {
       if (window.grecaptcha && recaptchaRef.current && recaptchaWidgetId.current === null) {
         try {
@@ -149,7 +164,7 @@ export default function Login() {
     return () => {
       delete (window as any).onRecaptchaLoad;
     };
-  }, [onRecaptchaVerify]);
+  }, [onRecaptchaVerify, requiresCaptcha]);
 
   const config = roleConfig[role];
 
@@ -191,23 +206,25 @@ export default function Login() {
   };
 
   // Execute the actual form submission after reCAPTCHA verification
-  const executeSubmit = useCallback(async (captchaToken: string) => {
-    // Verify reCAPTCHA token with backend
-    const captchaResult = await verifyRecaptcha(captchaToken);
-    if (!captchaResult.verified) {
-      setFormError("CAPTCHA verification failed. Please try again.");
-      toast({
-        variant: "destructive",
-        title: "Verification failed",
-        description: captchaResult.error || "Please try again.",
-      });
-      // Reset reCAPTCHA
-      if (recaptchaWidgetId.current !== null && window.grecaptcha) {
-        window.grecaptcha.reset(recaptchaWidgetId.current);
+  const executeSubmit = useCallback(async (captchaToken: string | null) => {
+    // Only verify reCAPTCHA on production domains
+    if (requiresCaptcha && captchaToken) {
+      const captchaResult = await verifyRecaptcha(captchaToken);
+      if (!captchaResult.verified) {
+        setFormError("CAPTCHA verification failed. Please try again.");
+        toast({
+          variant: "destructive",
+          title: "Verification failed",
+          description: captchaResult.error || "Please try again.",
+        });
+        // Reset reCAPTCHA
+        if (recaptchaWidgetId.current !== null && window.grecaptcha) {
+          window.grecaptcha.reset(recaptchaWidgetId.current);
+        }
+        setRecaptchaToken(null);
+        setIsLoading(false);
+        return;
       }
-      setRecaptchaToken(null);
-      setIsLoading(false);
-      return;
     }
     
     // Check rate limit
@@ -271,7 +288,7 @@ export default function Login() {
       }
       setRecaptchaToken(null);
     }
-  }, [isSignUp, email, password, fullName, role, signUp, signIn, toast, navigate, config.dashboardPath]);
+  }, [isSignUp, email, password, fullName, role, signUp, signIn, toast, navigate, config.dashboardPath, requiresCaptcha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,6 +302,13 @@ export default function Login() {
         title: "Weak password",
         description: "Please meet all password requirements before signing up.",
       });
+      return;
+    }
+
+    // Skip CAPTCHA checks on non-production domains
+    if (!requiresCaptcha) {
+      setIsLoading(true);
+      await executeSubmit(null);
       return;
     }
 
@@ -419,21 +443,23 @@ export default function Login() {
                 )}
               </div>
 
-              {/* reCAPTCHA Widget */}
-              <div className="flex flex-col items-center gap-2">
-                <div 
-                  ref={recaptchaRef} 
-                  aria-label="reCAPTCHA verification"
-                />
-                {recaptchaError && (
-                  <p className="text-sm text-destructive">{recaptchaError}</p>
-                )}
-              </div>
+              {/* reCAPTCHA Widget - only on production */}
+              {requiresCaptcha && (
+                <div className="flex flex-col items-center gap-2">
+                  <div 
+                    ref={recaptchaRef} 
+                    aria-label="reCAPTCHA verification"
+                  />
+                  {recaptchaError && (
+                    <p className="text-sm text-destructive">{recaptchaError}</p>
+                  )}
+                </div>
+              )}
 
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isLoading || isGoogleLoading || (!recaptchaToken && recaptchaLoaded && !recaptchaError)}
+                disabled={isLoading || isGoogleLoading || (requiresCaptcha && !recaptchaToken && recaptchaLoaded && !recaptchaError)}
               >
                 {isLoading 
                   ? (isSignUp ? "Creating account..." : "Signing in...") 
