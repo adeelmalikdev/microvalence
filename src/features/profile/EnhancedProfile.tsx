@@ -1,4 +1,6 @@
  import { Navbar } from "@/components/Navbar";
+ import { Footer } from "@/components/Footer";
+ import { BackButton } from "@/components/BackButton";
  import { LoadingSpinner } from "@/components/animations/LoadingSpinner";
  import { useStudentProfile } from "./hooks/useStudentProfile";
  import { ProfileHeader } from "./components/ProfileHeader";
@@ -53,7 +55,9 @@
    return (
      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
        <Navbar />
-       <main id="main-content" className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
+       <main id="main-content" className="container mx-auto px-4 py-8 max-w-4xl">
+         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+         <div className="space-y-6">
          <ProfileHeader
            profile={profile}
            isOwnProfile={isOwnProfile}
@@ -88,7 +92,9 @@
            onAdd={(exp) => addExperience.mutate(exp)}
            onRemove={(expId) => removeExperience.mutate(expId)}
          />
+         </div>
        </main>
+       <Footer />
      </div>
    );
  }
