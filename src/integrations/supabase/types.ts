@@ -1091,7 +1091,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          cover_image: string | null
+          created_at: string | null
+          full_name: string | null
+          github_url: string | null
+          graduation_year: number | null
+          id: string | null
+          location: string | null
+          major: string | null
+          portfolio_url: string | null
+          status: string | null
+          university: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          id?: string | null
+          location?: string | null
+          major?: string | null
+          portfolio_url?: string | null
+          status?: string | null
+          university?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          cover_image?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          id?: string | null
+          location?: string | null
+          major?: string | null
+          portfolio_url?: string | null
+          status?: string | null
+          university?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      user_2fa_status: {
+        Row: {
+          backup_codes_remaining: number | null
+          created_at: string | null
+          id: string | null
+          totp_enabled: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          backup_codes_remaining?: never
+          created_at?: string | null
+          id?: string | null
+          totp_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          backup_codes_remaining?: never
+          created_at?: string | null
+          id?: string | null
+          totp_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cancel_account_deletion: { Args: never; Returns: undefined }

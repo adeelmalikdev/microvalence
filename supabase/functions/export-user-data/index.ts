@@ -35,6 +35,34 @@ function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
   };
 }
 
+// Rate limiting for export (max 1 per hour per user)
+const exportRateLimits = new Map<string, number>();
+
+function checkExportRateLimit(userId: string): { allowed: boolean; retryAfter?: number } {
+  const now = Date.now();
+  const lastExport = exportRateLimits.get(userId);
+  const oneHour = 60 * 60 * 1000;
+  
+  if (lastExport && (now - lastExport) < oneHour) {
+    const retryAfter = Math.ceil((oneHour - (now - lastExport)) / 1000);
+    return { allowed: false, retryAfter };
+  }
+  
+  exportRateLimits.set(userId, now);
+  return { allowed: true };
+}
+
+// Clean up old rate limit entries periodically
+setInterval(() => {
+  const now = Date.now();
+  const oneHour = 60 * 60 * 1000;
+  for (const [userId, timestamp] of exportRateLimits.entries()) {
+    if (now - timestamp > oneHour) {
+      exportRateLimits.delete(userId);
+    }
+  }
+}, 60 * 60 * 1000); // Clean up every hour
+
 serve(async (req) => {
   const origin = req.headers.get("Origin");
   const corsHeaders = getCorsHeaders(origin);
@@ -68,6 +96,25 @@ serve(async (req) => {
     }
 
     const userId = user.id;
+
+    // Check rate limit
+    const rateLimitResult = checkExportRateLimit(userId);
+    if (!rateLimitResult.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Rate limit exceeded",
+          message: `Data export is limited to once per hour. Please try again in ${Math.ceil(rateLimitResult.retryAfter! / 60)} minutes.`
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": rateLimitResult.retryAfter!.toString()
+          } 
+        }
+      );
+    }
 
     // Fetch all user data in parallel
     const [

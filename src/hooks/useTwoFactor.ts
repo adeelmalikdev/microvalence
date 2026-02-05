@@ -21,15 +21,16 @@ export function useTwoFactor() {
   const queryClient = useQueryClient();
   const [setupData, setSetupData] = useState<TwoFactorSetupData | null>(null);
 
-  // Fetch 2FA status
+  // Fetch 2FA status using secure view that doesn't expose secrets
   const { data: status, isLoading: statusLoading } = useQuery({
     queryKey: ["2fa-status", user?.id],
     queryFn: async (): Promise<TwoFactorStatus> => {
       if (!user?.id) throw new Error("Not authenticated");
 
+      // Use the secure view that only exposes status, not secrets
       const { data, error } = await supabase
-        .from("user_2fa")
-        .select("totp_enabled, backup_codes")
+        .from("user_2fa_status")
+        .select("totp_enabled, backup_codes_remaining")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -37,8 +38,8 @@ export function useTwoFactor() {
 
       return {
         enabled: data?.totp_enabled ?? false,
-        hasBackupCodes: (data?.backup_codes?.length ?? 0) > 0,
-        backupCodesCount: data?.backup_codes?.length ?? 0,
+        hasBackupCodes: (data?.backup_codes_remaining ?? 0) > 0,
+        backupCodesCount: data?.backup_codes_remaining ?? 0,
       };
     },
     enabled: !!user?.id,
