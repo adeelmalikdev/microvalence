@@ -307,22 +307,25 @@
      },
    });
  
-   return {
-     profile: profileQuery.data,
-     skills: skillsQuery.data || [],
-     projects: projectsQuery.data || [],
-     experience: experienceQuery.data || [],
-     certifications: certificationsQuery.data || [],
-     isLoading: profileQuery.isLoading,
-     isOwnProfile: user?.id === targetUserId,
-     updateProfile,
-     addSkill,
-     removeSkill,
-     addProject,
-     removeProject,
-     addExperience,
-     removeExperience,
-     addCertification,
-     removeCertification,
-   };
+  return {
+    profile: profileQuery.data,
+    skills: skillsQuery.data || [],
+    projects: projectsQuery.data || [],
+    experience: experienceQuery.data || [],
+    certifications: certificationsQuery.data || [],
+    isLoading: profileQuery.isLoading, // Only wait for profile, rest loads progressively
+    isSkillsLoading: skillsQuery.isLoading,
+    isProjectsLoading: projectsQuery.isLoading,
+    isExperienceLoading: experienceQuery.isLoading,
+    isOwnProfile: user?.id === targetUserId,
+    updateProfile,
+    addSkill,
+    removeSkill,
+    addProject,
+    removeProject,
+    addExperience,
+    removeExperience,
+    addCertification,
+    removeCertification,
+  };
  }

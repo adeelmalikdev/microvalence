@@ -201,6 +201,9 @@ export default function StudentPortfolio() {
     projects,
     experience,
     isLoading: profileLoading,
+    isSkillsLoading,
+    isProjectsLoading,
+    isExperienceLoading,
     isOwnProfile,
     updateProfile,
     addSkill,
@@ -211,7 +214,8 @@ export default function StudentPortfolio() {
     removeExperience,
   } = useStudentProfile();
 
-  const isLoading = portfolioLoading || profileLoading;
+  // Only show full skeleton for initial profile load
+  const showFullSkeleton = profileLoading && !profile;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
@@ -220,7 +224,7 @@ export default function StudentPortfolio() {
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
-        {isLoading ? (
+        {showFullSkeleton ? (
           <PortfolioSkeleton />
         ) : (
           <div className="space-y-6 max-w-5xl">

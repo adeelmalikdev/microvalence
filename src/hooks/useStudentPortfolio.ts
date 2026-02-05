@@ -30,7 +30,7 @@ export function useStudentPortfolio() {
     queryFn: async (): Promise<PortfolioData> => {
       if (!user?.id) throw new Error("User not authenticated");
 
-      // Fetch completed applications with opportunity details
+      // Fetch completed applications first
       const { data: applications, error: appError } = await supabase
         .from("applications")
         .select(`
@@ -53,31 +53,32 @@ export function useStudentPortfolio() {
         };
       }
 
-      // Fetch opportunities for these applications
       const opportunityIds = applications.map((app) => app.opportunity_id);
-      const { data: opportunities, error: oppError } = await supabase
-        .from("opportunities")
-        .select("id, title, company_name, duration_hours, skills_required")
-        .in("id", opportunityIds);
-
-      if (oppError) throw oppError;
-
-      // Fetch feedback for completed applications
       const applicationIds = applications.map((app) => app.id);
-      const { data: feedbackData, error: feedbackError } = await supabase
-        .from("feedback")
-        .select("application_id, rating, comments, skills_demonstrated")
-        .in("application_id", applicationIds);
 
-      if (feedbackError) throw feedbackError;
+      // Run all dependent queries in PARALLEL for faster loading
+      const [opportunitiesResult, feedbackResult, certificatesResult] = await Promise.all([
+        supabase
+          .from("opportunities")
+          .select("id, title, company_name, duration_hours, skills_required")
+          .in("id", opportunityIds),
+        supabase
+          .from("feedback")
+          .select("application_id, rating, comments, skills_demonstrated")
+          .in("application_id", applicationIds),
+        supabase
+          .from("certificates")
+          .select("id, application_id, verification_code")
+          .in("application_id", applicationIds),
+      ]);
 
-      // Fetch certificates
-      const { data: certificates, error: certError } = await supabase
-        .from("certificates")
-        .select("id, application_id, verification_code")
-        .in("application_id", applicationIds);
+      if (opportunitiesResult.error) throw opportunitiesResult.error;
+      if (feedbackResult.error) throw feedbackResult.error;
+      if (certificatesResult.error) throw certificatesResult.error;
 
-      if (certError) throw certError;
+      const opportunities = opportunitiesResult.data;
+      const feedbackData = feedbackResult.data;
+      const certificates = certificatesResult.data;
 
       // Map data together
       const internships: CompletedInternship[] = applications.map((app) => {
