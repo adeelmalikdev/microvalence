@@ -649,10 +649,14 @@ export type Database = {
           location: string | null
           major: string | null
           portfolio_url: string | null
+          resume_url: string | null
+          semester: number | null
+          status: string | null
           theme_preference: string | null
           university: string | null
           updated_at: string
           user_id: string
+          website: string | null
         }
         Insert: {
           about_me?: string | null
@@ -673,10 +677,14 @@ export type Database = {
           location?: string | null
           major?: string | null
           portfolio_url?: string | null
+          resume_url?: string | null
+          semester?: number | null
+          status?: string | null
           theme_preference?: string | null
           university?: string | null
           updated_at?: string
           user_id: string
+          website?: string | null
         }
         Update: {
           about_me?: string | null
@@ -697,10 +705,14 @@ export type Database = {
           location?: string | null
           major?: string | null
           portfolio_url?: string | null
+          resume_url?: string | null
+          semester?: number | null
+          status?: string | null
           theme_preference?: string | null
           university?: string | null
           updated_at?: string
           user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
