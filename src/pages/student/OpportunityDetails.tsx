@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Users, Calendar, CheckCircle, Briefcase } from "lucide-react";
+import { MapPin, Clock, Users, Calendar, CheckCircle, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 import { Navbar } from "@/components/Navbar";
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -90,7 +91,6 @@ export default function OpportunityDetails() {
         <Navbar userRole="student" />
         <main className="container py-8">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
-            <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
           <Card>
@@ -114,10 +114,7 @@ export default function OpportunityDetails() {
 
       <main className="container py-8">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Opportunities
-        </Button>
+        <BackButton fallbackPath="/student/opportunities" className="mb-6" />
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}

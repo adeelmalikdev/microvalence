@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import { BackButton } from "@/components/BackButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,6 +50,9 @@ export default function Opportunities() {
       <Navbar userRole="student" />
 
       <main className="container py-8">
+        {/* Back Button */}
+        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Explore Opportunities</h1>

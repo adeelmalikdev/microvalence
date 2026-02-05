@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Bell, CheckCheck } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,6 +35,9 @@ export default function StudentNotifications() {
       <Navbar userRole="student" />
 
       <main className="container py-8 flex-1">
+        {/* Back Button */}
+        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Notifications</h1>

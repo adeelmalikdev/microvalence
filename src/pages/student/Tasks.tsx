@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ClipboardList, Search, Briefcase } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BackButton } from "@/components/BackButton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -87,6 +88,9 @@ export default function StudentTasks() {
       <Navbar userRole="student" />
 
       <main className="container py-8 flex-1">
+        {/* Back Button */}
+        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
