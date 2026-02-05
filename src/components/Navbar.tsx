@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, LogOut, MessageSquare } from "lucide-react";
+import { User, LogOut, MessageSquare, Users } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ const studentLinks = [
   { href: "/student/applications", label: "Applications" },
   { href: "/student/tasks", label: "Tasks" },
   { href: "/student/portfolio", label: "Portfolio" },
+  { href: "/student/alumni", label: "Alumni" },
 ];
 
 const recruiterLinks = [
@@ -133,6 +134,12 @@ export function Navbar({ userRole }: NavbarProps) {
                   {profile?.email}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {userRole === "student" && (
+                  <DropdownMenuItem onClick={() => navigate("/student/profile")}>
+                    <User className="h-4 w-4 mr-2" />
+                    My Profile
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign out
