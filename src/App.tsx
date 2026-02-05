@@ -34,6 +34,7 @@ import AboutUs from "./pages/AboutUs";
 import Feedback from "./pages/Feedback";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import DesignSystemDemo from "./pages/DesignSystemDemo";
 
 // Initialize error tracking on app load
 initializeErrorTracking();
@@ -221,6 +222,7 @@ const AppRoutes = () => (
     {/* Public Pages */}
     <Route path="/about" element={<AboutUs />} />
     <Route path="/feedback" element={<Feedback />} />
+    <Route path="/design-system" element={<DesignSystemDemo />} />
     
     {/* Settings - Available to all authenticated users */}
     <Route 
