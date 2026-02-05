@@ -216,14 +216,14 @@ export default function StudentPortfolio() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navbar userRole={role} />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container px-4 py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
         {isLoading ? (
           <PortfolioSkeleton />
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-5xl">
             {/* Profile Header */}
             {profile && (
               <ProfileHeader
