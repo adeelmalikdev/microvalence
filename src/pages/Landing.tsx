@@ -90,7 +90,7 @@ export default function Landing() {
 
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {features.map((feature) => (
-                <Card key={feature.label} className="bg-background/90 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+                <Card key={feature.label} className="bg-background/90 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="p-6 flex flex-col items-center text-center">
                     <feature.icon className="h-8 w-8 text-primary mb-3" />
                     <span className="font-medium text-foreground">{feature.label}</span>
@@ -114,7 +114,7 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
-              <Card key={item.step} className="bg-background/95 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1 relative">
+              <Card key={item.step} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1 relative">
                 <div className="absolute -top-3 left-6">
                   <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg">
                     {item.step}
@@ -143,7 +143,7 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="bg-background/95 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+              <Card key={index} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                 <CardContent className="p-6 text-center">
                   <benefit.icon className="h-10 w-10 text-primary mx-auto mb-4" />
                   <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
