@@ -52,11 +52,9 @@ function AuthenticatedRedirect() {
     );
   }
   
-  if (user && role) {
-    return <Navigate to={`/${role}/dashboard`} replace />;
-  }
-  
-  return <Landing />;
+  // Temporarily show Design System Demo for development
+  // TODO: Revert to Landing page after design review
+  return <DesignSystemDemo />;
 }
 
 function LoginRedirect() {
