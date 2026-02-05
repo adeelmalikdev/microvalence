@@ -53,6 +53,287 @@ export type Database = {
         }
         Relationships: []
       }
+      alumni_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumni_connections: {
+        Row: {
+          created_at: string | null
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      alumni_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string | null
+          role: Database["public"]["Enums"]["group_role"] | null
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["group_role"] | null
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["group_role"] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumni_group_messages: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          id: string
+          media_url: string | null
+          message: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          id?: string
+          media_url?: string | null
+          message: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          media_url?: string | null
+          message?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumni_groups: {
+        Row: {
+          cover_image: string | null
+          created_at: string | null
+          created_by: string
+          description: string | null
+          field: string
+          id: string
+          member_count: number | null
+          name: string
+        }
+        Insert: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          field: string
+          id?: string
+          member_count?: number | null
+          name: string
+        }
+        Update: {
+          cover_image?: string | null
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          field?: string
+          id?: string
+          member_count?: number | null
+          name?: string
+        }
+        Relationships: []
+      }
+      alumni_post_reactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          reaction_type:
+            | Database["public"]["Enums"]["alumni_reaction_type"]
+            | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          reaction_type?:
+            | Database["public"]["Enums"]["alumni_reaction_type"]
+            | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          reaction_type?:
+            | Database["public"]["Enums"]["alumni_reaction_type"]
+            | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_post_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alumni_posts: {
+        Row: {
+          author_id: string
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          media_urls: string[] | null
+          post_type: Database["public"]["Enums"]["alumni_post_type"] | null
+          updated_at: string | null
+          visibility: Database["public"]["Enums"]["alumni_visibility"] | null
+        }
+        Insert: {
+          author_id: string
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          media_urls?: string[] | null
+          post_type?: Database["public"]["Enums"]["alumni_post_type"] | null
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["alumni_visibility"] | null
+        }
+        Update: {
+          author_id?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          media_urls?: string[] | null
+          post_type?: Database["public"]["Enums"]["alumni_post_type"] | null
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["alumni_visibility"] | null
+        }
+        Relationships: []
+      }
+      alumni_profiles: {
+        Row: {
+          achievements: string[] | null
+          available_for_mentorship: boolean | null
+          bio: string | null
+          created_at: string | null
+          current_company: string | null
+          current_position: string | null
+          expertise_areas: string[] | null
+          graduation_year: number
+          id: string
+          industry: string | null
+          linkedin_url: string | null
+          portfolio_url: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievements?: string[] | null
+          available_for_mentorship?: boolean | null
+          bio?: string | null
+          created_at?: string | null
+          current_company?: string | null
+          current_position?: string | null
+          expertise_areas?: string[] | null
+          graduation_year: number
+          id?: string
+          industry?: string | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievements?: string[] | null
+          available_for_mentorship?: boolean | null
+          bio?: string | null
+          created_at?: string | null
+          current_company?: string | null
+          current_position?: string | null
+          expertise_areas?: string[] | null
+          graduation_year?: number
+          id?: string
+          industry?: string | null
+          linkedin_url?: string | null
+          portfolio_url?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       applications: {
         Row: {
           cover_letter: string | null
@@ -198,6 +479,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mentorship_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          mentee_id: string
+          mentor_id: string
+          message: string | null
+          status: Database["public"]["Enums"]["mentorship_status"] | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          mentee_id: string
+          mentor_id: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["mentorship_status"] | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          mentee_id?: string
+          mentor_id?: string
+          message?: string | null
+          status?: Database["public"]["Enums"]["mentorship_status"] | null
+        }
+        Relationships: []
       }
       messages: {
         Row: {
@@ -596,6 +904,14 @@ export type Database = {
       }
     }
     Enums: {
+      alumni_post_type:
+        | "update"
+        | "achievement"
+        | "job_posting"
+        | "advice"
+        | "event"
+      alumni_reaction_type: "like" | "celebrate" | "insightful" | "support"
+      alumni_visibility: "public" | "connections" | "private"
       app_role: "student" | "recruiter" | "admin"
       application_status:
         | "pending"
@@ -604,6 +920,8 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "withdrawn"
+      group_role: "admin" | "moderator" | "member"
+      mentorship_status: "pending" | "accepted" | "declined"
       opportunity_level: "beginner" | "intermediate" | "advanced"
       opportunity_status: "draft" | "published" | "closed"
       submission_status: "pending" | "approved" | "needs_revision"
@@ -734,6 +1052,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      alumni_post_type: [
+        "update",
+        "achievement",
+        "job_posting",
+        "advice",
+        "event",
+      ],
+      alumni_reaction_type: ["like", "celebrate", "insightful", "support"],
+      alumni_visibility: ["public", "connections", "private"],
       app_role: ["student", "recruiter", "admin"],
       application_status: [
         "pending",
@@ -743,6 +1070,8 @@ export const Constants = {
         "completed",
         "withdrawn",
       ],
+      group_role: ["admin", "moderator", "member"],
+      mentorship_status: ["pending", "accepted", "declined"],
       opportunity_level: ["beginner", "intermediate", "advanced"],
       opportunity_status: ["draft", "published", "closed"],
       submission_status: ["pending", "approved", "needs_revision"],
