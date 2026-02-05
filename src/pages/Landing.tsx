@@ -5,13 +5,6 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const stats = [
-  { icon: Users, label: "Students" },
-  { icon: Building2, label: "Recruiters" },
-  { icon: CheckCircle, label: "Opportunities" },
-  { icon: TrendingUp, label: "Real Experience" },
-];
-
 const howItWorks = [
   {
     step: 1,
@@ -97,8 +90,8 @@ export default function Landing() {
 
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {features.map((feature) => (
-                <Card key={feature.label} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
-                  <CardContent className="p-6 flex flex-col items-center text-center backdrop-blur-sm">
+                <Card key={feature.label} className="bg-background/90 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+                  <CardContent className="p-6 flex flex-col items-center text-center">
                     <feature.icon className="h-8 w-8 text-primary mb-3" />
                     <span className="font-medium text-foreground">{feature.label}</span>
                   </CardContent>
@@ -109,22 +102,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 border-b">
-        <div className="container">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <stat.icon className="h-10 w-10 text-primary mx-auto mb-3" />
-                <p className="text-lg font-semibold text-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
-      <section className="py-20 relative">
+      <section className="py-16">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">How It Works</h2>
@@ -135,7 +114,7 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
-              <Card key={item.step} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1 relative">
+              <Card key={item.step} className="bg-background/95 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1 relative">
                 <div className="absolute -top-3 left-6">
                   <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg">
                     {item.step}
@@ -153,8 +132,7 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+      <section className="py-16">
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Why Choose μ-intern?</h2>
@@ -165,8 +143,8 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="glass-light hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
-                <CardContent className="p-6 text-center backdrop-blur-sm">
+              <Card key={index} className="bg-background/95 border border-primary/20 shadow-sm hover:shadow-[0_0_30px_hsl(var(--primary)/0.3)] transition-all duration-300 hover:-translate-y-1">
+                <CardContent className="p-6 text-center">
                   <benefit.icon className="h-10 w-10 text-primary mx-auto mb-4" />
                   <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">{benefit.description}</p>
@@ -178,14 +156,12 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-secondary" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
-        <div className="container text-center">
-          <h2 className="text-3xl font-bold text-primary-foreground mb-4">
+      <section className="py-12 bg-gradient-to-r from-primary via-accent to-secondary rounded-xl mx-4 mb-8">
+        <div className="container text-center relative z-10">
+          <h2 className="text-3xl font-bold text-primary-foreground mb-3">
             Ready to Gain Real Experience?
           </h2>
-          <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-primary-foreground/80 mb-6 max-w-2xl mx-auto">
             Join IIUI SE/IT/CS students in building professional portfolios through micro-internships
           </p>
           <Link to="/login">
