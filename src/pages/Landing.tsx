@@ -4,6 +4,23 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
+
+// 3D Icon wrapper component
+function Icon3D({ icon: IconComponent }: { icon: LucideIcon }) {
+  return (
+    <div className="relative group/icon">
+      {/* 3D shadow layers */}
+      <div className="absolute inset-0 bg-primary/20 rounded-xl translate-x-1 translate-y-1 blur-sm" />
+      <div className="absolute inset-0 bg-primary/30 rounded-xl translate-x-0.5 translate-y-0.5" />
+      
+      {/* Icon container with gradient */}
+      <div className="relative p-3 rounded-xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_hsl(var(--primary)/0.4)] group-hover/icon:scale-110 group-hover/icon:rotate-3 transition-all duration-300">
+        <IconComponent className="h-6 w-6 text-primary-foreground" />
+      </div>
+    </div>
+  );
+}
 
 const howItWorks = [
   {
@@ -92,7 +109,9 @@ export default function Landing() {
               {features.map((feature) => (
                 <Card key={feature.label} className="bg-background/90 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="p-6 flex flex-col items-center text-center">
-                    <feature.icon className="h-8 w-8 text-primary mb-3" />
+                    <div className="mb-3">
+                      <Icon3D icon={feature.icon} />
+                    </div>
                     <span className="font-medium text-foreground">{feature.label}</span>
                   </CardContent>
                 </Card>
@@ -121,7 +140,9 @@ export default function Landing() {
                   </span>
                 </div>
                 <CardContent className="p-6 pt-8">
-                  <item.icon className="h-8 w-8 text-primary mb-4" />
+                  <div className="mb-4">
+                    <Icon3D icon={item.icon} />
+                  </div>
                   <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.description}</p>
                 </CardContent>
@@ -145,7 +166,9 @@ export default function Landing() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                 <CardContent className="p-6 text-center">
-                  <benefit.icon className="h-10 w-10 text-primary mx-auto mb-4" />
+                  <div className="flex justify-center mb-4">
+                    <Icon3D icon={benefit.icon} />
+                  </div>
                   <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
                   <p className="text-sm text-muted-foreground">{benefit.description}</p>
                 </CardContent>
