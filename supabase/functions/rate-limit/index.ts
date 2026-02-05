@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 // CORS headers with origin validation
 const ALLOWED_ORIGINS = [
@@ -43,7 +43,7 @@ const RATE_LIMITS = {
 };
 
 async function checkRateLimit(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   key: string,
   action: keyof typeof RATE_LIMITS
 ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
