@@ -288,11 +288,25 @@ export default function Login() {
       return;
     }
 
-    // If reCAPTCHA is not loaded or has an error, skip verification in dev
-    if (recaptchaError || !recaptchaLoaded) {
-      console.warn("reCAPTCHA not available, proceeding without verification");
-      setIsLoading(true);
-      await executeSubmit("bypass-dev");
+    // If reCAPTCHA has a configuration error, show error
+    if (recaptchaError) {
+      setFormError(recaptchaError);
+      toast({
+        variant: "destructive",
+        title: "CAPTCHA Error",
+        description: "Please refresh the page and try again.",
+      });
+      return;
+    }
+    
+    // If reCAPTCHA is still loading, wait for it
+    if (!recaptchaLoaded) {
+      setFormError("Please wait for the CAPTCHA to load.");
+      toast({
+        variant: "destructive",
+        title: "Loading...",
+        description: "Please wait for the CAPTCHA to load and try again.",
+      });
       return;
     }
 
