@@ -1,8 +1,7 @@
-import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 import { useStudentPortfolio } from "@/hooks/useStudentPortfolio";
 import { useStudentProfile } from "@/features/profile/hooks/useStudentProfile";
-import { useAuth } from "@/hooks/useAuth";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -193,7 +192,7 @@ function InternshipCard({
 }
 
 export default function StudentPortfolio() {
-  const { role } = useAuth();
+  
   const { data: portfolio, isLoading: portfolioLoading } = useStudentPortfolio();
   const {
     profile,
@@ -218,10 +217,8 @@ export default function StudentPortfolio() {
   const showFullSkeleton = profileLoading && !profile;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <Navbar userRole={role} />
-      <main className="container px-4 py-8">
-        {/* Back Button */}
+    <div className="container px-4 py-8">
+      {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
         {showFullSkeleton ? (
@@ -325,7 +322,6 @@ export default function StudentPortfolio() {
             </div>
           </div>
         )}
-      </main>
     </div>
   );
 }

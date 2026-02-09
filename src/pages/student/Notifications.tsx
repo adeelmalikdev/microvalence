@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { Bell, CheckCheck } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,10 +29,7 @@ export default function StudentNotifications() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="student" />
-
-      <main className="container py-8 flex-1">
+    <div className="container py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
@@ -92,9 +87,6 @@ export default function StudentNotifications() {
             )}
           </CardContent>
         </Card>
-      </main>
-
-      <Footer />
     </div>
   );
 }

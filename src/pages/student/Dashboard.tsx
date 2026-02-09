@@ -1,7 +1,7 @@
  import { useEffect } from "react";
  import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
+
 import { StatCard } from "@/components/StatCard";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,241 +82,237 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
-      <Navbar userRole="student" />
-
-      <main id="main-content" className="container py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 glass-light p-6 rounded-2xl">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Welcome back, {firstName}! 👋
-              </h1>
-              <p className="text-muted-foreground">
-                Track your micro-internship journey at IIUI SE/IT/CS.
-              </p>
-            </div>
-            <UserLevelBadge size="lg" showTitle />
+    <div className="container py-8">
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-4 glass-light p-6 rounded-2xl">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Welcome back, {firstName}! 👋
+            </h1>
+            <p className="text-muted-foreground">
+              Track your micro-internship journey at IIUI SE/IT/CS.
+            </p>
           </div>
+          <UserLevelBadge size="lg" showTitle />
         </div>
- 
-        {/* XP Progress */}
-        <Card className="mb-8 glass-light">
-          <CardContent className="p-4">
-            <XPProgressBar showDetails />
-          </CardContent>
-        </Card>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {statsData.map((stat) => (
-            <StatCard key={stat.title} {...stat} />
-          ))}
+      {/* XP Progress */}
+      <Card className="mb-8 glass-light">
+        <CardContent className="p-4">
+          <XPProgressBar showDetails />
+        </CardContent>
+      </Card>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {statsData.map((stat) => (
+          <StatCard key={stat.title} {...stat} />
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Recommended Opportunities */}
+          <Card className="glass-light">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-lg font-semibold">Recommended Micro-Internships</CardTitle>
+                <p className="text-sm text-muted-foreground">Based on your skills and interests</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-1 text-muted-foreground hover:text-foreground"
+                onClick={() => navigate("/student/opportunities")}
+              >
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {oppsLoading ? (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-24 w-full" />
+                  ))}
+                </>
+              ) : opportunities && opportunities.length > 0 ? (
+                opportunities.map((opp) => (
+                  <OpportunityCard
+                    key={opp.id}
+                    title={opp.title}
+                    company={opp.company_name}
+                    skills={opp.skills_required}
+                    duration={getDurationLabel(opp.duration_hours)}
+                    level={capitalize(opp.level) as "Beginner" | "Intermediate" | "Advanced"}
+                    isRemote={opp.is_remote}
+                    onViewDetails={() => navigate(`/student/opportunities/${opp.id}`)}
+                  />
+                ))
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  No new opportunities available. Check back soon!
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Ongoing Tasks */}
+          <Card className="glass-light">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-lg font-semibold">Ongoing Tasks</CardTitle>
+                <p className="text-sm text-muted-foreground">Track your active micro-internship tasks</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="gap-1 text-muted-foreground hover:text-foreground"
+                onClick={() => navigate("/student/tasks")}
+              >
+                View All
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {tasksLoading ? (
+                <>
+                  {[1, 2].map((i) => (
+                    <Skeleton key={i} className="h-20 w-full" />
+                  ))}
+                </>
+              ) : tasks && tasks.length > 0 ? (
+                tasks.slice(0, 3).map((task) => (
+                  <TaskCardItem
+                    key={task.id}
+                    title={task.title}
+                    company={task.opportunity?.company_name || "Unknown"}
+                    status={task.submission?.status || "not_started"}
+                    dueDays={task.due_days}
+                  />
+                ))
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  No active tasks. Apply to opportunities to get started!
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Recommended Opportunities */}
-            <Card className="glass-light">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Recommended Micro-Internships</CardTitle>
-                  <p className="text-sm text-muted-foreground">Based on your skills and interests</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-1 text-muted-foreground hover:text-foreground"
-                  onClick={() => navigate("/student/opportunities")}
-                >
-                  View All
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {oppsLoading ? (
-                  <>
-                    {[1, 2, 3].map((i) => (
-                      <Skeleton key={i} className="h-24 w-full" />
-                    ))}
-                  </>
-                ) : opportunities && opportunities.length > 0 ? (
-                  opportunities.map((opp) => (
-                    <OpportunityCard
-                      key={opp.id}
-                      title={opp.title}
-                      company={opp.company_name}
-                      skills={opp.skills_required}
-                      duration={getDurationLabel(opp.duration_hours)}
-                      level={capitalize(opp.level) as "Beginner" | "Intermediate" | "Advanced"}
-                      isRemote={opp.is_remote}
-                      onViewDetails={() => navigate(`/student/opportunities/${opp.id}`)}
-                    />
-                  ))
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">
-                    No new opportunities available. Check back soon!
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Ongoing Tasks */}
-            <Card className="glass-light">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div>
-                  <CardTitle className="text-lg font-semibold">Ongoing Tasks</CardTitle>
-                  <p className="text-sm text-muted-foreground">Track your active micro-internship tasks</p>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-1 text-muted-foreground hover:text-foreground"
-                  onClick={() => navigate("/student/tasks")}
-                >
-                  View All
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {tasksLoading ? (
-                  <>
-                    {[1, 2].map((i) => (
-                      <Skeleton key={i} className="h-20 w-full" />
-                    ))}
-                  </>
-                ) : tasks && tasks.length > 0 ? (
-                  tasks.slice(0, 3).map((task) => (
-                    <TaskCardItem
-                      key={task.id}
-                      title={task.title}
-                      company={task.opportunity?.company_name || "Unknown"}
-                      status={task.submission?.status || "not_started"}
-                      dueDays={task.due_days}
-                    />
-                  ))
-                ) : (
-                  <p className="text-center py-8 text-muted-foreground">
-                    No active tasks. Apply to opportunities to get started!
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Upcoming Deadlines */}
-            <Card className="glass-light">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
-                  <Clock className="h-4 w-4" />
-                  Upcoming Deadlines
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {deadlinesLoading ? (
-                  <>
-                    {[1, 2, 3].map((i) => (
-                      <Skeleton key={i} className="h-10 w-full" />
-                    ))}
-                  </>
-                ) : deadlines && deadlines.length > 0 ? (
-                  deadlines.map((deadline) => (
-                    <div key={deadline.id} className="flex items-start gap-3">
-                      <div className={`mt-1.5 w-2 h-2 rounded-full ${
-                        deadline.isUrgent ? "bg-destructive" : "bg-success"
-                      }`} />
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{deadline.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(deadline.dueDate, "MMM d, yyyy")}
-                        </p>
-                      </div>
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Upcoming Deadlines */}
+          <Card className="glass-light">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
+                <Clock className="h-4 w-4" />
+                Upcoming Deadlines
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {deadlinesLoading ? (
+                <>
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </>
+              ) : deadlines && deadlines.length > 0 ? (
+                deadlines.map((deadline) => (
+                  <div key={deadline.id} className="flex items-start gap-3">
+                    <div className={`mt-1.5 w-2 h-2 rounded-full ${
+                      deadline.isUrgent ? "bg-destructive" : "bg-success"
+                    }`} />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{deadline.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(deadline.dueDate, "MMM d, yyyy")}
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">No upcoming deadlines</p>
-                )}
-              </CardContent>
-            </Card>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No upcoming deadlines</p>
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Quick Actions */}
-            <Card className="glass-light">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-2 h-10"
-                  onClick={() => navigate("/student/opportunities")}
-                >
-                  <Building2 className="h-4 w-4" />
-                  Browse Opportunities
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-2 h-10"
-                  onClick={() => navigate("/student/applications")}
-                >
-                  <FileText className="h-4 w-4" />
-                  My Applications
-                </Button>
-                <Button variant="ghost" className="w-full justify-start gap-2 h-10">
-                  <Star className="h-4 w-4" />
-                  Update Portfolio
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Quick Actions */}
+          <Card className="glass-light">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-2 h-10"
+                onClick={() => navigate("/student/opportunities")}
+              >
+                <Building2 className="h-4 w-4" />
+                Browse Opportunities
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-2 h-10"
+                onClick={() => navigate("/student/applications")}
+              >
+                <FileText className="h-4 w-4" />
+                My Applications
+              </Button>
+              <Button variant="ghost" className="w-full justify-start gap-2 h-10">
+                <Star className="h-4 w-4" />
+                Update Portfolio
+              </Button>
+            </CardContent>
+          </Card>
 
-            {/* Performance */}
-            <Card className="glass-light">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center justify-between">
-                  <span className="flex items-center gap-2">📈 Performance</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {statsLoading ? (
-                  <>
-                    {[1, 2].map((i) => (
-                      <Skeleton key={i} className="h-8 w-full" />
-                    ))}
-                  </>
-                ) : (
-                  performance.map((item, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-muted-foreground">{item.label}</span>
-                        <span className="font-medium text-foreground">
-                          {item.suffix || `${item.value}%`}
-                        </span>
-                      </div>
-                      <Progress value={item.value} className="h-2" />
+          {/* Performance */}
+          <Card className="glass-light">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center justify-between">
+                <span className="flex items-center gap-2">📈 Performance</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {statsLoading ? (
+                <>
+                  {[1, 2].map((i) => (
+                    <Skeleton key={i} className="h-8 w-full" />
+                  ))}
+                </>
+              ) : (
+                performance.map((item, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-muted-foreground">{item.label}</span>
+                      <span className="font-medium text-foreground">
+                        {item.suffix || `${item.value}%`}
+                      </span>
                     </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
+                    <Progress value={item.value} className="h-2" />
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Achievements Preview */}
-            <Card className="glass-light">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
-                  <Trophy className="h-4 w-4" />
-                  Achievements
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <AchievementGrid showFilters={false} maxItems={8} />
-              </CardContent>
-            </Card>
-          </div>
+          {/* Achievements Preview */}
+          <Card className="glass-light">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
+                <Trophy className="h-4 w-4" />
+                Achievements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AchievementGrid showFilters={false} maxItems={8} />
+            </CardContent>
+          </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

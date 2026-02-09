@@ -40,11 +40,19 @@ import Feedback from "./pages/Feedback";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DesignSystemDemo from "./pages/DesignSystemDemo";
+import StudentLayout from "./layouts/StudentLayout";
 
 // Initialize error tracking on app load
 initializeErrorTracking();
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+});
 
 function AuthenticatedRedirect() {
   const { user, role, isLoading } = useAuth();
@@ -91,110 +99,26 @@ const AppRoutes = () => (
       <Route path="/login" element={<LoginRedirect />} />
     
     {/* Student Routes */}
-    <Route 
-      path="/student/dashboard" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentDashboard />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/opportunities" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentOpportunities />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/opportunities/:id" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentOpportunityDetails />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/applications" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentApplications />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/portfolio" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentPortfolio />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/tasks" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentTasks />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/messages" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentMessages />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/notifications" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentNotifications />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/alumni" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentAlumniConnect />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/alumni/groups" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentAlumniGroups />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/student/alumni/groups/:groupId" 
-      element={
-        <ProtectedRoute allowedRoles={["student"]}>
-          <StudentAlumniGroupDetail />
-        </ProtectedRoute>
-      } 
-    />
-     <Route 
-       path="/student/search" 
-       element={
-         <ProtectedRoute allowedRoles={["student"]}>
-           <StudentAdvancedSearch />
-         </ProtectedRoute>
-       } 
-     />
-     <Route 
-       path="/student/profile" 
-       element={
-         <ProtectedRoute allowedRoles={["student"]}>
-           <StudentProfile />
-         </ProtectedRoute>
-       } 
-     />
+    <Route element={
+      <ProtectedRoute allowedRoles={["student"]}>
+        <StudentLayout />
+      </ProtectedRoute>
+    }>
+      <Route path="/student/dashboard" element={<StudentDashboard />} />
+      <Route path="/student/opportunities" element={<StudentOpportunities />} />
+      <Route path="/student/opportunities/:id" element={<StudentOpportunityDetails />} />
+      <Route path="/student/applications" element={<StudentApplications />} />
+      <Route path="/student/portfolio" element={<StudentPortfolio />} />
+      <Route path="/student/tasks" element={<StudentTasks />} />
+      <Route path="/student/messages" element={<StudentMessages />} />
+      <Route path="/student/notifications" element={<StudentNotifications />} />
+      <Route path="/student/alumni" element={<StudentAlumniConnect />} />
+      <Route path="/student/alumni/groups" element={<StudentAlumniGroups />} />
+      <Route path="/student/alumni/groups/:groupId" element={<StudentAlumniGroupDetail />} />
+      <Route path="/student/search" element={<StudentAdvancedSearch />} />
+      <Route path="/student/profile" element={<StudentProfile />} />
+      <Route path="/student/profile/:userId" element={<StudentProfile />} />
+    </Route>
      <Route 
        path="/student/profile/:userId" 
        element={

@@ -2,8 +2,6 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Clock, CheckCircle, XCircle, AlertCircle, ExternalLink, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,10 +80,7 @@ export default function StudentApplications() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="student" />
-
-      <main className="container py-8 flex-1">
+    <div className="container py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
@@ -275,9 +270,6 @@ export default function StudentApplications() {
             </CardContent>
           </Card>
         )}
-      </main>
-
-      <Footer />
     </div>
   );
 }

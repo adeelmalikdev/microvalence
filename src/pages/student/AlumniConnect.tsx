@@ -2,18 +2,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MessageSquare, Users } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { BackButton } from "@/components/BackButton";
 import { AlumniFeed } from "@/features/alumni-connect/AlumniFeed";
  
  export default function AlumniConnect() {
   const navigate = useNavigate();
 
-   return (
-     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
-       <Navbar />
-       <main id="main-content" className="flex-1 container mx-auto px-4 py-8">
+    return (
+      <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
@@ -40,9 +36,7 @@ import { AlumniFeed } from "@/features/alumni-connect/AlumniFeed";
           </div>
         </div>
 
-         <AlumniFeed />
-       </main>
-       <Footer />
-     </div>
-   );
- }
+          <AlumniFeed />
+      </div>
+    );
+  }
