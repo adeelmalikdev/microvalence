@@ -1,8 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, Search, Briefcase } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import { BackButton } from "@/components/BackButton";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -84,10 +82,7 @@ export default function StudentTasks() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="student" />
-
-      <main className="container py-8 flex-1">
+    <div className="container py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
@@ -194,9 +189,7 @@ export default function StudentTasks() {
             ))}
           </div>
         )}
-      </main>
 
-      <Footer />
 
       {/* Submission Dialog */}
       <TaskSubmissionDialog

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
 import { BackButton } from "@/components/BackButton";
 import { Card } from "@/components/ui/card";
 import { ConversationList } from "@/components/messaging/ConversationList";
@@ -47,10 +46,7 @@ export default function StudentMessages() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="student" />
-
-      <main className="container py-8">
+    <div className="container py-8">
         {/* Back Button */}
         <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
@@ -104,7 +100,6 @@ export default function StudentMessages() {
             </div>
           </div>
         </Card>
-      </main>
     </div>
   );
 }
