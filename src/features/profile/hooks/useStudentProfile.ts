@@ -84,8 +84,8 @@
        const { data, error } = await supabase
          .from("profiles")
          .select("*")
-         .eq("user_id", targetUserId)
-         .single();
+        .eq("user_id", targetUserId)
+        .maybeSingle();
        
        if (error) throw error;
        return data as ExtendedProfile;
