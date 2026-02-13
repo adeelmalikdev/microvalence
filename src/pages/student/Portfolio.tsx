@@ -1,12 +1,13 @@
 import { BackButton } from "@/components/BackButton";
 import { useStudentPortfolio } from "@/hooks/useStudentPortfolio";
 import { useStudentProfile } from "@/features/profile/hooks/useStudentProfile";
+import { PortfolioProfileCard } from "@/components/portfolio/PortfolioProfileCard";
+import { PortfolioAchievements } from "@/components/portfolio/PortfolioAchievements";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProfileHeader } from "@/features/profile/components/ProfileHeader";
 import { AboutSection } from "@/features/profile/components/AboutSection";
 import { SkillsSection } from "@/features/profile/components/SkillsSection";
 import { ProjectsSection } from "@/features/profile/components/ProjectsSection";
@@ -18,30 +19,8 @@ import {
   Download, 
   Star, 
   CheckCircle2,
-  Trophy
 } from "lucide-react";
 import { format } from "date-fns";
-
-function PortfolioSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-6">
-        <Skeleton className="h-24 w-24 rounded-full" />
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-24" />
-        ))}
-      </div>
-      <Skeleton className="h-32" />
-      <Skeleton className="h-64" />
-    </div>
-  );
-}
 
 function StatCard({ 
   icon: Icon, 
@@ -192,7 +171,6 @@ function InternshipCard({
 }
 
 export default function StudentPortfolio() {
-  
   const { data: portfolio, isLoading: portfolioLoading } = useStudentPortfolio();
   const {
     profile,
@@ -200,9 +178,6 @@ export default function StudentPortfolio() {
     projects,
     experience,
     isLoading: profileLoading,
-    isSkillsLoading,
-    isProjectsLoading,
-    isExperienceLoading,
     isOwnProfile,
     updateProfile,
     addSkill,
@@ -213,30 +188,27 @@ export default function StudentPortfolio() {
     removeExperience,
   } = useStudentProfile();
 
-  // Only show full skeleton for initial profile load
-  const showFullSkeleton = profileLoading && !profile;
-
   return (
     <div className="container px-4 py-8">
-      {/* Back Button */}
-        <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+      <BackButton fallbackPath="/student/dashboard" className="mb-6" />
 
-        {showFullSkeleton ? (
-          <PortfolioSkeleton />
-        ) : (
-          <div className="space-y-6 max-w-5xl">
-            {/* Profile Header */}
-            {profile && (
-              <ProfileHeader
-                profile={profile}
-                isOwnProfile={isOwnProfile}
-                onSave={(updates) => updateProfile.mutate(updates)}
-                isSaving={updateProfile.isPending}
-              />
-            )}
+      <div className="space-y-6 max-w-5xl">
+        {/* Profile Card - always renders, shows skeleton when loading */}
+        <PortfolioProfileCard profile={profile} isLoading={profileLoading} />
 
-            {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-3">
+        {/* Achievement Badges & Level */}
+        <PortfolioAchievements />
+
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {portfolioLoading ? (
+            <>
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+            </>
+          ) : (
+            <>
               <StatCard 
                 icon={Briefcase} 
                 label="Completed Internships" 
@@ -252,76 +224,82 @@ export default function StudentPortfolio() {
                 label="Average Rating" 
                 value={portfolio?.averageRating?.toFixed(1) || "N/A"} 
               />
-            </div>
+            </>
+          )}
+        </div>
 
-            {/* About Section */}
-            {profile && (
-              <AboutSection
-                aboutMe={profile.about_me}
-                isOwnProfile={isOwnProfile}
-                onSave={(aboutMe) => updateProfile.mutate({ about_me: aboutMe })}
-                isSaving={updateProfile.isPending}
-              />
-            )}
-
-            {/* Skills Section */}
-            <SkillsSection
-              skills={skills}
-              isOwnProfile={isOwnProfile}
-              onAdd={(skill) => addSkill.mutate(skill)}
-              onRemove={(skillId) => removeSkill.mutate(skillId)}
-            />
-
-            {/* Projects Section */}
-            <ProjectsSection
-              projects={projects}
-              isOwnProfile={isOwnProfile}
-              onAdd={(project) => addProject.mutate(project)}
-              onRemove={(projectId) => removeProject.mutate(projectId)}
-            />
-
-            {/* Experience Section */}
-            <ExperienceSection
-              experience={experience}
-              isOwnProfile={isOwnProfile}
-              onAdd={(exp) => addExperience.mutate(exp)}
-              onRemove={(expId) => removeExperience.mutate(expId)}
-            />
-
-            {/* Internships Section */}
-            <div>
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <Award className="h-6 w-6 text-primary" />
-                Completed Internships
-              </h2>
-              
-              {portfolio?.internships && portfolio.internships.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2">
-                  {portfolio.internships.map((internship) => (
-                    <InternshipCard key={internship.id} internship={internship} />
-                  ))}
-                </div>
-              ) : (
-                <Card className="p-8 text-center border-primary/20">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                      <Briefcase className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">No Completed Internships Yet</h3>
-                      <p className="text-muted-foreground mt-1">
-                        Complete your first micro-internship to build your portfolio!
-                      </p>
-                    </div>
-                    <Button asChild>
-                      <a href="/student/opportunities">Browse Opportunities</a>
-                    </Button>
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
+        {/* About Section */}
+        {profile && (
+          <AboutSection
+            aboutMe={profile.about_me}
+            isOwnProfile={isOwnProfile}
+            onSave={(aboutMe) => updateProfile.mutate({ about_me: aboutMe })}
+            isSaving={updateProfile.isPending}
+          />
         )}
+
+        {/* Skills Section */}
+        <SkillsSection
+          skills={skills}
+          isOwnProfile={isOwnProfile}
+          onAdd={(skill) => addSkill.mutate(skill)}
+          onRemove={(skillId) => removeSkill.mutate(skillId)}
+        />
+
+        {/* Projects Section */}
+        <ProjectsSection
+          projects={projects}
+          isOwnProfile={isOwnProfile}
+          onAdd={(project) => addProject.mutate(project)}
+          onRemove={(projectId) => removeProject.mutate(projectId)}
+        />
+
+        {/* Experience Section */}
+        <ExperienceSection
+          experience={experience}
+          isOwnProfile={isOwnProfile}
+          onAdd={(exp) => addExperience.mutate(exp)}
+          onRemove={(expId) => removeExperience.mutate(expId)}
+        />
+
+        {/* Internships Section */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Award className="h-6 w-6 text-primary" />
+            Completed Internships
+          </h2>
+          
+          {portfolioLoading ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              <Skeleton className="h-48" />
+              <Skeleton className="h-48" />
+            </div>
+          ) : portfolio?.internships && portfolio.internships.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {portfolio.internships.map((internship) => (
+                <InternshipCard key={internship.id} internship={internship} />
+              ))}
+            </div>
+          ) : (
+            <Card className="p-8 text-center border-primary/20">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                  <Briefcase className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">No Completed Internships Yet</h3>
+                  <p className="text-muted-foreground mt-1">
+                    Complete your first micro-internship to build your portfolio!
+                  </p>
+                </div>
+                <Button asChild>
+                  <a href="/student/opportunities">Browse Opportunities</a>
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
