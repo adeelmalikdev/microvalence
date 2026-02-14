@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Building2, Users, CheckCircle, Plus, FileText, TrendingUp, ClipboardCheck, ArrowRight } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
+
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
