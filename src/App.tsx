@@ -33,6 +33,7 @@ import RecruiterManageApplicants from "./pages/recruiter/ManageApplicants";
 import RecruiterSubmissions from "./pages/recruiter/Submissions";
 import RecruiterMessages from "./pages/recruiter/Messages";
 import RecruiterNotifications from "./pages/recruiter/Notifications";
+import RecruiterProfile from "./pages/recruiter/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminActivities from "./pages/admin/Activities";
 import AboutUs from "./pages/AboutUs";
@@ -41,6 +42,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DesignSystemDemo from "./pages/DesignSystemDemo";
 import StudentLayout from "./layouts/StudentLayout";
+import RecruiterLayout from "./layouts/RecruiterLayout";
 import AdminLayout from "./layouts/AdminLayout";
 
 initializeErrorTracking();
@@ -125,30 +127,19 @@ const AppRoutes = () => (
       </Route>
 
       {/* Recruiter Routes */}
-      <Route
-        path="/recruiter/dashboard"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterDashboard /></ProtectedRoute>}
-      />
-      <Route
-        path="/recruiter/post"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterPostOpportunity /></ProtectedRoute>}
-      />
-      <Route
-        path="/recruiter/opportunities/:id/applicants"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterManageApplicants /></ProtectedRoute>}
-      />
-      <Route
-        path="/recruiter/submissions"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterSubmissions /></ProtectedRoute>}
-      />
-      <Route
-        path="/recruiter/messages"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterMessages /></ProtectedRoute>}
-      />
-      <Route
-        path="/recruiter/notifications"
-        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterNotifications /></ProtectedRoute>}
-      />
+      <Route element={
+        <ProtectedRoute allowedRoles={["recruiter"]}>
+          <RecruiterLayout />
+        </ProtectedRoute>
+      }>
+        <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
+        <Route path="/recruiter/post" element={<RecruiterPostOpportunity />} />
+        <Route path="/recruiter/opportunities/:id/applicants" element={<RecruiterManageApplicants />} />
+        <Route path="/recruiter/submissions" element={<RecruiterSubmissions />} />
+        <Route path="/recruiter/messages" element={<RecruiterMessages />} />
+        <Route path="/recruiter/notifications" element={<RecruiterNotifications />} />
+        <Route path="/recruiter/profile" element={<RecruiterProfile />} />
+      </Route>
 
       {/* Public Pages */}
       <Route path="/about" element={<AboutUs />} />

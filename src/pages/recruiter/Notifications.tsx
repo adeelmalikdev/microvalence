@@ -30,10 +30,8 @@ export default function RecruiterNotifications() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="recruiter" />
-
-      <main className="container py-8 flex-1">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
@@ -88,9 +86,7 @@ export default function RecruiterNotifications() {
             )}
           </CardContent>
         </Card>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }

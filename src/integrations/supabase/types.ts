@@ -634,16 +634,23 @@ export type Database = {
           about_me: string | null
           avatar_url: string | null
           bio: string | null
+          company_description: string | null
+          company_logo: string | null
+          company_name: string | null
+          company_size: string | null
+          company_website: string | null
           cover_image: string | null
           created_at: string
           deletion_requested_at: string | null
           deletion_scheduled_for: string | null
           email: string
+          founded_year: number | null
           full_name: string | null
           github_url: string | null
           gpa: number | null
           graduation_year: number | null
           id: string
+          industry: string | null
           is_deactivated: boolean | null
           language_preference: string | null
           location: string | null
@@ -662,16 +669,23 @@ export type Database = {
           about_me?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_description?: string | null
+          company_logo?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          company_website?: string | null
           cover_image?: string | null
           created_at?: string
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email: string
+          founded_year?: number | null
           full_name?: string | null
           github_url?: string | null
           gpa?: number | null
           graduation_year?: number | null
           id?: string
+          industry?: string | null
           is_deactivated?: boolean | null
           language_preference?: string | null
           location?: string | null
@@ -690,16 +704,23 @@ export type Database = {
           about_me?: string | null
           avatar_url?: string | null
           bio?: string | null
+          company_description?: string | null
+          company_logo?: string | null
+          company_name?: string | null
+          company_size?: string | null
+          company_website?: string | null
           cover_image?: string | null
           created_at?: string
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email?: string
+          founded_year?: number | null
           full_name?: string | null
           github_url?: string | null
           gpa?: number | null
           graduation_year?: number | null
           id?: string
+          industry?: string | null
           is_deactivated?: boolean | null
           language_preference?: string | null
           location?: string | null
