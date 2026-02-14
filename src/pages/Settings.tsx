@@ -80,7 +80,7 @@ export default function Settings() {
     }
   };
 
-  const dashboardPath = `/${role}/dashboard`;
+  const dashboardPath = role ? `/${role}/dashboard` : "/";
 
   return (
     <div className="min-h-screen bg-background">
