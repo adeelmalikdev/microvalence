@@ -46,10 +46,8 @@ export default function RecruiterMessages() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="recruiter" />
-
-      <main className="container py-8">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-3">
@@ -100,7 +98,7 @@ export default function RecruiterMessages() {
             </div>
           </div>
         </Card>
-      </main>
+      </div>
     </div>
   );
 }

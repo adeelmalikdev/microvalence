@@ -150,10 +150,8 @@ export default function PostOpportunity() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="recruiter" />
-
-      <main className="container py-8 max-w-4xl">
+    <div className="bg-muted/30">
+      <div className="container py-8 max-w-4xl">
         {/* Header */}
         <Button
           variant="ghost"
@@ -596,7 +594,7 @@ export default function PostOpportunity() {
             </div>
           </form>
         </Form>
-      </main>
+      </div>
     </div>
   );
 }

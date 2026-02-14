@@ -55,10 +55,8 @@ export default function RecruiterDashboard() {
   const activePostings = opportunities?.filter(o => o.status === "published") || [];
   
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="recruiter" />
-
-      <main id="main-content" className="container py-8">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
@@ -182,7 +180,7 @@ export default function RecruiterDashboard() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

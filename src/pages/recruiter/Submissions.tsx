@@ -73,10 +73,8 @@ export default function RecruiterSubmissions() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="recruiter" />
-
-      <main className="container py-8 flex-1">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
@@ -165,9 +163,7 @@ export default function RecruiterSubmissions() {
             ))}
           </div>
         )}
-      </main>
-
-      <Footer />
+      </div>
 
       {/* Review Dialog */}
       <ReviewSubmissionDialog

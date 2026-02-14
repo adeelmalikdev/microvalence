@@ -33,6 +33,7 @@ const recruiterLinks = [
   { href: "/recruiter/dashboard", label: "Dashboard" },
   { href: "/recruiter/post", label: "Post Opportunity" },
   { href: "/recruiter/submissions", label: "Reviews" },
+  { href: "/recruiter/profile", label: "Profile" },
 ];
 
 const adminLinks = [

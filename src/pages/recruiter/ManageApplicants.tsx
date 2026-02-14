@@ -73,9 +73,8 @@ export default function ManageApplicants() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted/30">
-        <Navbar userRole="recruiter" />
-        <main className="container py-8">
+      <div className="bg-muted/30">
+        <div className="container py-8">
           <Skeleton className="h-8 w-32 mb-6" />
           <Skeleton className="h-48 w-full mb-6" />
           <div className="space-y-4">
@@ -83,16 +82,15 @@ export default function ManageApplicants() {
               <Skeleton key={i} className="h-32 w-full" />
             ))}
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-muted/30">
-        <Navbar userRole="recruiter" />
-        <main className="container py-8">
+      <div className="bg-muted/30">
+        <div className="container py-8">
           <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -104,7 +102,7 @@ export default function ManageApplicants() {
               </p>
             </CardContent>
           </Card>
-        </main>
+        </div>
       </div>
     );
   }
@@ -117,10 +115,8 @@ export default function ManageApplicants() {
   const completedApplicants = applications.filter((a) => a.status === "completed");
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
-      <Navbar userRole="recruiter" />
-
-      <main className="container py-8 flex-1">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         {/* Back Button */}
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
           <ArrowLeft className="h-4 w-4" />
@@ -239,9 +235,7 @@ export default function ManageApplicants() {
             </CardContent>
           </Card>
         )}
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
