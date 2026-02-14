@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Shield,
@@ -8,21 +8,77 @@ import {
   ArrowLeft,
   Palette,
   Globe,
+  Save,
+  Github,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { DataExportButton } from "@/components/settings/DataExportButton";
 import { AccountDeletionDialog } from "@/components/settings/AccountDeletionDialog";
+import { toast } from "sonner";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, role } = useAuth();
+  const { profile, role, user } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Editable profile fields
+  const [fullName, setFullName] = useState("");
+  const [bio, setBio] = useState("");
+  const [location, setLocation] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [website, setWebsite] = useState("");
+
+  useEffect(() => {
+    if (profile) {
+      setFullName(profile.full_name || "");
+      setBio(profile.bio || "");
+      setLocation(profile.location || "");
+      setGithubUrl(profile.github_url || "");
+      setPortfolioUrl(profile.portfolio_url || "");
+      setWebsite(profile.website || "");
+    }
+  }, [profile]);
+
+  const handleSaveProfile = async () => {
+    if (!fullName.trim()) {
+      toast.error("Full name is required");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName.trim(),
+          bio: bio.trim() || null,
+          location: location.trim() || null,
+          github_url: githubUrl.trim() || null,
+          portfolio_url: portfolioUrl.trim() || null,
+          website: website.trim() || null,
+        })
+        .eq("user_id", user?.id);
+
+      if (error) throw error;
+      toast.success("Profile updated successfully!");
+    } catch {
+      toast.error("Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const dashboardPath = `/${role}/dashboard`;
 
@@ -68,7 +124,10 @@ export default function Settings() {
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Picture</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Camera className="h-5 w-5" />
+                  Profile Picture
+                </CardTitle>
                 <CardDescription>
                   Upload a profile picture to personalize your account
                 </CardDescription>
@@ -76,45 +135,116 @@ export default function Settings() {
               <CardContent>
                 <AvatarUpload
                   currentUrl={profile?.avatar_url}
-                  onUpload={() => {
-                    // Profile will be refreshed automatically
-                  }}
+                  onUpload={() => {}}
                 />
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>Personal Information</CardTitle>
                 <CardDescription>
-                  Your basic profile information
+                  Update your profile details
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Full Name</p>
-                    <p className="font-medium">{profile?.full_name || "Not set"}</p>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Your full name"
+                    />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                    <p className="font-medium">{profile?.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Role</p>
-                    <p className="font-medium capitalize">{role}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Member Since</p>
-                    <p className="font-medium">
-                      {profile?.created_at
-                        ? new Date(profile.created_at).toLocaleDateString()
-                        : "Unknown"}
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input value={profile?.email || ""} disabled />
+                    <p className="text-xs text-muted-foreground">
+                      Email cannot be changed here
                     </p>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Input value={role || ""} disabled className="capitalize" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="City, Country"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Bio / Headline</Label>
+                  <Textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="A short bio about yourself"
+                    rows={3}
+                  />
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  Social Links
+                </CardTitle>
+                <CardDescription>
+                  Add your online profiles
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="github" className="flex items-center gap-2">
+                    <Github className="h-4 w-4" /> GitHub
+                  </Label>
+                  <Input
+                    id="github"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="https://github.com/username"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="portfolio" className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> Portfolio
+                  </Label>
+                  <Input
+                    id="portfolio"
+                    value={portfolioUrl}
+                    onChange={(e) => setPortfolioUrl(e.target.value)}
+                    placeholder="https://yourportfolio.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="website" className="flex items-center gap-2">
+                    <Globe className="h-4 w-4" /> Website
+                  </Label>
+                  <Input
+                    id="website"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    placeholder="https://yourwebsite.com"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-end">
+              <Button onClick={handleSaveProfile} disabled={saving}>
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </TabsContent>
 
           {/* Security Tab */}

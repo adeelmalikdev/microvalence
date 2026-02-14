@@ -1,6 +1,6 @@
- import { useEffect } from "react";
- import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy, Eye } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 
 import { StatCard } from "@/components/StatCard";
 import { OpportunityCard } from "@/components/OpportunityCard";
@@ -93,6 +93,17 @@ export default function StudentDashboard() {
             <p className="text-muted-foreground">
               Track your micro-internship journey at IIUI SE/IT/CS.
             </p>
+            <div className="flex items-center gap-3 mt-3">
+              <Link to="/student/portfolio">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  View My Portfolio
+                </Button>
+              </Link>
+              <Link to="/settings">
+                <Button variant="ghost" size="sm">Settings</Button>
+              </Link>
+            </div>
           </div>
           <UserLevelBadge size="lg" showTitle />
         </div>
@@ -262,9 +273,13 @@ export default function StudentDashboard() {
                 <FileText className="h-4 w-4" />
                 My Applications
               </Button>
-              <Button variant="ghost" className="w-full justify-start gap-2 h-10">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-2 h-10"
+                onClick={() => navigate("/student/portfolio")}
+              >
                 <Star className="h-4 w-4" />
-                Update Portfolio
+                My Portfolio
               </Button>
             </CardContent>
           </Card>
