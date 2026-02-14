@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy, Eye } from "lucide-react";
+import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy, Eye, MapPin, Mail, Github, Globe, Edit } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
 import { StatCard } from "@/components/StatCard";
@@ -8,41 +8,45 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { useStudentStats } from "@/hooks/useStudentStats";
 import { useRecommendedOpportunities } from "@/hooks/useRecommendedOpportunities";
 import { useStudentTasks, useDeadlines } from "@/hooks/useStudentTasks";
- import { useGamification } from "@/hooks/useGamification";
- import { XPProgressBar } from "@/components/gamification/XPProgressBar";
- import { AchievementGrid } from "@/components/gamification/AchievementGrid";
- import { UserLevelBadge } from "@/components/gamification/UserLevelBadge";
+import { useGamification } from "@/hooks/useGamification";
+import { XPProgressBar } from "@/components/gamification/XPProgressBar";
+import { AchievementGrid } from "@/components/gamification/AchievementGrid";
+import { UserLevelBadge } from "@/components/gamification/UserLevelBadge";
 import { format } from "date-fns";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(" ")[0] || "Student";
+  const initials = profile?.full_name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase() || "ST";
 
   const { data: stats, isLoading: statsLoading } = useStudentStats();
   const { data: opportunities, isLoading: oppsLoading } = useRecommendedOpportunities(3);
   const { data: tasks, isLoading: tasksLoading } = useStudentTasks();
   const { data: deadlines, isLoading: deadlinesLoading } = useDeadlines();
-   const { checkAchievements, stats: gamificationStats } = useGamification();
- 
-   // Check achievements when stats change
-   useEffect(() => {
-     if (stats) {
-       checkAchievements({
-         applications_count: stats.applicationCount,
-         completed_count: stats.completedCount,
-        tasks_completed: stats.activeTasksCount || 0,
-         profile_complete: !!profile?.full_name && !!profile?.avatar_url,
-         has_avatar: !!profile?.avatar_url,
-       });
-     }
-   }, [stats, profile]);
+  const { checkAchievements, stats: gamificationStats } = useGamification();
 
-  // Build stats array from real data
+  useEffect(() => {
+    if (stats) {
+      checkAchievements({
+        applications_count: stats.applicationCount,
+        completed_count: stats.completedCount,
+        tasks_completed: stats.activeTasksCount || 0,
+        profile_complete: !!profile?.full_name && !!profile?.avatar_url,
+        has_avatar: !!profile?.avatar_url,
+      });
+    }
+  }, [stats, profile]);
+
   const statsData = [
     { 
       title: "Applications", 
@@ -83,29 +87,142 @@ export default function StudentDashboard() {
 
   return (
     <div className="container py-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 glass-light p-6 rounded-2xl">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Welcome back, {firstName}! 👋
-            </h1>
-            <p className="text-muted-foreground">
-              Track your micro-internship journey at IIUI SE/IT/CS.
-            </p>
-            <div className="flex items-center gap-3 mt-3">
-              <Link to="/student/portfolio">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Eye className="h-4 w-4" />
-                  View My Portfolio
-                </Button>
-              </Link>
-              <Link to="/settings">
-                <Button variant="ghost" size="sm">Settings</Button>
-              </Link>
+      {/* LinkedIn-Style Profile Banner */}
+      <div className="mb-8 rounded-2xl overflow-hidden border border-border bg-card shadow-sm">
+        {/* Cover Photo */}
+        <div className="relative h-40 sm:h-48 md:h-56">
+          {profile?.cover_image ? (
+            <img
+              src={profile.cover_image}
+              alt="Cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-r from-primary via-primary/80 to-accent">
+              <div className="absolute inset-0 opacity-20"
+                style={{
+                  backgroundImage: "radial-gradient(circle at 20% 50%, hsl(var(--primary-foreground) / 0.15) 1px, transparent 1px), radial-gradient(circle at 80% 20%, hsl(var(--primary-foreground) / 0.1) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px, 60px 60px",
+                }}
+              />
+            </div>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            className="absolute top-3 right-3 gap-1.5 bg-background/80 backdrop-blur-sm hover:bg-background/95"
+            onClick={() => navigate("/student/profile")}
+          >
+            <Edit className="h-3.5 w-3.5" />
+            Edit Profile
+          </Button>
+        </div>
+
+        {/* Profile Info Section */}
+        <div className="relative px-4 sm:px-6 pb-5">
+          {/* Avatar overlapping cover */}
+          <div className="-mt-14 sm:-mt-16 mb-3">
+            <div className="relative inline-block">
+              <Avatar className="h-24 w-24 sm:h-28 sm:w-28 border-4 border-background shadow-lg">
+                <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
+                <AvatarFallback className="text-2xl sm:text-3xl font-bold bg-primary text-primary-foreground">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-success border-2 border-background" />
             </div>
           </div>
-          <UserLevelBadge size="lg" showTitle />
+
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            {/* Name, Bio, Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                  {profile?.full_name || "Complete Your Profile"}
+                </h1>
+                {profile?.full_name && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    <CheckCircle className="h-3 w-3" />
+                    Verified
+                  </span>
+                )}
+              </div>
+
+              <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+                {profile?.bio || "Add your headline in profile settings"}
+              </p>
+
+              <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground mt-2">
+                {profile?.location && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {profile.location}
+                  </span>
+                )}
+                {profile?.university && (
+                  <span className="flex items-center gap-1">
+                    🎓 {profile.university}
+                  </span>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                <Link to="/student/portfolio">
+                  <Button size="sm" className="gap-1.5">
+                    <Eye className="h-3.5 w-3.5" />
+                    View My Portfolio
+                  </Button>
+                </Link>
+                <div className="flex items-center gap-1">
+                  {profile?.github_url && (
+                    <a href={profile.github_url} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Github className="h-4 w-4" />
+                      </Button>
+                    </a>
+                  )}
+                  {profile?.portfolio_url && (
+                    <a href={profile.portfolio_url} target="_blank" rel="noopener noreferrer">
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Globe className="h-4 w-4" />
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats (desktop) */}
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="text-center px-4 py-2 rounded-lg bg-muted/50">
+                <div className="text-lg font-bold text-primary">{statsLoading ? "..." : (stats?.applicationCount || 0)}</div>
+                <div className="text-xs text-muted-foreground">Applications</div>
+              </div>
+              <div className="text-center px-4 py-2 rounded-lg bg-muted/50">
+                <UserLevelBadge size="sm" />
+              </div>
+              <div className="text-center px-4 py-2 rounded-lg bg-muted/50">
+                <div className="text-lg font-bold text-primary">{gamificationStats?.streak_days || 0} 🔥</div>
+                <div className="text-xs text-muted-foreground">Day Streak</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile stats */}
+          <div className="grid grid-cols-3 gap-2 mt-4 lg:hidden">
+            <div className="text-center py-2 rounded-lg bg-muted/50">
+              <div className="text-base font-bold text-primary">{statsLoading ? "..." : (stats?.applicationCount || 0)}</div>
+              <div className="text-xs text-muted-foreground">Applications</div>
+            </div>
+            <div className="text-center py-2 rounded-lg bg-muted/50 flex items-center justify-center">
+              <UserLevelBadge size="sm" />
+            </div>
+            <div className="text-center py-2 rounded-lg bg-muted/50">
+              <div className="text-base font-bold text-primary">{gamificationStats?.streak_days || 0} 🔥</div>
+              <div className="text-xs text-muted-foreground">Streak</div>
+            </div>
+          </div>
         </div>
       </div>
 
