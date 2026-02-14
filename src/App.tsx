@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipLink } from "@/components/accessibility/SkipLink";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -25,8 +25,8 @@ import StudentNotifications from "./pages/student/Notifications";
 import StudentAlumniConnect from "./pages/student/AlumniConnect";
 import StudentAlumniGroups from "./pages/student/AlumniGroups";
 import StudentAlumniGroupDetail from "./pages/student/AlumniGroupDetail";
- import StudentAdvancedSearch from "./features/search/AdvancedSearch";
- import StudentProfile from "./pages/student/Profile";
+import StudentAdvancedSearch from "./features/search/AdvancedSearch";
+import StudentProfile from "./pages/student/Profile";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import RecruiterPostOpportunity from "./pages/recruiter/PostOpportunity";
 import RecruiterManageApplicants from "./pages/recruiter/ManageApplicants";
@@ -41,22 +41,21 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import DesignSystemDemo from "./pages/DesignSystemDemo";
 import StudentLayout from "./layouts/StudentLayout";
+import AdminLayout from "./layouts/AdminLayout";
 
-// Initialize error tracking on app load
 initializeErrorTracking();
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
     },
   },
 });
 
 function AuthenticatedRedirect() {
   const { user, role, isLoading } = useAuth();
-  
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -64,17 +63,14 @@ function AuthenticatedRedirect() {
       </div>
     );
   }
-  
   if (user && role) {
     return <Navigate to={`/${role}/dashboard`} replace />;
   }
-  
   return <Landing />;
 }
 
 function LoginRedirect() {
   const { user, role, isLoading } = useAuth();
-  
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -82,11 +78,9 @@ function LoginRedirect() {
       </div>
     );
   }
-  
   if (user && role) {
     return <Navigate to={`/${role}/dashboard`} replace />;
   }
-  
   return <Login />;
 }
 
@@ -97,123 +91,76 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<AuthenticatedRedirect />} />
       <Route path="/login" element={<LoginRedirect />} />
-    
-    {/* Student Routes */}
-    <Route element={
-      <ProtectedRoute allowedRoles={["student"]}>
-        <StudentLayout />
-      </ProtectedRoute>
-    }>
-      <Route path="/student/dashboard" element={<StudentDashboard />} />
-      <Route path="/student/opportunities" element={<StudentOpportunities />} />
-      <Route path="/student/opportunities/:id" element={<StudentOpportunityDetails />} />
-      <Route path="/student/applications" element={<StudentApplications />} />
-      <Route path="/student/portfolio" element={<StudentPortfolio />} />
-      <Route path="/student/tasks" element={<StudentTasks />} />
-      <Route path="/student/messages" element={<StudentMessages />} />
-      <Route path="/student/notifications" element={<StudentNotifications />} />
-      <Route path="/student/alumni" element={<StudentAlumniConnect />} />
-      <Route path="/student/alumni/groups" element={<StudentAlumniGroups />} />
-      <Route path="/student/alumni/groups/:groupId" element={<StudentAlumniGroupDetail />} />
-      <Route path="/student/search" element={<StudentAdvancedSearch />} />
-      <Route path="/student/profile" element={<StudentProfile />} />
-      <Route path="/student/profile/:userId" element={<StudentProfile />} />
-    </Route>
-     <Route 
-       path="/student/profile/:userId" 
-       element={
-         <ProtectedRoute allowedRoles={["student"]}>
-           <StudentProfile />
-         </ProtectedRoute>
-       } 
-     />
-    
-    {/* Recruiter Routes */}
-    <Route 
-      path="/recruiter/dashboard" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterDashboard />
+
+      {/* Student Routes */}
+      <Route element={
+        <ProtectedRoute allowedRoles={["student"]}>
+          <StudentLayout />
         </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/recruiter/post" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterPostOpportunity />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/recruiter/opportunities/:id/applicants" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterManageApplicants />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/recruiter/submissions" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterSubmissions />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/recruiter/messages" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterMessages />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/recruiter/notifications" 
-      element={
-        <ProtectedRoute allowedRoles={["recruiter"]}>
-          <RecruiterNotifications />
-        </ProtectedRoute>
-      } 
-    />
-    
-    {/* Admin Routes */}
-    <Route 
-      path="/admin/dashboard" 
-      element={
+      }>
+        <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/opportunities" element={<StudentOpportunities />} />
+        <Route path="/student/opportunities/:id" element={<StudentOpportunityDetails />} />
+        <Route path="/student/applications" element={<StudentApplications />} />
+        <Route path="/student/portfolio" element={<StudentPortfolio />} />
+        <Route path="/student/tasks" element={<StudentTasks />} />
+        <Route path="/student/messages" element={<StudentMessages />} />
+        <Route path="/student/notifications" element={<StudentNotifications />} />
+        <Route path="/student/alumni" element={<StudentAlumniConnect />} />
+        <Route path="/student/alumni/groups" element={<StudentAlumniGroups />} />
+        <Route path="/student/alumni/groups/:groupId" element={<StudentAlumniGroupDetail />} />
+        <Route path="/student/search" element={<StudentAdvancedSearch />} />
+        <Route path="/student/profile" element={<StudentProfile />} />
+        <Route path="/student/profile/:userId" element={<StudentProfile />} />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <AdminDashboard />
+          <AdminLayout />
         </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/admin/activities" 
-      element={
-        <ProtectedRoute allowedRoles={["admin"]}>
-          <AdminActivities />
-        </ProtectedRoute>
-      } 
-    />
-    
-    {/* Public Pages */}
-    <Route path="/about" element={<AboutUs />} />
-    <Route path="/feedback" element={<Feedback />} />
-    <Route path="/design-system" element={<DesignSystemDemo />} />
-    
-    {/* Settings - Available to all authenticated users */}
-    <Route 
-      path="/settings" 
-      element={
-        <ProtectedRoute>
-          <Settings />
-        </ProtectedRoute>
-      } 
-    />
-    
-    {/* Catch-all */}
-    <Route path="*" element={<NotFound />} />
-  </Routes>
+      }>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/activities" element={<AdminActivities />} />
+      </Route>
+
+      {/* Recruiter Routes */}
+      <Route
+        path="/recruiter/dashboard"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterDashboard /></ProtectedRoute>}
+      />
+      <Route
+        path="/recruiter/post"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterPostOpportunity /></ProtectedRoute>}
+      />
+      <Route
+        path="/recruiter/opportunities/:id/applicants"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterManageApplicants /></ProtectedRoute>}
+      />
+      <Route
+        path="/recruiter/submissions"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterSubmissions /></ProtectedRoute>}
+      />
+      <Route
+        path="/recruiter/messages"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterMessages /></ProtectedRoute>}
+      />
+      <Route
+        path="/recruiter/notifications"
+        element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterNotifications /></ProtectedRoute>}
+      />
+
+      {/* Public Pages */}
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/feedback" element={<Feedback />} />
+      <Route path="/design-system" element={<DesignSystemDemo />} />
+
+      {/* Settings */}
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   </>
 );
 
@@ -224,10 +171,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          {import.meta.env.DEV && <A11yChecker />}
-          <OfflineIndicator />
-          <AppRoutes />
-          <CookieConsent />
+          <ErrorBoundary>
+            {import.meta.env.DEV && <A11yChecker />}
+            <OfflineIndicator />
+            <AppRoutes />
+            <CookieConsent />
+          </ErrorBoundary>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

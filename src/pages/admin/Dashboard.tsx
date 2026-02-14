@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Users, Building2, TrendingUp, AlertTriangle } from "lucide-react";
-import { Navbar } from "@/components/Navbar";
+
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,10 +44,8 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="admin" />
-
-      <main className="container py-8">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -135,7 +133,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
