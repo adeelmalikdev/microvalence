@@ -87,39 +87,42 @@ export default function StudentDashboard() {
 
   return (
     <div className="container py-8">
-      {/* Simple Profile Header */}
+      {/* Profile Header - Left aligned with level badge on right */}
       <div className="mb-8">
-        <div className="flex flex-col items-center text-center glass-light p-6 rounded-2xl">
-          {/* Profile Image */}
-          <Avatar className="h-24 w-24 border-4 border-background shadow-lg mb-3">
-            <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
-            <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+        <div className="flex items-start justify-between glass-light p-6 rounded-2xl">
+          {/* Left: Avatar + Name + Headline */}
+          <div className="flex items-start gap-4">
+            {/* Profile Image */}
+            <Avatar className="h-20 w-20 border-4 border-background shadow-lg flex-shrink-0">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
+              <AvatarFallback className="text-xl font-bold bg-primary text-primary-foreground">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
-          {/* Name */}
-          <h1 className="text-2xl font-bold text-foreground">
-            {profile?.full_name || firstName}
-          </h1>
+            <div className="min-w-0">
+              {/* Name */}
+              <h1 className="text-2xl font-bold text-foreground">
+                {profile?.full_name || firstName}
+              </h1>
 
-          {/* Bio / Headline */}
-          <p className="text-sm text-muted-foreground mt-1 max-w-md">
-            {profile?.bio || "Track your micro-internship journey at IIUI SE/IT/CS."}
-          </p>
+              {/* Headline / Bio */}
+              <p className="text-sm text-muted-foreground mt-1">
+                {profile?.bio || "Add your headline in profile settings"}
+              </p>
 
-          {/* Quick Actions */}
-          <div className="flex items-center gap-3 mt-4">
-            <Link to="/student/portfolio">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Eye className="h-4 w-4" />
-                View My Portfolio
-              </Button>
-            </Link>
-            <Link to="/settings">
-              <Button variant="ghost" size="sm">Settings</Button>
-            </Link>
+              {/* Portfolio link */}
+              <Link to="/student/portfolio" className="mt-3 inline-block">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  View My Portfolio
+                </Button>
+              </Link>
+            </div>
           </div>
+
+          {/* Right: Level Badge */}
+          <UserLevelBadge size="lg" showTitle />
         </div>
       </div>
 
