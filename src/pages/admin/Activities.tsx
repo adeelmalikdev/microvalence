@@ -1,4 +1,3 @@
-import { Navbar } from "@/components/Navbar";
 import { useRecentActivity } from "@/hooks/useAdminData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,16 +10,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserPlus, FileText, Briefcase, CheckCircle, XCircle, Activity } from "lucide-react";
+import { UserPlus, FileText, Briefcase, Activity } from "lucide-react";
 
-const activityIcons = {
+const activityIcons: Record<string, typeof Activity> = {
   registration: UserPlus,
   application: FileText,
   opportunity: Briefcase,
   status_change: Activity,
 };
 
-const activityColors = {
+const activityColors: Record<string, string> = {
   registration: "bg-info/10 text-info",
   application: "bg-warning/10 text-warning",
   opportunity: "bg-success/10 text-success",
@@ -31,10 +30,8 @@ export default function AdminActivities() {
   const { data: activities, isLoading } = useRecentActivity();
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <Navbar userRole="admin" />
-
-      <main className="container py-8">
+    <div className="bg-muted/30">
+      <div className="container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Platform Activities</h1>
           <p className="text-muted-foreground">Monitor all platform activities in real-time</p>
@@ -71,7 +68,6 @@ export default function AdminActivities() {
                     const Icon = activityIcons[activity.type] || Activity;
                     const colorClass = activityColors[activity.type] || "bg-muted text-muted-foreground";
                     
-                    // Determine badge label
                     let typeLabel = activity.type.replace("_", " ");
                     if (activity.event.includes("accepted")) {
                       typeLabel = "accepted";
@@ -106,7 +102,7 @@ export default function AdminActivities() {
             )}
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   );
 }
