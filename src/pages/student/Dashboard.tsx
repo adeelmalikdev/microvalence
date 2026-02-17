@@ -74,9 +74,9 @@ export default function StudentDashboard() {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {/* Avatar */}
-            <Avatar className="h-20 w-20 border-4 border-background shadow-lg shrink-0">
+            <Avatar className="h-28 w-28 border-4 border-background shadow-lg shrink-0">
               <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
-              <AvatarFallback className="text-xl font-bold bg-primary text-primary-foreground">
+              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
                 {initials}
               </AvatarFallback>
             </Avatar>
