@@ -30,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { DataExportButton } from "@/components/settings/DataExportButton";
@@ -39,6 +40,7 @@ import { toast } from "sonner";
 export default function Settings() {
   const navigate = useNavigate();
   const { profile, role, user, refreshProfile } = useAuth();
+  const queryClient = useQueryClient();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -124,6 +126,8 @@ export default function Settings() {
       if (error) throw error;
 
       await refreshProfile();
+      // Invalidate Portfolio's separate profile query so it re-fetches
+      queryClient.invalidateQueries({ queryKey: ["student-profile"] });
       setSaveSuccess(true);
       toast.success("Profile saved successfully!");
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -136,6 +140,7 @@ export default function Settings() {
 
   const handleAvatarUpload = async () => {
     await refreshProfile();
+    queryClient.invalidateQueries({ queryKey: ["student-profile"] });
   };
 
   const dashboardPath = role ? `/${role}/dashboard` : "/student/dashboard";
