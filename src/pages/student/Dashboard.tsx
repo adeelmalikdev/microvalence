@@ -91,35 +91,32 @@ export default function StudentDashboard() {
       <div className="mb-8">
         <div className="flex items-start justify-between glass-light p-6 rounded-2xl">
           {/* Left: Avatar + Name + Headline */}
-          <div className="flex items-start gap-5">
-            {/* Profile Image + Portfolio Button (vertically aligned) */}
-            <div className="flex flex-col items-center gap-3 flex-shrink-0">
-              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-                <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
-                <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+          <div className="flex flex-col items-start gap-3">
+            {/* Profile Image */}
+            <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
+              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
-              <Link to="/student/portfolio">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Eye className="h-4 w-4" />
-                  View My Portfolio
-                </Button>
-              </Link>
-            </div>
+            {/* Name */}
+            <h1 className="text-2xl font-bold text-foreground">
+              {profile?.full_name || firstName}
+            </h1>
 
-            <div className="min-w-0 pt-1">
-              {/* Name */}
-              <h1 className="text-2xl font-bold text-foreground">
-                {profile?.full_name || firstName}
-              </h1>
+            {/* Headline / Bio */}
+            <p className="text-sm text-muted-foreground -mt-1">
+              {profile?.bio || "Add your headline in profile settings"}
+            </p>
 
-              {/* Headline / Bio */}
-              <p className="text-sm text-muted-foreground mt-1">
-                {profile?.bio || "Add your headline in profile settings"}
-              </p>
-            </div>
+            {/* Portfolio Button */}
+            <Link to="/student/portfolio">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Eye className="h-4 w-4" />
+                View My Portfolio
+              </Button>
+            </Link>
           </div>
 
           {/* Right: Level Badge */}
