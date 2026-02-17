@@ -10,6 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 
 import { useAuth } from "@/hooks/useAuth";
 import { useRecruiterStats, useRecruiterOpportunities, useRecruiterApplicationTrends } from "@/hooks/useRecruiterData";
 import { usePendingSubmissionsCount } from "@/hooks/useRecruiterSubmissions";
+import { AvatarUpload } from "@/components/profile/AvatarUpload";
 
 export default function RecruiterDashboard() {
   const navigate = useNavigate();
@@ -59,11 +60,18 @@ export default function RecruiterDashboard() {
       <div className="container py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Welcome, {profile?.full_name || "Recruiter"}
-            </h1>
-            <p className="text-muted-foreground">Manage micro-internships for IIUI SE/IT/CS students</p>
+          <div className="flex items-center gap-4">
+            <AvatarUpload
+              currentUrl={profile?.avatar_url}
+              onUpload={() => {}}
+              size="lg"
+            />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-1">
+                Welcome, {profile?.full_name || "Recruiter"}
+              </h1>
+              <p className="text-muted-foreground">{profile?.bio || "Manage your micro-internship opportunities"}</p>
+            </div>
           </div>
           <Button className="gap-2" onClick={() => navigate("/recruiter/post")}>
             <Plus className="h-4 w-4" />

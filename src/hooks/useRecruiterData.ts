@@ -220,7 +220,7 @@ export function useCreateOpportunity() {
   return useMutation({
     mutationFn: async (data: {
       opportunity: Omit<TablesInsert<"opportunities">, "recruiter_id">;
-      tasks: { title: string; description: string; due_days: number }[];
+      tasks: { title: string; description: string; due_days: number; attachment_url?: string }[];
     }) => {
       if (!user?.id) throw new Error("User not authenticated");
 
@@ -244,6 +244,7 @@ export function useCreateOpportunity() {
           description: task.description,
           due_days: task.due_days,
           order_index: index,
+          attachment_url: task.attachment_url || null,
         }));
 
         const { error: taskError } = await supabase

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ArrowLeft, Plus, Trash2, Save, Send } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Send, Upload, FileText, X, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -65,6 +66,28 @@ export default function PostOpportunity() {
   const { profile } = useAuth();
   const createOpportunity = useCreateOpportunity();
   const [skillInput, setSkillInput] = useState("");
+  const [taskAttachments, setTaskAttachments] = useState<Record<number, { file: File; name: string } | null>>({});
+  const [uploadingTask, setUploadingTask] = useState<number | null>(null);
+  const fileInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  const handleTaskFileDrop = useCallback((index: number, e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === "application/pdf" && file.size <= 10 * 1024 * 1024) {
+      setTaskAttachments(prev => ({ ...prev, [index]: { file, name: file.name } }));
+    } else {
+      toast({ title: "Invalid file", description: "Only PDF files up to 10MB are allowed", variant: "destructive" });
+    }
+  }, [toast]);
+
+  const handleTaskFileSelect = useCallback((index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === "application/pdf" && file.size <= 10 * 1024 * 1024) {
+      setTaskAttachments(prev => ({ ...prev, [index]: { file, name: file.name } }));
+    } else if (file) {
+      toast({ title: "Invalid file", description: "Only PDF files up to 10MB are allowed", variant: "destructive" });
+    }
+  }, [toast]);
 
   const form = useForm<OpportunityFormData>({
     resolver: zodResolver(opportunitySchema),
@@ -105,12 +128,36 @@ export default function PostOpportunity() {
     );
   };
 
+  const uploadTaskAttachment = async (taskIndex: number, userId: string): Promise<string | null> => {
+    const attachment = taskAttachments[taskIndex];
+    if (!attachment) return null;
+    const filePath = `${userId}/${Date.now()}-${attachment.name}`;
+    const { error } = await supabase.storage.from("opportunity-task-attachments").upload(filePath, attachment.file);
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from("opportunity-task-attachments").getPublicUrl(filePath);
+    return urlData.publicUrl;
+  };
+
   const onSubmit = async (data: OpportunityFormData, status: "draft" | "published") => {
     try {
       const validTasks = data.tasks.filter(
         (task): task is { title: string; description: string; due_days: number } =>
           !!task.title && !!task.description && !!task.due_days
       );
+
+      // Upload task attachments first
+      const taskAttachmentUrls: Record<number, string | null> = {};
+      for (const [indexStr] of Object.entries(taskAttachments)) {
+        const idx = parseInt(indexStr);
+        if (taskAttachments[idx]) {
+          taskAttachmentUrls[idx] = await uploadTaskAttachment(idx, profile?.user_id || "anon");
+        }
+      }
+
+      const tasksWithAttachments = validTasks.map((task, idx) => ({
+        ...task,
+        attachment_url: taskAttachmentUrls[idx] || undefined,
+      }));
 
       await createOpportunity.mutateAsync({
         opportunity: {
@@ -126,7 +173,7 @@ export default function PostOpportunity() {
           deadline: data.deadline ? new Date(data.deadline).toISOString() : null,
           status,
         },
-        tasks: validTasks,
+        tasks: tasksWithAttachments,
       });
 
       toast({
@@ -534,6 +581,44 @@ export default function PostOpportunity() {
                               </FormItem>
                             )}
                           />
+
+                          {/* PDF Attachment Drop Zone */}
+                          <div
+                            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary"); }}
+                            onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary"); }}
+                            onDrop={(e) => { e.currentTarget.classList.remove("border-primary"); handleTaskFileDrop(index, e); }}
+                            className="border-2 border-dashed rounded-lg p-3 text-center transition-colors border-muted-foreground/25 hover:border-primary/50 cursor-pointer"
+                            onClick={() => fileInputRefs.current[index]?.click()}
+                          >
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              className="hidden"
+                              ref={(el) => { fileInputRefs.current[index] = el; }}
+                              onChange={(e) => handleTaskFileSelect(index, e)}
+                            />
+                            {taskAttachments[index] ? (
+                              <div className="flex items-center justify-center gap-2 text-sm">
+                                <FileText className="h-4 w-4 text-primary" />
+                                <span className="text-foreground font-medium truncate max-w-[200px]">{taskAttachments[index]!.name}</span>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-5 w-5"
+                                  onClick={(e) => { e.stopPropagation(); setTaskAttachments(prev => { const n = {...prev}; delete n[index]; return n; }); }}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                <Upload className="h-5 w-5" />
+                                <span className="text-xs">Drag & drop a PDF or click to browse</span>
+                                <span className="text-xs opacity-60">Max 10MB</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <Button
                           type="button"

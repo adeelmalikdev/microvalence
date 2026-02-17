@@ -967,6 +967,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          attachment_url: string | null
           created_at: string
           description: string | null
           due_days: number | null
@@ -977,6 +978,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attachment_url?: string | null
           created_at?: string
           description?: string | null
           due_days?: number | null
@@ -987,6 +989,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attachment_url?: string | null
           created_at?: string
           description?: string | null
           due_days?: number | null
