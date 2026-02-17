@@ -29,8 +29,8 @@ export default function StudentDashboard() {
     .join("")
     .toUpperCase() || "ST";
 
-  const linkedinUrl = (profile as any)?.linkedin_url;
-  const customLink = (profile as any)?.custom_link;
+  const linkedinUrl = profile?.linkedin_url;
+  const customLink = profile?.custom_link;
 
   const { data: stats, isLoading: statsLoading } = useStudentStats();
   const { data: opportunities, isLoading: oppsLoading } = useRecommendedOpportunities(3);

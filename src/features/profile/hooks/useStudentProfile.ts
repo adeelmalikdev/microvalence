@@ -65,11 +65,21 @@
    location: string | null;
    github_url: string | null;
    portfolio_url: string | null;
- status: "freshman" | "sophomore" | "junior" | "senior" | "graduated" | "alumni" | null;
- semester: number | null;
- website: string | null;
- resume_url: string | null;
- }
+  status: string | null;
+  semester: number | null;
+  website: string | null;
+  resume_url: string | null;
+  linkedin_url: string | null;
+  custom_link: string | null;
+  phone: string | null;
+  company_name: string | null;
+  company_logo: string | null;
+  company_website: string | null;
+  company_description: string | null;
+  company_size: string | null;
+  industry: string | null;
+  founded_year: number | null;
+}
  
  export function useStudentProfile(userId?: string) {
    const { user } = useAuth();

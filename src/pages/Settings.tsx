@@ -67,18 +67,18 @@ export default function Settings() {
       setFullName(profile.full_name || "");
       setBio(profile.bio || "");
       setEmail(profile.email || user?.email || "");
-      setPhone((profile as any).phone || "");
+      setPhone(profile.phone || "");
       setLocation(profile.location || "");
       setGithubUrl(profile.github_url || "");
-      setLinkedinUrl((profile as any).linkedin_url || "");
+      setLinkedinUrl(profile.linkedin_url || "");
       setPortfolioUrl(profile.portfolio_url || "");
       setWebsite(profile.website || "");
-      setCustomLink((profile as any).custom_link || "");
+      setCustomLink(profile.custom_link || "");
       setUniversity(profile.university || "");
       setMajor(profile.major || "");
-      setSemester((profile as any).semester?.toString() || "");
+      setSemester(profile.semester?.toString() || "");
       setGraduationYear(profile.graduation_year?.toString() || "");
-      setStatus((profile as any).status || "");
+      setStatus(profile.status || "");
     }
   }, [profile, user]);
 
@@ -120,7 +120,7 @@ export default function Settings() {
           semester: semester ? parseInt(semester) : null,
           graduation_year: graduationYear ? parseInt(graduationYear) : null,
           status: status || null,
-        } as any)
+        })
         .eq("user_id", user?.id);
 
       if (error) throw error;
