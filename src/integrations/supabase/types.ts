@@ -249,6 +249,7 @@ export type Database = {
           author_id: string
           comments_count: number | null
           content: string
+          cover_image: string | null
           created_at: string | null
           id: string
           likes_count: number | null
@@ -261,6 +262,7 @@ export type Database = {
           author_id: string
           comments_count?: number | null
           content: string
+          cover_image?: string | null
           created_at?: string | null
           id?: string
           likes_count?: number | null
@@ -273,6 +275,7 @@ export type Database = {
           author_id?: string
           comments_count?: number | null
           content?: string
+          cover_image?: string | null
           created_at?: string | null
           id?: string
           likes_count?: number | null
