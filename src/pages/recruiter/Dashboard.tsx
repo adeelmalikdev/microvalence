@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecruiterStats, useRecruiterOpportunities, useRecruiterApplicationTrends } from "@/hooks/useRecruiterData";
 import { usePendingSubmissionsCount } from "@/hooks/useRecruiterSubmissions";
-import { AvatarUpload } from "@/components/profile/AvatarUpload";
 
 export default function RecruiterDashboard() {
   const navigate = useNavigate();
@@ -61,11 +61,10 @@ export default function RecruiterDashboard() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <AvatarUpload
-              currentUrl={profile?.avatar_url}
-              onUpload={() => {}}
-              size="lg"
-            />
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Recruiter"} />
+              <AvatarFallback className="text-xl font-bold">{(profile?.full_name || "R").charAt(0)}</AvatarFallback>
+            </Avatar>
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-1">
                 Welcome, {profile?.full_name || "Recruiter"}
