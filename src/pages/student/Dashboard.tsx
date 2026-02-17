@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy, Eye } from "lucide-react";
+import { FileText, Clock, CheckCircle, Star, ArrowRight, Building2, Trophy, Eye, Github, Globe, Linkedin, Link as LinkIcon } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
 import { StatCard } from "@/components/StatCard";
@@ -22,18 +22,21 @@ import { format } from "date-fns";
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const firstName = profile?.full_name?.split(" ")[0] || "Student";
+  const displayName = profile?.full_name || "Student";
   const initials = profile?.full_name
     ?.split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase() || "ST";
 
+  const linkedinUrl = (profile as any)?.linkedin_url;
+  const customLink = (profile as any)?.custom_link;
+
   const { data: stats, isLoading: statsLoading } = useStudentStats();
   const { data: opportunities, isLoading: oppsLoading } = useRecommendedOpportunities(3);
   const { data: tasks, isLoading: tasksLoading } = useStudentTasks();
   const { data: deadlines, isLoading: deadlinesLoading } = useDeadlines();
-  const { checkAchievements, stats: gamificationStats } = useGamification();
+  const { checkAchievements } = useGamification();
 
   useEffect(() => {
     if (stats) {
@@ -48,35 +51,14 @@ export default function StudentDashboard() {
   }, [stats, profile]);
 
   const statsData = [
-    { 
-      title: "Applications", 
-      value: statsLoading ? "..." : (stats?.applicationCount || 0), 
-      icon: FileText, 
-      iconColor: "text-info" 
-    },
-    { 
-      title: "Active Tasks", 
-      value: statsLoading ? "..." : (stats?.activeTasksCount || 0), 
-      icon: Clock, 
-      iconColor: "text-warning" 
-    },
-    { 
-      title: "Completed", 
-      value: statsLoading ? "..." : (stats?.completedCount || 0), 
-      icon: CheckCircle, 
-      iconColor: "text-success" 
-    },
-    { 
-      title: "Feedback Score", 
-      value: statsLoading ? "..." : (stats?.averageRating?.toFixed(1) || "N/A"), 
-      icon: Star, 
-      iconColor: "text-warning" 
-    },
+    { title: "Applications", value: statsLoading ? "..." : (stats?.applicationCount || 0), icon: FileText, iconColor: "text-info" },
+    { title: "Active Tasks", value: statsLoading ? "..." : (stats?.activeTasksCount || 0), icon: Clock, iconColor: "text-warning" },
+    { title: "Completed", value: statsLoading ? "..." : (stats?.completedCount || 0), icon: CheckCircle, iconColor: "text-success" },
+    { title: "Feedback Score", value: statsLoading ? "..." : (stats?.averageRating?.toFixed(1) || "N/A"), icon: Star, iconColor: "text-warning" },
   ];
 
-  // Calculate performance metrics from stats
-  const completionRate = stats && stats.applicationCount > 0 
-    ? Math.round((stats.completedCount / stats.applicationCount) * 100) 
+  const completionRate = stats && stats.applicationCount > 0
+    ? Math.round((stats.completedCount / stats.applicationCount) * 100)
     : 0;
   const ratingPercent = stats?.averageRating ? Math.round((stats.averageRating / 5) * 100) : 0;
 
@@ -87,27 +69,27 @@ export default function StudentDashboard() {
 
   return (
     <div className="container py-8">
-      {/* Profile Header - Left aligned with level badge on right */}
+      {/* Profile Header */}
       <div className="mb-8">
         <div className="flex items-start justify-between glass-light p-6 rounded-2xl">
-          {/* Left: Avatar + Name + Headline */}
+          {/* Left: Avatar + Name + Headline + Links */}
           <div className="flex flex-col items-start gap-3">
             {/* Profile Image */}
             <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-              <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || "Profile"} />
+              <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
               <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
                 {initials}
               </AvatarFallback>
             </Avatar>
 
-            {/* Name */}
+            {/* Name — from Settings full_name */}
             <h1 className="text-2xl font-bold text-foreground">
-              {profile?.full_name || firstName}
+              {displayName}
             </h1>
 
-            {/* Headline / Bio */}
+            {/* Headline / Bio — from Settings bio */}
             <p className="text-sm text-muted-foreground -mt-1">
-              {profile?.bio || "Add your headline in profile settings"}
+              {profile?.bio || "Add your headline in Settings → Account"}
             </p>
 
             {/* Portfolio Button */}
@@ -117,6 +99,42 @@ export default function StudentDashboard() {
                 View My Portfolio
               </Button>
             </Link>
+
+            {/* Social Links — from Settings */}
+            {(linkedinUrl || profile?.github_url || profile?.portfolio_url || profile?.website || customLink) && (
+              <div className="flex items-center gap-2 mt-1">
+                {linkedinUrl && (
+                  <a href={linkedinUrl} target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                )}
+                {profile?.github_url && (
+                  <a href={profile.github_url} target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                    <Github className="h-4 w-4" />
+                  </a>
+                )}
+                {profile?.portfolio_url && (
+                  <a href={profile.portfolio_url} target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                    <Globe className="h-4 w-4" />
+                  </a>
+                )}
+                {profile?.website && (
+                  <a href={profile.website} target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                    <Globe className="h-4 w-4" />
+                  </a>
+                )}
+                {customLink && (
+                  <a href={customLink} target="_blank" rel="noopener noreferrer"
+                    className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                    <LinkIcon className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right: Level Badge */}
@@ -148,9 +166,9 @@ export default function StudentDashboard() {
                 <CardTitle className="text-lg font-semibold">Recommended Micro-Internships</CardTitle>
                 <p className="text-sm text-muted-foreground">Based on your skills and interests</p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="gap-1 text-muted-foreground hover:text-foreground"
                 onClick={() => navigate("/student/opportunities")}
               >
@@ -160,11 +178,7 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {oppsLoading ? (
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-24 w-full" />
-                  ))}
-                </>
+                [1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full" />)
               ) : opportunities && opportunities.length > 0 ? (
                 opportunities.map((opp) => (
                   <OpportunityCard
@@ -193,9 +207,9 @@ export default function StudentDashboard() {
                 <CardTitle className="text-lg font-semibold">Ongoing Tasks</CardTitle>
                 <p className="text-sm text-muted-foreground">Track your active micro-internship tasks</p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="gap-1 text-muted-foreground hover:text-foreground"
                 onClick={() => navigate("/student/tasks")}
               >
@@ -205,11 +219,7 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {tasksLoading ? (
-                <>
-                  {[1, 2].map((i) => (
-                    <Skeleton key={i} className="h-20 w-full" />
-                  ))}
-                </>
+                [1, 2].map((i) => <Skeleton key={i} className="h-20 w-full" />)
               ) : tasks && tasks.length > 0 ? (
                 tasks.slice(0, 3).map((task) => (
                   <TaskCardItem
@@ -241,22 +251,14 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {deadlinesLoading ? (
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="h-10 w-full" />
-                  ))}
-                </>
+                [1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)
               ) : deadlines && deadlines.length > 0 ? (
                 deadlines.map((deadline) => (
                   <div key={deadline.id} className="flex items-start gap-3">
-                    <div className={`mt-1.5 w-2 h-2 rounded-full ${
-                      deadline.isUrgent ? "bg-destructive" : "bg-success"
-                    }`} />
+                    <div className={`mt-1.5 w-2 h-2 rounded-full ${deadline.isUrgent ? "bg-destructive" : "bg-success"}`} />
                     <div>
                       <p className="text-sm font-medium text-foreground">{deadline.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(deadline.dueDate, "MMM d, yyyy")}
-                      </p>
+                      <p className="text-xs text-muted-foreground">{format(deadline.dueDate, "MMM d, yyyy")}</p>
                     </div>
                   </div>
                 ))
@@ -272,29 +274,14 @@ export default function StudentDashboard() {
               <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => navigate("/student/opportunities")}
-              >
-                <Building2 className="h-4 w-4" />
-                Browse Opportunities
+              <Button variant="ghost" className="w-full justify-start gap-2 h-10" onClick={() => navigate("/student/opportunities")}>
+                <Building2 className="h-4 w-4" /> Browse Opportunities
               </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => navigate("/student/applications")}
-              >
-                <FileText className="h-4 w-4" />
-                My Applications
+              <Button variant="ghost" className="w-full justify-start gap-2 h-10" onClick={() => navigate("/student/applications")}>
+                <FileText className="h-4 w-4" /> My Applications
               </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => navigate("/student/portfolio")}
-              >
-                <Star className="h-4 w-4" />
-                My Portfolio
+              <Button variant="ghost" className="w-full justify-start gap-2 h-10" onClick={() => navigate("/student/portfolio")}>
+                <Star className="h-4 w-4" /> My Portfolio
               </Button>
             </CardContent>
           </Card>
@@ -308,19 +295,13 @@ export default function StudentDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               {statsLoading ? (
-                <>
-                  {[1, 2].map((i) => (
-                    <Skeleton key={i} className="h-8 w-full" />
-                  ))}
-                </>
+                [1, 2].map((i) => <Skeleton key={i} className="h-8 w-full" />)
               ) : (
                 performance.map((item, index) => (
                   <div key={index}>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-muted-foreground">{item.label}</span>
-                      <span className="font-medium text-foreground">
-                        {item.suffix || `${item.value}%`}
-                      </span>
+                      <span className="font-medium text-foreground">{item.suffix || `${item.value}%`}</span>
                     </div>
                     <Progress value={item.value} className="h-2" />
                   </div>
@@ -333,8 +314,7 @@ export default function StudentDashboard() {
           <Card className="glass-light">
             <CardHeader className="pb-3">
               <CardTitle className="text-base font-semibold flex items-center gap-2 text-primary">
-                <Trophy className="h-4 w-4" />
-                Achievements
+                <Trophy className="h-4 w-4" /> Achievements
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -347,7 +327,6 @@ export default function StudentDashboard() {
   );
 }
 
-// Helper functions
 function getDurationLabel(hours: number): string {
   if (hours <= 20) return "1 week";
   if (hours <= 40) return "2 weeks";
@@ -359,7 +338,6 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Inline task card component for dashboard
 function TaskCardItem({ title, company, status, dueDays }: {
   title: string;
   company: string;
@@ -372,7 +350,6 @@ function TaskCardItem({ title, company, status, dueDays }: {
     approved: { label: "Approved", color: "bg-success/10 text-success" },
     needs_revision: { label: "Needs Revision", color: "bg-destructive/10 text-destructive" },
   };
-
   const statusInfo = statusLabels[status] || statusLabels.not_started;
 
   return (
@@ -382,13 +359,9 @@ function TaskCardItem({ title, company, status, dueDays }: {
           <div>
             <h4 className="font-medium text-foreground mb-1">{title}</h4>
             <p className="text-sm text-muted-foreground">{company}</p>
-            {dueDays && (
-              <p className="text-xs text-muted-foreground mt-1">Due in {dueDays} days</p>
-            )}
+            {dueDays && <p className="text-xs text-muted-foreground mt-1">Due in {dueDays} days</p>}
           </div>
-          <span className={`text-xs px-2 py-1 rounded ${statusInfo.color}`}>
-            {statusInfo.label}
-          </span>
+          <span className={`text-xs px-2 py-1 rounded ${statusInfo.color}`}>{statusInfo.label}</span>
         </div>
       </CardContent>
     </Card>

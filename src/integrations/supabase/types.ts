@@ -641,6 +641,7 @@ export type Database = {
           company_website: string | null
           cover_image: string | null
           created_at: string
+          custom_link: string | null
           deletion_requested_at: string | null
           deletion_scheduled_for: string | null
           email: string
@@ -653,8 +654,10 @@ export type Database = {
           industry: string | null
           is_deactivated: boolean | null
           language_preference: string | null
+          linkedin_url: string | null
           location: string | null
           major: string | null
+          phone: string | null
           portfolio_url: string | null
           resume_url: string | null
           semester: number | null
@@ -676,6 +679,7 @@ export type Database = {
           company_website?: string | null
           cover_image?: string | null
           created_at?: string
+          custom_link?: string | null
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email: string
@@ -688,8 +692,10 @@ export type Database = {
           industry?: string | null
           is_deactivated?: boolean | null
           language_preference?: string | null
+          linkedin_url?: string | null
           location?: string | null
           major?: string | null
+          phone?: string | null
           portfolio_url?: string | null
           resume_url?: string | null
           semester?: number | null
@@ -711,6 +717,7 @@ export type Database = {
           company_website?: string | null
           cover_image?: string | null
           created_at?: string
+          custom_link?: string | null
           deletion_requested_at?: string | null
           deletion_scheduled_for?: string | null
           email?: string
@@ -723,8 +730,10 @@ export type Database = {
           industry?: string | null
           is_deactivated?: boolean | null
           language_preference?: string | null
+          linkedin_url?: string | null
           location?: string | null
           major?: string | null
+          phone?: string | null
           portfolio_url?: string | null
           resume_url?: string | null
           semester?: number | null
