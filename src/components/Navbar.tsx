@@ -51,8 +51,6 @@ const navLinks: Record<string, NavLink[]> = {
     { path: "/student/dashboard", label: "Dashboard", icon: Home },
     { path: "/student/opportunities", label: "Opportunities", icon: Briefcase },
     { path: "/student/applications", label: "Applications", icon: FileText },
-    { path: "/student/tasks", label: "Tasks", icon: ClipboardList },
-    { path: "/student/portfolio", label: "Portfolio", icon: FolderOpen },
     { path: "/student/alumni", label: "Alumni", icon: GraduationCap },
     { path: "/student/search", label: "Search", icon: Search },
   ],
@@ -115,7 +113,7 @@ export function Navbar({ userRole }: NavbarProps) {
 
         {/* Desktop Navigation */}
         {userRole && (
-          <div className="hidden lg:flex items-center gap-1 min-w-0 flex-wrap">
+          <div className="hidden lg:flex items-center gap-1">
             {currentLinks.map((link) => {
               const isActive = location.pathname === link.path ||
                 (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
