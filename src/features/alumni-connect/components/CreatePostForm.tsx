@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Image, Send, X, Loader2 } from "lucide-react";
+import { Image, Send, X, Loader2, PanelTop } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,8 +30,11 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const { user, profile } = useAuth();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,40 +67,69 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (coverInputRef.current) coverInputRef.current.value = "";
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Cover image must be under 10MB");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Cover must be an image file");
+      return;
+    }
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
+
+  const removeCover = () => {
+    if (coverPreview) URL.revokeObjectURL(coverPreview);
+    setCoverFile(null);
+    setCoverPreview(null);
+  };
+
   const removeMedia = (index: number) => {
     URL.revokeObjectURL(mediaPreviews[index]);
     setMediaFiles((prev) => prev.filter((_, i) => i !== index));
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const uploadMedia = async (): Promise<string[]> => {
-    if (mediaFiles.length === 0 || !user) return [];
+  const uploadMedia = async (): Promise<{ mediaUrls: string[]; coverUrl: string | null }> => {
+    if (mediaFiles.length === 0 && !coverFile) return { mediaUrls: [], coverUrl: null };
+    if (!user) return { mediaUrls: [], coverUrl: null };
 
     setIsUploading(true);
     const urls: string[] = [];
+    let uploadedCoverUrl: string | null = null;
 
     try {
+      // Upload cover image
+      if (coverFile) {
+        const ext = coverFile.name.split(".").pop();
+        const filePath = `${user.id}/cover_${Date.now()}.${ext}`;
+        const { error } = await supabase.storage.from("alumni-media").upload(filePath, coverFile);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from("alumni-media").getPublicUrl(filePath);
+        uploadedCoverUrl = urlData.publicUrl;
+      }
+
+      // Upload media files
       for (const file of mediaFiles) {
         const ext = file.name.split(".").pop();
         const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-
-        const { error } = await supabase.storage
-          .from("alumni-media")
-          .upload(filePath, file);
-
+        const { error } = await supabase.storage.from("alumni-media").upload(filePath, file);
         if (error) throw error;
-
-        const { data: urlData } = supabase.storage
-          .from("alumni-media")
-          .getPublicUrl(filePath);
-
+        const { data: urlData } = supabase.storage.from("alumni-media").getPublicUrl(filePath);
         urls.push(urlData.publicUrl);
       }
     } finally {
       setIsUploading(false);
     }
 
-    return urls;
+    return { mediaUrls: urls, coverUrl: uploadedCoverUrl };
   };
 
   const handleSubmit = async () => {
@@ -113,24 +145,27 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
 
     setIsLoading(true);
     try {
-      // Upload media first
-      const mediaUrls = await uploadMedia();
+      const { mediaUrls, coverUrl } = await uploadMedia();
 
       const { error } = await supabase.from("alumni_posts").insert({
         author_id: user.id,
         content: content.trim(),
         post_type: postType,
         media_urls: mediaUrls.length > 0 ? mediaUrls : [],
-      });
+        cover_image: coverUrl,
+      } as any);
 
       if (error) throw error;
 
       // Cleanup previews
       mediaPreviews.forEach((url) => URL.revokeObjectURL(url));
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
       setContent("");
       setPostType("update");
       setMediaFiles([]);
       setMediaPreviews([]);
+      setCoverFile(null);
+      setCoverPreview(null);
       setIsExpanded(false);
       toast.success("Post created successfully!");
       onPostCreated?.();
@@ -230,7 +265,22 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                   </div>
                 )}
 
-                {/* Hidden file input */}
+                {/* Cover Image Preview */}
+                {coverPreview && (
+                  <div className="relative mt-3 rounded-lg overflow-hidden border border-border">
+                    <img src={coverPreview} alt="Cover" className="w-full h-36 object-cover" />
+                    <button
+                      type="button"
+                      onClick={removeCover}
+                      className="absolute top-1 right-1 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                    <span className="absolute bottom-1 left-2 text-xs bg-background/70 backdrop-blur-sm rounded px-1.5 py-0.5 text-muted-foreground">Cover Image</span>
+                  </div>
+                )}
+
+                {/* Hidden file inputs */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -239,21 +289,40 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                   className="hidden"
                   onChange={handleFileSelect}
                 />
+                <input
+                  ref={coverInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={handleCoverSelect}
+                />
 
                 {/* Actions */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-primary"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={mediaFiles.length >= 4 || isLoading}
-                  >
-                    <Image className="h-4 w-4 mr-2" />
-                    {mediaFiles.length > 0
-                      ? `${mediaFiles.length}/4 Media`
-                      : "Add Media"}
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-primary"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={mediaFiles.length >= 4 || isLoading}
+                    >
+                      <Image className="h-4 w-4 mr-2" />
+                      {mediaFiles.length > 0
+                        ? `${mediaFiles.length}/4 Media`
+                        : "Add Media"}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-primary"
+                      onClick={() => coverInputRef.current?.click()}
+                      disabled={!!coverFile || isLoading}
+                    >
+                      <PanelTop className="h-4 w-4 mr-2" />
+                      {coverFile ? "Cover Added" : "Add Cover"}
+                    </Button>
+                  </div>
 
                   <div className="flex gap-2">
                     <Button
@@ -263,8 +332,11 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                         setIsExpanded(false);
                         setContent("");
                         mediaPreviews.forEach((url) => URL.revokeObjectURL(url));
+                        if (coverPreview) URL.revokeObjectURL(coverPreview);
                         setMediaFiles([]);
                         setMediaPreviews([]);
+                        setCoverFile(null);
+                        setCoverPreview(null);
                       }}
                     >
                       <X className="h-4 w-4 mr-1" />

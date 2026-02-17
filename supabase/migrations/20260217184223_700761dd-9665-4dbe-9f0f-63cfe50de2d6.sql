@@ -1,0 +1,1 @@
+ALTER TABLE public.alumni_posts ADD COLUMN cover_image text;
