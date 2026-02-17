@@ -5,18 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { ImageCropDialog } from "./ImageCropDialog";
 
-// Magic bytes for allowed image types
-const FILE_SIGNATURES: Record<string, number[]> = {
-  "image/jpeg": [0xff, 0xd8, 0xff],
-  "image/png": [0x89, 0x50, 0x4e, 0x47],
-  "image/webp": [0x52, 0x49, 0x46, 0x46], // RIFF header
-  "image/gif": [0x47, 0x49, 0x46],
-};
-
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-const MAX_DIMENSION = 1024;
-const MIN_DIMENSION = 100;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB before crop
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 interface AvatarUploadProps {
   currentUrl?: string | null;
@@ -31,135 +23,69 @@ export function AvatarUpload({ currentUrl, onUpload, size = "lg" }: AvatarUpload
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Crop dialog state
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>("avatar.jpg");
+
   const sizeClasses = {
     sm: "h-16 w-16",
     md: "h-24 w-24",
     lg: "h-32 w-32",
   };
 
-  const validateFileSignature = async (file: File): Promise<boolean> => {
-    const buffer = await file.slice(0, 12).arrayBuffer();
-    const bytes = new Uint8Array(buffer);
-
-    for (const [, signature] of Object.entries(FILE_SIGNATURES)) {
-      const matches = signature.every((byte, index) => bytes[index] === byte);
-      if (matches) return true;
-    }
-
-    // Special check for WebP (RIFF + WEBP)
-    if (
-      bytes[0] === 0x52 &&
-      bytes[1] === 0x49 &&
-      bytes[2] === 0x46 &&
-      bytes[3] === 0x46 &&
-      bytes[8] === 0x57 &&
-      bytes[9] === 0x45 &&
-      bytes[10] === 0x42 &&
-      bytes[11] === 0x50
-    ) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const validateImageDimensions = (file: File): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        URL.revokeObjectURL(img.src);
-        const valid =
-          img.width >= MIN_DIMENSION &&
-          img.height >= MIN_DIMENSION &&
-          img.width <= MAX_DIMENSION &&
-          img.height <= MAX_DIMENSION;
-        resolve(valid);
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(img.src);
-        resolve(false);
-      };
-      img.src = URL.createObjectURL(file);
-    });
-  };
-
   const handleFileSelect = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (!file || !user?.id) return;
-
-      // Reset input
       event.target.value = "";
 
-      // Validate file size
       if (file.size > MAX_FILE_SIZE) {
-        toast({
-          variant: "destructive",
-          title: "File too large",
-          description: "Please select an image under 2MB.",
-        });
+        toast({ variant: "destructive", title: "File too large", description: "Please select an image under 5MB." });
         return;
       }
 
-      // Validate file signature (magic bytes)
-      const validSignature = await validateFileSignature(file);
-      if (!validSignature) {
-        toast({
-          variant: "destructive",
-          title: "Invalid file type",
-          description: "Please upload a valid image file (JPEG, PNG, WebP, or GIF).",
-        });
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        toast({ variant: "destructive", title: "Invalid file type", description: "Please upload JPEG, PNG, WebP, or GIF." });
         return;
       }
 
-      // Validate dimensions
-      const validDimensions = await validateImageDimensions(file);
-      if (!validDimensions) {
-        toast({
-          variant: "destructive",
-          title: "Invalid dimensions",
-          description: `Image must be between ${MIN_DIMENSION}x${MIN_DIMENSION} and ${MAX_DIMENSION}x${MAX_DIMENSION} pixels.`,
-        });
-        return;
-      }
+      setSelectedFileName(file.name);
+      const objectUrl = URL.createObjectURL(file);
+      setRawImageSrc(objectUrl);
+      setCropDialogOpen(true);
+    },
+    [user?.id, toast]
+  );
 
-      // Create preview
-      const preview = URL.createObjectURL(file);
+  const handleCroppedImage = useCallback(
+    async (croppedBlob: Blob) => {
+      if (!user?.id) return;
+
+      const preview = URL.createObjectURL(croppedBlob);
       setPreviewUrl(preview);
-
-      // Upload to Supabase Storage
       setIsUploading(true);
+
       try {
         const timestamp = Date.now();
-        const fileExt = file.name.split(".").pop() || "jpg";
+        const fileExt = selectedFileName.split(".").pop() || "jpg";
         const fileName = `${user.id}/avatar_${timestamp}.${fileExt}`;
 
-        // Delete old avatar if exists
+        // Delete old avatar
         if (currentUrl) {
           const oldPath = currentUrl.split("/avatars/").pop();
-          if (oldPath) {
-            await supabase.storage.from("avatars").remove([oldPath]);
-          }
+          if (oldPath) await supabase.storage.from("avatars").remove([oldPath]);
         }
 
-        // Upload new avatar
         const { error: uploadError } = await supabase.storage
           .from("avatars")
-          .upload(fileName, file, {
-            cacheControl: "3600",
-            upsert: true,
-          });
+          .upload(fileName, croppedBlob, { cacheControl: "3600", upsert: true });
 
         if (uploadError) throw uploadError;
 
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(fileName);
-
+        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(fileName);
         const publicUrl = urlData.publicUrl;
 
-        // Update profile
         const { error: updateError } = await supabase
           .from("profiles")
           .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
@@ -168,37 +94,27 @@ export function AvatarUpload({ currentUrl, onUpload, size = "lg" }: AvatarUpload
         if (updateError) throw updateError;
 
         onUpload?.(publicUrl);
-        toast({
-          title: "Avatar updated",
-          description: "Your profile picture has been updated successfully.",
-        });
+        toast({ title: "Avatar updated", description: "Your profile picture has been updated." });
       } catch (error) {
         console.error("Avatar upload error:", error);
-        toast({
-          variant: "destructive",
-          title: "Upload failed",
-          description: "Failed to upload avatar. Please try again.",
-        });
+        toast({ variant: "destructive", title: "Upload failed", description: "Failed to upload avatar." });
         setPreviewUrl(null);
       } finally {
         setIsUploading(false);
+        if (rawImageSrc) URL.revokeObjectURL(rawImageSrc);
+        setRawImageSrc(null);
       }
     },
-    [user?.id, currentUrl, onUpload, toast]
+    [user?.id, currentUrl, onUpload, toast, selectedFileName, rawImageSrc]
   );
 
   const handleRemoveAvatar = async () => {
     if (!user?.id || !currentUrl) return;
-
     setIsUploading(true);
     try {
-      // Delete from storage
       const oldPath = currentUrl.split("/avatars/").pop();
-      if (oldPath) {
-        await supabase.storage.from("avatars").remove([oldPath]);
-      }
+      if (oldPath) await supabase.storage.from("avatars").remove([oldPath]);
 
-      // Update profile
       await supabase
         .from("profiles")
         .update({ avatar_url: null, updated_at: new Date().toISOString() })
@@ -206,17 +122,10 @@ export function AvatarUpload({ currentUrl, onUpload, size = "lg" }: AvatarUpload
 
       setPreviewUrl(null);
       onUpload?.("");
-      toast({
-        title: "Avatar removed",
-        description: "Your profile picture has been removed.",
-      });
+      toast({ title: "Avatar removed", description: "Your profile picture has been removed." });
     } catch (error) {
       console.error("Avatar remove error:", error);
-      toast({
-        variant: "destructive",
-        title: "Remove failed",
-        description: "Failed to remove avatar. Please try again.",
-      });
+      toast({ variant: "destructive", title: "Remove failed", description: "Failed to remove avatar." });
     } finally {
       setIsUploading(false);
     }
@@ -278,10 +187,23 @@ export function AvatarUpload({ currentUrl, onUpload, size = "lg" }: AvatarUpload
       </Button>
 
       <p className="text-xs text-muted-foreground text-center">
-        JPEG, PNG, WebP or GIF. Max 2MB.
-        <br />
-        {MIN_DIMENSION}x{MIN_DIMENSION} to {MAX_DIMENSION}x{MAX_DIMENSION} pixels.
+        JPEG, PNG, WebP or GIF. Max 5MB.
       </p>
+
+      {rawImageSrc && (
+        <ImageCropDialog
+          open={cropDialogOpen}
+          onOpenChange={(open) => {
+            setCropDialogOpen(open);
+            if (!open && rawImageSrc) {
+              URL.revokeObjectURL(rawImageSrc);
+              setRawImageSrc(null);
+            }
+          }}
+          imageSrc={rawImageSrc}
+          onCropComplete={handleCroppedImage}
+        />
+      )}
     </div>
   );
 }

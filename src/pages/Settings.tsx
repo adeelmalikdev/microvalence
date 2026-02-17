@@ -29,9 +29,10 @@ import { toast } from "sonner";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, role, user } = useAuth();
+  const { profile, role, user, refreshProfile } = useAuth();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [email, setEmail] = useState("");
 
   // Editable profile fields
   const [fullName, setFullName] = useState("");
@@ -49,8 +50,9 @@ export default function Settings() {
       setGithubUrl(profile.github_url || "");
       setPortfolioUrl(profile.portfolio_url || "");
       setWebsite(profile.website || "");
+      setEmail(profile.email || user?.email || "");
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const handleSaveProfile = async () => {
     if (!fullName.trim()) {
@@ -59,6 +61,20 @@ export default function Settings() {
     }
     setSaving(true);
     try {
+      // Update email in auth if changed
+      const currentEmail = profile?.email || user?.email;
+      if (email.trim() && email.trim() !== currentEmail) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: email.trim(),
+        });
+        if (emailError) {
+          toast.error("Failed to update email: " + emailError.message);
+        } else {
+          toast.info("Please check your new email for a confirmation link.");
+        }
+      }
+
+      // Update profile fields
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -72,6 +88,8 @@ export default function Settings() {
         .eq("user_id", user?.id);
 
       if (error) throw error;
+      
+      await refreshProfile();
       toast.success("Profile updated successfully!");
     } catch {
       toast.error("Failed to save profile");
@@ -135,7 +153,7 @@ export default function Settings() {
               <CardContent>
                 <AvatarUpload
                   currentUrl={profile?.avatar_url}
-                  onUpload={() => {}}
+                  onUpload={() => refreshProfile()}
                 />
               </CardContent>
             </Card>
@@ -159,15 +177,24 @@ export default function Settings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input value={profile?.email || ""} disabled />
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="your@email.com"
+                    />
                     <p className="text-xs text-muted-foreground">
-                      Email cannot be changed here
+                      Changing email requires confirmation via your new email
                     </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Role</Label>
                     <Input value={role || ""} disabled className="capitalize" />
+                    <p className="text-xs text-muted-foreground">
+                      Role cannot be changed
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="location">Location</Label>
