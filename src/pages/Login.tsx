@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { GraduationCap, Building2, Shield, Loader2 } from "lucide-react";
+import { GraduationCap, Building2, Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import { verifyRecaptcha } from "@/lib/recaptcha";
 // reCAPTCHA v2 Checkbox - site key is defined in useReCaptcha.ts
 import { RECAPTCHA_SITE_KEY } from "@/hooks/useReCaptcha";
 
-type UserRole = "student" | "recruiter" | "admin";
+type UserRole = "student" | "recruiter";
 
 const roleConfig = {
   student: {
@@ -43,16 +43,6 @@ const roleConfig = {
     signupText: "New recruiter?",
     signupLink: "Register your company",
     dashboardPath: "/recruiter/dashboard",
-  },
-  admin: {
-    icon: Shield,
-    emailLabel: "Email",
-    emailPlaceholder: "you@example.com",
-    buttonText: "Sign In as Admin",
-    signupButtonText: "Sign Up as Admin",
-    signupText: "",
-    signupLink: "",
-    dashboardPath: "/admin/dashboard",
   },
 };
 
@@ -393,7 +383,7 @@ export default function Login() {
           </CardHeader>
           <CardContent>
             <Tabs value={role} onValueChange={(v) => setRole(v as UserRole)} className="mb-6">
-              <TabsList className="grid grid-cols-3 w-full">
+              <TabsList className="grid grid-cols-2 w-full">
                 <TabsTrigger value="student" className="gap-1.5">
                   <GraduationCap className="h-4 w-4" />
                   <span className="hidden sm:inline">Student</span>
@@ -401,10 +391,6 @@ export default function Login() {
                 <TabsTrigger value="recruiter" className="gap-1.5">
                   <Building2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Recruiter</span>
-                </TabsTrigger>
-                <TabsTrigger value="admin" className="gap-1.5">
-                  <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin</span>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -488,8 +474,8 @@ export default function Login() {
               </LiveRegion>
             </form>
 
-            {/* Google Sign-In - only show for non-admin roles */}
-            {role !== "admin" && (
+            {/* Google Sign-In */}
+            {(
               <>
                 <div className="relative my-6">
                   <Separator />

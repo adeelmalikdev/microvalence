@@ -36,6 +36,7 @@ import RecruiterNotifications from "./pages/recruiter/Notifications";
 import RecruiterProfile from "./pages/recruiter/Profile";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminActivities from "./pages/admin/Activities";
+import AdminLogin from "./pages/admin/AdminLogin";
 import AboutUs from "./pages/AboutUs";
 import Feedback from "./pages/Feedback";
 import Settings from "./pages/Settings";
@@ -115,6 +116,9 @@ const AppRoutes = () => (
         <Route path="/student/profile" element={<StudentProfile />} />
         <Route path="/student/profile/:userId" element={<StudentProfile />} />
       </Route>
+
+      {/* Admin Login */}
+      <Route path="/admin" element={<AdminLogin />} />
 
       {/* Admin Routes */}
       <Route element={
