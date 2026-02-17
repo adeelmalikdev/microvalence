@@ -184,16 +184,30 @@ export default function Login() {
         return;
       }
       
-      const { error } = await signInWithGoogle();
+      const { error, redirected } = await signInWithGoogle();
       
+      if (redirected) {
+        // OAuth redirect is happening, don't do anything
+        return;
+      }
+
       if (error) {
         toast({
           variant: "destructive",
           title: "Google sign-in failed",
           description: error.message,
         });
+        return;
       }
-      // If successful, the page will redirect
+
+      // Sign-in successful - wait for auth state to update, then navigate
+      // The role might not be set yet for new Google users, default to student
+      const targetPath = config.dashboardPath || "/student/dashboard";
+      
+      // Small delay to let onAuthStateChange fire and fetchUserData complete
+      setTimeout(() => {
+        navigate(targetPath, { replace: true });
+      }, 500);
     } catch (error) {
       toast({
         variant: "destructive",
