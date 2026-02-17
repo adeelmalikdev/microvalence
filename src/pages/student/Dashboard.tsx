@@ -70,39 +70,31 @@ export default function StudentDashboard() {
   return (
     <div className="container py-8">
       {/* Profile Header */}
-      <div className="mb-8">
-        <div className="flex items-start justify-between glass-light p-6 rounded-2xl">
-          {/* Left: Avatar + Name + Headline + Links */}
-          <div className="flex flex-col items-start gap-3">
-            {/* Profile Image */}
-            <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+      <Card className="mb-8 glass-light overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            {/* Avatar */}
+            <Avatar className="h-20 w-20 border-4 border-background shadow-lg shrink-0">
               <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
-              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">
+              <AvatarFallback className="text-xl font-bold bg-primary text-primary-foreground">
                 {initials}
               </AvatarFallback>
             </Avatar>
 
-            {/* Name — from Settings full_name */}
-            <h1 className="text-2xl font-bold text-foreground">
-              {displayName}
-            </h1>
-
-            {/* Headline / Bio — from Settings bio */}
-            <p className="text-sm text-muted-foreground -mt-1">
-              {profile?.bio || "Add your headline in Settings → Account"}
-            </p>
-
-            {/* Portfolio Button */}
-            <Link to="/student/portfolio">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Eye className="h-4 w-4" />
-                View My Portfolio
-              </Button>
-            </Link>
-
-            {/* Social Links — from Settings */}
-            {(linkedinUrl || profile?.github_url || profile?.portfolio_url || profile?.website || customLink) && (
-              <div className="flex items-center gap-2 mt-1">
+            {/* Name + Bio + Links */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                {profile?.bio || "Add your headline in Settings → Account"}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 mt-3">
+                <Link to="/student/portfolio">
+                  <Button variant="outline" size="sm" className="gap-2 h-8">
+                    <Eye className="h-3.5 w-3.5" />
+                    View My Portfolio
+                  </Button>
+                </Link>
+                {/* Social Links */}
                 {linkedinUrl && (
                   <a href={linkedinUrl} target="_blank" rel="noopener noreferrer"
                     className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
@@ -134,26 +126,40 @@ export default function StudentDashboard() {
                   </a>
                 )}
               </div>
-            )}
+            </div>
+
+            {/* Right: Level Badge */}
+            <div className="shrink-0 self-start sm:self-center">
+              <UserLevelBadge size="lg" showTitle />
+            </div>
           </div>
-
-          {/* Right: Level Badge */}
-          <UserLevelBadge size="lg" showTitle />
-        </div>
-      </div>
-
-      {/* XP Progress */}
-      <Card className="mb-8 glass-light">
-        <CardContent className="p-4">
-          <XPProgressBar showDetails />
         </CardContent>
       </Card>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statsData.map((stat) => (
-          <StatCard key={stat.title} {...stat} />
-        ))}
+      {/* XP + Stats in one row */}
+      <div className="grid lg:grid-cols-5 gap-4 mb-8">
+        <Card className="lg:col-span-3 glass-light">
+          <CardContent className="p-4">
+            <XPProgressBar showDetails />
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-2 glass-light">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 gap-3">
+              {statsData.map((stat) => (
+                <div key={stat.title} className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-lg bg-muted ${stat.iconColor}`}>
+                    <stat.icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-foreground leading-none">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.title}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
