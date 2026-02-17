@@ -105,7 +105,9 @@ export default function Settings() {
       // Update profile fields
       const { error } = await supabase
         .from("profiles")
-        .update({
+        .upsert({
+          user_id: user?.id,
+          email: email.trim() || user?.email || "",
           full_name: fullName.trim(),
           bio: bio.trim() || null,
           phone: phone.trim() || null,
@@ -120,8 +122,7 @@ export default function Settings() {
           semester: semester ? parseInt(semester) : null,
           graduation_year: graduationYear ? parseInt(graduationYear) : null,
           status: status || null,
-        })
-        .eq("user_id", user?.id);
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
 
