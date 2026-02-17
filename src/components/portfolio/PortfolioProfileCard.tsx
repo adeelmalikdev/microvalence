@@ -2,7 +2,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, GraduationCap, Github, Globe, Link, FileText } from "lucide-react";
+import { MapPin, GraduationCap, Github, Globe, Link, FileText, Linkedin } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { CoverImageUpload } from "@/components/profile/CoverImageUpload";
 import { useAuth } from "@/hooks/useAuth";
@@ -140,10 +140,22 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
                   <Globe className="h-4 w-4" />
                 </a>
               )}
+              {profile.linkedin_url && (
+                <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
+                  className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                  <Linkedin className="h-4 w-4" />
+                </a>
+              )}
               {profile.website && (
                 <a href={profile.website} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Link className="h-4 w-4" />
+                </a>
+              )}
+              {profile.custom_link && (
+                <a href={profile.custom_link} target="_blank" rel="noopener noreferrer"
+                  className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
+                  <Globe className="h-4 w-4" />
                 </a>
               )}
               {profile.resume_url && (

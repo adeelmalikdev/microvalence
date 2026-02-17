@@ -22,6 +22,7 @@ import {
   Globe,
   Github,
   Link2,
+  Linkedin,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -364,6 +365,44 @@ export default function StudentPortfolio() {
                       className="text-sm text-primary hover:underline truncate block"
                     >
                       {profile.website}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Not added yet</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Linkedin className="h-5 w-5 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">LinkedIn</p>
+                  {profile?.linkedin_url ? (
+                    <a
+                      href={profile.linkedin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline truncate block"
+                    >
+                      {profile.linkedin_url}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Not added yet</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Link2 className="h-5 w-5 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">Custom Link</p>
+                  {profile?.custom_link ? (
+                    <a
+                      href={profile.custom_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline truncate block"
+                    >
+                      {profile.custom_link}
                     </a>
                   ) : (
                     <p className="text-sm text-muted-foreground">Not added yet</p>

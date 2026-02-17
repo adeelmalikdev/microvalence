@@ -1,10 +1,11 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AppRole = "student" | "recruiter" | "admin";
 
-interface Profile {
+export interface Profile {
   id: string;
   user_id: string;
   email: string;
@@ -23,8 +24,24 @@ interface Profile {
   company_name: string | null;
   company_logo: string | null;
   company_website: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
+  phone: string | null;
+  linkedin_url: string | null;
+  custom_link: string | null;
+  semester: number | null;
+  status: string | null;
+  gpa: number | null;
+  resume_url: string | null;
+  industry: string | null;
+  company_size: string | null;
+  company_description: string | null;
+  founded_year: number | null;
+  theme_preference: string | null;
+  language_preference: string | null;
+  is_deactivated: boolean | null;
+  deletion_requested_at: string | null;
+  deletion_scheduled_for: string | null;
 }
 
 interface AuthContextType {
@@ -42,6 +59,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -139,6 +157,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function refreshProfile() {
     if (user?.id) {
       await fetchUserData(user.id);
+      // Invalidate all profile-related React Query caches
+      queryClient.invalidateQueries({ queryKey: ['student-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
     }
   }
 
