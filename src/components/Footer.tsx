@@ -25,7 +25,7 @@ export function Footer() {
       <div className="container">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">μ-intern</h3>
+            <h3 className="text-xl font-bold mb-4">Valence</h3>
             <p className="text-sm text-background/70">
               Empowering students with micro-internship opportunities
             </p>
@@ -76,7 +76,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-background/20 pt-6 text-center text-sm text-background/60">
-          © 2026 μ-intern Platform | All Rights Reserved
+          © 2026 Valence | All Rights Reserved
         </div>
       </div>
     </footer>

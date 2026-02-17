@@ -18,10 +18,10 @@ export default function AboutUs() {
         </Link>
 
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold text-foreground mb-6">About μ-intern</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-6">About Valence</h1>
           
           <p className="text-lg text-muted-foreground mb-8">
-            μ-intern is a micro-internship platform designed to bridge the gap between students 
+            Valence is a micro-internship platform designed to bridge the gap between students 
             and industry experience. We believe that every student deserves the opportunity to 
             gain real-world skills before entering the job market.
           </p>
