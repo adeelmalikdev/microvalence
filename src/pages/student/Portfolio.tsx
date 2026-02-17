@@ -19,6 +19,9 @@ import {
   Download, 
   Star, 
   CheckCircle2,
+  Globe,
+  Github,
+  Link2,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -299,6 +302,77 @@ export default function StudentPortfolio() {
             </Card>
           )}
         </div>
+
+        {/* Social Links Section */}
+        <Card className="border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-primary" />
+              Social Links
+            </CardTitle>
+            <CardDescription>Add your online profiles</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Github className="h-5 w-5 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">GitHub</p>
+                  {profile?.github_url ? (
+                    <a
+                      href={profile.github_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline truncate block"
+                    >
+                      {profile.github_url}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Not added yet</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Globe className="h-5 w-5 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">Portfolio</p>
+                  {profile?.portfolio_url ? (
+                    <a
+                      href={profile.portfolio_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline truncate block"
+                    >
+                      {profile.portfolio_url}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Not added yet</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <Link2 className="h-5 w-5 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">Website</p>
+                  {profile?.website ? (
+                    <a
+                      href={profile.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline truncate block"
+                    >
+                      {profile.website}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Not added yet</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
