@@ -107,9 +107,9 @@ export function Navbar({ userRole }: NavbarProps) {
         <div className="flex items-center gap-2">
           <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">μ</span>
+              <span className="text-primary-foreground font-bold text-lg">V</span>
             </div>
-            <span className="font-bold text-xl text-foreground hidden sm:inline">μ-intern</span>
+            <span className="font-bold text-xl text-foreground hidden sm:inline">Valence</span>
           </Link>
         </div>
 

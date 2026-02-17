@@ -156,7 +156,7 @@ export default function Landing() {
       <section className="py-16">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Why Choose μ-intern?</h2>
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Why Choose Valence?</h2>
             <p className="text-muted-foreground">
               Built specifically for IIUI SE/IT/CS students
             </p>

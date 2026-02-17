@@ -378,7 +378,7 @@ export default function Login() {
               {isSignUp ? "Create Account" : "Welcome Back"}
             </CardTitle>
             <CardDescription>
-              {isSignUp ? "Sign up for μ-intern" : "Sign in to your μ-intern account"}
+              {isSignUp ? "Sign up for Valence" : "Sign in to your Valence account"}
             </CardDescription>
           </CardHeader>
           <CardContent>
