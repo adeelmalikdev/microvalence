@@ -102,7 +102,7 @@ export function Navbar({ userRole }: NavbarProps) {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-16 items-center justify-between gap-2 overflow-visible">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export function Navbar({ userRole }: NavbarProps) {
 
         {/* Desktop Navigation */}
         {userRole && (
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1 min-w-0 overflow-x-auto scrollbar-none">
             {currentLinks.map((link) => {
               const isActive = location.pathname === link.path ||
                 (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
@@ -139,7 +139,7 @@ export function Navbar({ userRole }: NavbarProps) {
         )}
 
         {/* Right side actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {/* Notifications */}
           {userRole && <NotificationBell userRole={userRole} />}
 
