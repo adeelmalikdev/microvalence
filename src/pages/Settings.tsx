@@ -19,6 +19,7 @@ import {
   Linkedin,
   Loader2,
   CheckCircle,
+  Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +62,13 @@ export default function Settings() {
   const [semester, setSemester] = useState("");
   const [graduationYear, setGraduationYear] = useState("");
   const [status, setStatus] = useState("");
+  // Recruiter company fields
+  const [companyName, setCompanyName] = useState("");
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [companySize, setCompanySize] = useState("");
+  const [companyDescription, setCompanyDescription] = useState("");
+  const [foundedYear, setFoundedYear] = useState("");
 
   useEffect(() => {
     if (profile) {
@@ -79,6 +87,13 @@ export default function Settings() {
       setSemester(profile.semester?.toString() || "");
       setGraduationYear(profile.graduation_year?.toString() || "");
       setStatus(profile.status || "");
+      // Recruiter fields
+      setCompanyName(profile.company_name || "");
+      setCompanyWebsite(profile.company_website || "");
+      setIndustry(profile.industry || "");
+      setCompanySize(profile.company_size || "");
+      setCompanyDescription(profile.company_description || "");
+      setFoundedYear(profile.founded_year?.toString() || "");
     }
   }, [profile, user]);
 
@@ -122,6 +137,13 @@ export default function Settings() {
           semester: semester ? parseInt(semester) : null,
           graduation_year: graduationYear ? parseInt(graduationYear) : null,
           status: status || null,
+          // Recruiter company fields
+          company_name: companyName.trim() || null,
+          company_website: companyWebsite.trim() || null,
+          industry: industry || null,
+          company_size: companySize || null,
+          company_description: companyDescription.trim() || null,
+          founded_year: foundedYear ? parseInt(foundedYear) : null,
         }, { onConflict: 'user_id' });
 
       if (error) throw error;
@@ -293,86 +315,171 @@ export default function Settings() {
               </CardContent>
             </Card>
 
-            {/* Education */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Education
-                </CardTitle>
-                <CardDescription>
-                  Your academic information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+            {/* Education (students) or Company Details (recruiters) */}
+            {role === "recruiter" ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Company Details
+                  </CardTitle>
+                  <CardDescription>
+                    Your company information visible to students
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="companyName">Company Name</Label>
+                      <Input
+                        id="companyName"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        placeholder="Acme Corp"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="companyWebsite" className="flex items-center gap-1.5">
+                        <Globe className="h-3.5 w-3.5" /> Website
+                      </Label>
+                      <Input
+                        id="companyWebsite"
+                        value={companyWebsite}
+                        onChange={(e) => setCompanyWebsite(e.target.value)}
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Industry</Label>
+                      <Select value={industry} onValueChange={setIndustry}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select industry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["Technology", "Finance", "Healthcare", "Education", "Marketing", "Consulting", "Manufacturing", "Retail", "Media", "Other"].map((i) => (
+                            <SelectItem key={i} value={i}>{i}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Company Size</Label>
+                      <Select value={companySize} onValueChange={setCompanySize}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"].map((s) => (
+                            <SelectItem key={s} value={s}>{s} employees</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Founded Year</Label>
+                      <Input
+                        type="number"
+                        value={foundedYear}
+                        onChange={(e) => setFoundedYear(e.target.value)}
+                        placeholder="2020"
+                        min={1900}
+                        max={new Date().getFullYear()}
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2">
-                    <Label htmlFor="university">University</Label>
-                    <Input
-                      id="university"
-                      value={university}
-                      onChange={(e) => setUniversity(e.target.value)}
-                      placeholder="International Islamic University"
+                    <Label htmlFor="companyDescription">Company Description</Label>
+                    <Textarea
+                      id="companyDescription"
+                      value={companyDescription}
+                      onChange={(e) => setCompanyDescription(e.target.value)}
+                      placeholder="Tell students about your company..."
+                      rows={4}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="major">Major / Degree</Label>
-                    <Input
-                      id="major"
-                      value={major}
-                      onChange={(e) => setMajor(e.target.value)}
-                      placeholder="Artificial Intelligence"
-                    />
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <GraduationCap className="h-5 w-5" />
+                    Education
+                  </CardTitle>
+                  <CardDescription>
+                    Your academic information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="university">University</Label>
+                      <Input
+                        id="university"
+                        value={university}
+                        onChange={(e) => setUniversity(e.target.value)}
+                        placeholder="International Islamic University"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="major">Major / Degree</Label>
+                      <Input
+                        id="major"
+                        value={major}
+                        onChange={(e) => setMajor(e.target.value)}
+                        placeholder="Artificial Intelligence"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Current Status</Label>
+                      <Select value={status} onValueChange={setStatus}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="freshman">Freshman (1st Year)</SelectItem>
+                          <SelectItem value="sophomore">Sophomore (2nd Year)</SelectItem>
+                          <SelectItem value="junior">Junior (3rd Year)</SelectItem>
+                          <SelectItem value="senior">Senior (4th Year)</SelectItem>
+                          <SelectItem value="graduated">Graduated</SelectItem>
+                          <SelectItem value="alumni">Alumni</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Current Semester</Label>
+                      <Select value={semester} onValueChange={setSemester}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select semester" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                            <SelectItem key={s} value={s.toString()}>
+                              Semester {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Expected Graduation Year</Label>
+                      <Select value={graduationYear} onValueChange={setGraduationYear}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
+                            <SelectItem key={y} value={y.toString()}>
+                              {y}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Current Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="freshman">Freshman (1st Year)</SelectItem>
-                        <SelectItem value="sophomore">Sophomore (2nd Year)</SelectItem>
-                        <SelectItem value="junior">Junior (3rd Year)</SelectItem>
-                        <SelectItem value="senior">Senior (4th Year)</SelectItem>
-                        <SelectItem value="graduated">Graduated</SelectItem>
-                        <SelectItem value="alumni">Alumni</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Current Semester</Label>
-                    <Select value={semester} onValueChange={setSemester}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select semester" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-                          <SelectItem key={s} value={s.toString()}>
-                            Semester {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Expected Graduation Year</Label>
-                    <Select value={graduationYear} onValueChange={setGraduationYear}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select year" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[2025, 2026, 2027, 2028, 2029, 2030].map((y) => (
-                          <SelectItem key={y} value={y.toString()}>
-                            {y}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Social & Professional Links */}
             <Card>
