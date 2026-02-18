@@ -165,7 +165,7 @@ export default function Landing() {
         <div className="container">
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
+              <Card key={index} className="bg-background border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                 <CardContent className="p-6 text-center">
                   <div className="flex justify-center mb-4">
                     <Icon3D icon={benefit.icon} />
