@@ -77,7 +77,7 @@ export default function Landing() {
         src={valenceLogo}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] object-contain opacity-[0.04] z-0"
+        className="pointer-events-none select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] object-contain opacity-[0.06] z-0"
       />
       <Navbar />
 

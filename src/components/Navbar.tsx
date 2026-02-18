@@ -106,7 +106,7 @@ export function Navbar({ userRole }: NavbarProps) {
           <div className="flex h-14 items-center justify-between px-5 gap-2">
             {/* Logo */}
             <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2.5 group">
-              <img src={valenceLogo} alt="Valence" className="h-8 w-8 object-contain" />
+              <img src={valenceLogo} alt="Valence" className="h-10 w-10 object-contain" />
               <span className="font-bold text-lg text-foreground hidden sm:inline tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
                 Valence
               </span>
