@@ -163,7 +163,7 @@ export default function OpportunityDetails() {
               <CardTitle className="text-lg">Description</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground whitespace-pre-wrap">
+              <p className="text-muted-foreground whitespace-pre-wrap break-words overflow-hidden">
                 {opportunity.description}
               </p>
             </CardContent>
