@@ -27,6 +27,8 @@ import StudentAlumniGroups from "./pages/student/AlumniGroups";
 import StudentAlumniGroupDetail from "./pages/student/AlumniGroupDetail";
 import StudentAdvancedSearch from "./features/search/AdvancedSearch";
 import StudentProfile from "./pages/student/Profile";
+import StudentBrowseRecruiters from "./pages/student/BrowseRecruiters";
+import StudentRecruiterProfile from "./pages/student/RecruiterProfile";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import RecruiterPostOpportunity from "./pages/recruiter/PostOpportunity";
 import RecruiterManageApplicants from "./pages/recruiter/ManageApplicants";
@@ -34,6 +36,8 @@ import RecruiterSubmissions from "./pages/recruiter/Submissions";
 import RecruiterMessages from "./pages/recruiter/Messages";
 import RecruiterNotifications from "./pages/recruiter/Notifications";
 import RecruiterProfile from "./pages/recruiter/Profile";
+import RecruiterBrowseStudents from "./pages/recruiter/BrowseStudents";
+import RecruiterStudentProfile from "./pages/recruiter/StudentProfile";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminActivities from "./pages/admin/Activities";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -115,6 +119,8 @@ const AppRoutes = () => (
         <Route path="/student/search" element={<StudentAdvancedSearch />} />
         <Route path="/student/profile" element={<StudentProfile />} />
         <Route path="/student/profile/:userId" element={<StudentProfile />} />
+        <Route path="/student/browse-recruiters" element={<StudentBrowseRecruiters />} />
+        <Route path="/student/recruiter/:userId" element={<StudentRecruiterProfile />} />
       </Route>
 
       {/* Admin Login */}
@@ -143,6 +149,8 @@ const AppRoutes = () => (
         <Route path="/recruiter/messages" element={<RecruiterMessages />} />
         <Route path="/recruiter/notifications" element={<RecruiterNotifications />} />
         <Route path="/recruiter/profile" element={<RecruiterProfile />} />
+        <Route path="/recruiter/browse-students" element={<RecruiterBrowseStudents />} />
+        <Route path="/recruiter/student/:userId" element={<RecruiterStudentProfile />} />
       </Route>
 
       {/* Public Pages */}

@@ -53,12 +53,13 @@ const navLinks: Record<string, NavLink[]> = {
     { path: "/student/opportunities", label: "Opportunities", icon: Briefcase },
     { path: "/student/applications", label: "Applications", icon: FileText },
     { path: "/student/alumni", label: "Alumni", icon: GraduationCap },
-    { path: "/student/search", label: "Search", icon: Search },
+    { path: "/student/browse-recruiters", label: "Companies", icon: Building2 },
   ],
   recruiter: [
     { path: "/recruiter/dashboard", label: "Dashboard", icon: Home },
     { path: "/recruiter/post", label: "Post Opportunity", icon: Briefcase },
     { path: "/recruiter/submissions", label: "Reviews", icon: ClipboardList },
+    { path: "/recruiter/browse-students", label: "Students", icon: Users },
     { path: "/recruiter/profile", label: "Company Profile", icon: Building2 },
   ],
   admin: [
