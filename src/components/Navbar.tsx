@@ -86,7 +86,6 @@ export function Navbar({ userRole }: NavbarProps) {
       ? "/recruiter/messages"
       : null;
 
-  // Inject badge into messages link for mobile menu
   const allLinks: NavLink[] = [
     ...currentLinks,
     ...(messagesPath
@@ -99,158 +98,165 @@ export function Navbar({ userRole }: NavbarProps) {
     : profile?.email?.[0]?.toUpperCase() ?? "U";
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between gap-2 overflow-visible">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">V</span>
-            </div>
-            <span className="font-bold text-xl text-foreground hidden sm:inline">Valence</span>
-          </Link>
-        </div>
+    <nav className="sticky top-0 z-50 w-full">
+      {/* Floating glass navbar */}
+      <div className="mx-auto max-w-7xl px-3 pt-3">
+        <div className="rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl shadow-[var(--shadow-medium)]">
+          <div className="flex h-14 items-center justify-between px-5 gap-2">
+            {/* Logo */}
+            <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2.5 group">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[var(--shadow-emerald-glow)] transition-shadow duration-300 group-hover:shadow-[var(--glow-hover)]">
+                <span className="text-primary-foreground font-extrabold text-base tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>μ</span>
+              </div>
+              <span className="font-bold text-lg text-foreground hidden sm:inline tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
+                Valence
+              </span>
+            </Link>
 
-        {/* Desktop Navigation */}
-        {userRole && (
-          <div className="hidden lg:flex items-center gap-1">
-            {currentLinks.map((link) => {
-              const isActive = location.pathname === link.path ||
-                (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
-              return (
+            {/* Desktop Navigation */}
+            {userRole && (
+              <div className="hidden lg:flex items-center gap-0.5">
+                {currentLinks.map((link) => {
+                  const isActive = location.pathname === link.path ||
+                    (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
+                  return (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                        isActive
+                          ? "bg-primary text-primary-foreground shadow-[var(--shadow-emerald-glow)]"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      <link.icon className="h-3.5 w-3.5" />
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Right side actions */}
+            <div className="flex items-center gap-1 shrink-0">
+              {userRole && <NotificationBell userRole={userRole} />}
+
+              {messagesPath && (
                 <Link
-                  key={link.path}
-                  to={link.path}
+                  to={messagesPath}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-primary/10 text-primary"
+                    "relative p-2 rounded-full transition-all duration-200 hidden lg:flex items-center",
+                    location.pathname === messagesPath
+                      ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  <link.icon className="h-4 w-4" />
-                  {link.label}
+                  <MessageSquare className="h-4.5 w-4.5" />
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="default"
+                      className="absolute -top-1 -right-1 h-4.5 min-w-4.5 p-0 flex items-center justify-center text-[10px] bg-destructive text-destructive-foreground border-2 border-background"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </Badge>
+                  )}
                 </Link>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Right side actions */}
-        <div className="flex items-center gap-1 shrink-0">
-          {/* Notifications */}
-          {userRole && <NotificationBell userRole={userRole} />}
-
-          {/* Messages with badge (desktop) */}
-          {messagesPath && (
-            <Link
-              to={messagesPath}
-              className={cn(
-                "relative p-2 rounded-lg transition-colors hidden lg:flex items-center",
-                location.pathname === messagesPath
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
-            >
-              <MessageSquare className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <Badge
-                  variant="default"
-                  className="absolute -top-1 -right-1 h-5 min-w-5 p-0 flex items-center justify-center text-xs"
-                >
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </Badge>
-              )}
-            </Link>
-          )}
 
-          {/* User dropdown */}
-          {userRole ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 ml-1">
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage src={profile?.avatar_url ?? undefined} />
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="hidden sm:inline text-sm font-medium max-w-[120px] truncate">
-                    {profile?.full_name || "Account"}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <div className="px-3 py-2">
-                  <p className="text-sm font-medium truncate">{profile?.full_name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
+              {userRole ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2 ml-1 rounded-full hover:bg-muted">
+                      <div className="relative">
+                        <Avatar className="h-7 w-7 ring-2 ring-primary/20 transition-all duration-200 hover:ring-primary/50">
+                          <AvatarImage src={profile?.avatar_url ?? undefined} />
+                          <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-accent text-primary-foreground font-semibold">
+                            {initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        {/* Online indicator */}
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-success border-2 border-background" />
+                      </div>
+                      <span className="hidden sm:inline text-sm font-medium max-w-[120px] truncate">
+                        {profile?.full_name || "Account"}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-[var(--shadow-medium)]">
+                    <div className="px-3 py-2.5">
+                      <p className="text-sm font-semibold truncate">{profile?.full_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive cursor-pointer">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link to="/login">
+                    <Button variant="ghost" size="sm" className="rounded-full">Login</Button>
+                  </Link>
+                  <Link to="/login">
+                    <Button size="sm" className="rounded-full shadow-[var(--shadow-emerald-glow)] hover:shadow-[var(--glow-hover)] transition-shadow duration-300">
+                      Get Started
+                    </Button>
+                  </Link>
                 </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/settings")}>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" size="sm">Login</Button>
-              </Link>
-              <Link to="/login">
-                <Button size="sm">Get Started</Button>
-              </Link>
-            </div>
-          )}
+              )}
 
-          {/* Mobile menu toggle */}
-          {userRole && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden ml-1"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+              {userRole && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden ml-1 rounded-full"
+                  onClick={() => setMobileOpen(!mobileOpen)}
+                >
+                  {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          {userRole && mobileOpen && (
+            <div className="lg:hidden border-t border-border/40 px-4 py-3 space-y-0.5">
+              {allLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-[var(--shadow-emerald-glow)]"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <link.icon className="h-4.5 w-4.5" />
+                    {link.label}
+                    {link.badge && link.badge > 0 ? (
+                      <Badge variant="default" className="ml-auto text-xs bg-destructive text-destructive-foreground">
+                        {link.badge > 9 ? "9+" : link.badge}
+                      </Badge>
+                    ) : null}
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
-
-      {/* Mobile Navigation Drawer */}
-      {userRole && mobileOpen && (
-        <div className="lg:hidden border-t border-border bg-background px-4 py-3 space-y-1">
-          {allLinks.map((link) => {
-            const isActive = location.pathname === link.path;
-            return (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <link.icon className="h-5 w-5" />
-                {link.label}
-                {link.badge && link.badge > 0 ? (
-                  <Badge variant="default" className="ml-auto text-xs">
-                    {link.badge > 9 ? "9+" : link.badge}
-                  </Badge>
-                ) : null}
-              </Link>
-            );
-          })}
-        </div>
-      )}
     </nav>
   );
 }
