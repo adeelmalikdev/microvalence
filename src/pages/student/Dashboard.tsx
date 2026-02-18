@@ -278,6 +278,12 @@ function ProfileHeader({ displayName, initials, profile, linkedinUrl, customLink
   );
 }
 
+function ensureAbsoluteUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+}
+
 function SocialLinks({ profile, linkedinUrl, customLink }: any) {
   const links = [
     { url: linkedinUrl, icon: Linkedin },
@@ -292,7 +298,7 @@ function SocialLinks({ profile, linkedinUrl, customLink }: any) {
   return (
     <>
       {links.map((link, i) => (
-        <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+        <a key={i} href={ensureAbsoluteUrl(link.url)} target="_blank" rel="noopener noreferrer"
           className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-110">
           <link.icon className="h-4 w-4" />
         </a>

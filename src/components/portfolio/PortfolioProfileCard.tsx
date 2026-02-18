@@ -52,6 +52,12 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
     .map((n) => n[0])
     .join("") || profile.email?.[0]?.toUpperCase() || "?";
 
+  const ensureAbsoluteUrl = (url: string) => {
+    if (!url) return url;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+  };
+
   return (
     <Card className="border-primary/20 overflow-hidden">
       {/* Cover Image */}
@@ -129,37 +135,37 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
 
             <div className="flex gap-2 mt-3">
               {profile.github_url && (
-                <a href={profile.github_url} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.github_url)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Github className="h-4 w-4" />
                 </a>
               )}
               {profile.portfolio_url && (
-                <a href={profile.portfolio_url} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.portfolio_url)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Globe className="h-4 w-4" />
                 </a>
               )}
               {profile.linkedin_url && (
-                <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.linkedin_url)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Linkedin className="h-4 w-4" />
                 </a>
               )}
               {profile.website && (
-                <a href={profile.website} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.website)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Link className="h-4 w-4" />
                 </a>
               )}
               {profile.custom_link && (
-                <a href={profile.custom_link} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.custom_link)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <Globe className="h-4 w-4" />
                 </a>
               )}
               {profile.resume_url && (
-                <a href={profile.resume_url} target="_blank" rel="noopener noreferrer"
+                <a href={ensureAbsoluteUrl(profile.resume_url)} target="_blank" rel="noopener noreferrer"
                   className="p-1.5 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors">
                   <FileText className="h-4 w-4" />
                 </a>

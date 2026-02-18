@@ -6,6 +6,8 @@ import { AboutSection } from "./components/AboutSection";
 import { SkillsSection } from "./components/SkillsSection";
 import { ProjectsSection } from "./components/ProjectsSection";
 import { ExperienceSection } from "./components/ExperienceSection";
+import { Link } from "react-router-dom";
+import { Settings } from "lucide-react";
 
 interface EnhancedProfileProps {
   userId?: string;
@@ -46,7 +48,18 @@ export function EnhancedProfile({ userId }: EnhancedProfileProps) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+      <div className="flex items-center justify-between mb-6">
+        <BackButton fallbackPath="/student/dashboard" />
+        {isOwnProfile && (
+          <Link
+            to="/settings"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Settings className="h-4 w-4" />
+            Complete your portfolio from Settings &gt; Account
+          </Link>
+        )}
+      </div>
       <div className="space-y-6">
       <ProfileHeader
         profile={profile}

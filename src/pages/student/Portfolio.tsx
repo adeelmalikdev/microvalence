@@ -315,100 +315,32 @@ export default function StudentPortfolio() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Github className="h-5 w-5 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">GitHub</p>
-                  {profile?.github_url ? (
-                    <a
-                      href={profile.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline truncate block"
-                    >
-                      {profile.github_url}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not added yet</p>
-                  )}
+              {[
+                { icon: Github, label: "GitHub", url: profile?.github_url },
+                { icon: Globe, label: "Portfolio", url: profile?.portfolio_url },
+                { icon: Link2, label: "Website", url: profile?.website },
+                { icon: Linkedin, label: "LinkedIn", url: profile?.linkedin_url },
+                { icon: Link2, label: "Custom Link", url: profile?.custom_link },
+              ].map(({ icon: Icon, label, url }) => (
+                <div key={label} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{label}</p>
+                    {url ? (
+                      <a
+                        href={url.startsWith("http") ? url : `https://${url}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline truncate block"
+                      >
+                        {url}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Not added yet</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Globe className="h-5 w-5 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">Portfolio</p>
-                  {profile?.portfolio_url ? (
-                    <a
-                      href={profile.portfolio_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline truncate block"
-                    >
-                      {profile.portfolio_url}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not added yet</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Link2 className="h-5 w-5 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">Website</p>
-                  {profile?.website ? (
-                    <a
-                      href={profile.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline truncate block"
-                    >
-                      {profile.website}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not added yet</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Linkedin className="h-5 w-5 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">LinkedIn</p>
-                  {profile?.linkedin_url ? (
-                    <a
-                      href={profile.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline truncate block"
-                    >
-                      {profile.linkedin_url}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not added yet</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Link2 className="h-5 w-5 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">Custom Link</p>
-                  {profile?.custom_link ? (
-                    <a
-                      href={profile.custom_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline truncate block"
-                    >
-                      {profile.custom_link}
-                    </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not added yet</p>
-                  )}
-                </div>
-              </div>
+              ))}
             </div>
           </CardContent>
         </Card>

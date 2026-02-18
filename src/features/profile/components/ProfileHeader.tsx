@@ -15,7 +15,13 @@
    isSaving: boolean;
  }
  
- export function ProfileHeader({ profile, isOwnProfile, onSave, isSaving }: ProfileHeaderProps) {
+function ensureAbsoluteUrl(url: string): string {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `https://${url}`;
+}
+
+export function ProfileHeader({ profile, isOwnProfile, onSave, isSaving }: ProfileHeaderProps) {
    const [isEditing, setIsEditing] = useState(false);
    const [editData, setEditData] = useState({
      full_name: profile.full_name || "",
@@ -261,7 +267,7 @@
               <div className="flex gap-3 mt-3">
                {profile.github_url && (
                  <a
-                   href={profile.github_url}
+                   href={ensureAbsoluteUrl(profile.github_url)}
                    target="_blank"
                    rel="noopener noreferrer"
                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
@@ -271,7 +277,7 @@
                )}
                {profile.portfolio_url && (
                  <a
-                   href={profile.portfolio_url}
+                   href={ensureAbsoluteUrl(profile.portfolio_url)}
                    target="_blank"
                    rel="noopener noreferrer"
                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
@@ -281,7 +287,7 @@
                )}
                {profile.website && (
                  <a
-                   href={profile.website}
+                   href={ensureAbsoluteUrl(profile.website)}
                    target="_blank"
                    rel="noopener noreferrer"
                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
@@ -291,7 +297,7 @@
                )}
                {profile.resume_url && (
                  <a
-                   href={profile.resume_url}
+                   href={ensureAbsoluteUrl(profile.resume_url)}
                    target="_blank"
                    rel="noopener noreferrer"
                   className="p-2 rounded-full bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
