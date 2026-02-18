@@ -161,7 +161,7 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="pt-0 pb-16">
+      <section className="pt-0 pb-16 relative z-10 bg-gradient-to-br from-muted via-background to-muted">
         <div className="container">
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
