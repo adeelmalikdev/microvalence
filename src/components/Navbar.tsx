@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import valenceLogo from "@/assets/valence-logo.jpeg";
 import {
   Home,
   Briefcase,
@@ -105,9 +106,7 @@ export function Navbar({ userRole }: NavbarProps) {
           <div className="flex h-14 items-center justify-between px-5 gap-2">
             {/* Logo */}
             <Link to={userRole ? `/${userRole}/dashboard` : "/"} className="flex items-center gap-2.5 group">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[var(--shadow-emerald-glow)] transition-shadow duration-300 group-hover:shadow-[var(--glow-hover)]">
-                <span className="text-primary-foreground font-extrabold text-base tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>μ</span>
-              </div>
+              <img src={valenceLogo} alt="Valence" className="h-8 w-8 object-contain" />
               <span className="font-bold text-lg text-foreground hidden sm:inline tracking-tight" style={{ fontFamily: "'Syne', sans-serif" }}>
                 Valence
               </span>
