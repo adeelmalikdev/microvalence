@@ -20,13 +20,15 @@ export default function BrowseStudents() {
       const { data: studentIds, error: rpcError } = await supabase
         .rpc("get_users_by_role", { _role: "student" });
 
+      console.log("RPC studentIds:", studentIds, "error:", rpcError);
       if (rpcError) throw rpcError;
       if (!studentIds || studentIds.length === 0) return [];
 
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar_url, bio, university, major, graduation_year, location")
-        .in("user_id", studentIds);
+        .in("user_id", studentIds as string[]);
+      console.log("Profiles:", profiles, "error:", error);
 
       if (error) throw error;
       return profiles ?? [];
