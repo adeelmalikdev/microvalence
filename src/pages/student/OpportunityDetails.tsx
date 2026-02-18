@@ -113,11 +113,18 @@ export default function OpportunityDetails() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground mb-2">
-                    {opportunity.title}
-                  </h1>
-                  <p className="text-lg text-muted-foreground">{opportunity.company_name}</p>
+                <div className="flex items-center gap-4">
+                  {opportunity.company_logo && (
+                    <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-muted border border-border">
+                      <img src={opportunity.company_logo} alt={opportunity.company_name} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-2xl font-bold text-foreground mb-2">
+                      {opportunity.title}
+                    </h1>
+                    <p className="text-lg text-muted-foreground">{opportunity.company_name}</p>
+                  </div>
                 </div>
                 <Badge className={levelColors[opportunity.level]}>
                   {opportunity.level.charAt(0).toUpperCase() + opportunity.level.slice(1)}

@@ -1,0 +1,1 @@
+ALTER TABLE public.opportunities ADD COLUMN company_logo text;

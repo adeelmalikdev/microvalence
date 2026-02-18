@@ -8,6 +8,7 @@ interface Opportunity {
   id: string;
   title: string;
   company_name: string;
+  company_logo?: string | null;
   description: string;
   skills_required: string[];
   duration_hours: number;
@@ -57,9 +58,13 @@ export function OpportunityListCard({ opportunity, onViewDetails }: OpportunityL
     <Card className="shadow-card hover:shadow-card-hover transition-shadow">
       <CardContent className="p-5">
         <div className="flex gap-4">
-          {/* Icon */}
-          <div className="shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-2xl">
-            {icon}
+          {/* Company Logo or Icon */}
+          <div className="shrink-0 w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-2xl overflow-hidden">
+            {opportunity.company_logo ? (
+              <img src={opportunity.company_logo} alt={opportunity.company_name} className="w-full h-full object-cover rounded-lg" />
+            ) : (
+              icon
+            )}
           </div>
 
           {/* Content */}

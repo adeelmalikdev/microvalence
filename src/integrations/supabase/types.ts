@@ -580,6 +580,7 @@ export type Database = {
       }
       opportunities: {
         Row: {
+          company_logo: string | null
           company_name: string
           created_at: string
           deadline: string | null
@@ -597,6 +598,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          company_logo?: string | null
           company_name: string
           created_at?: string
           deadline?: string | null
@@ -614,6 +616,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          company_logo?: string | null
           company_name?: string
           created_at?: string
           deadline?: string | null
