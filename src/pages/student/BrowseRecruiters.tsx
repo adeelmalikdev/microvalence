@@ -20,15 +20,14 @@ export default function BrowseRecruiters() {
       const { data: recruiterIds, error: rpcError } = await supabase
         .rpc("get_users_by_role", { _role: "recruiter" });
 
-      console.log("RPC recruiterIds:", recruiterIds, "error:", rpcError);
       if (rpcError) throw rpcError;
       if (!recruiterIds || recruiterIds.length === 0) return [];
 
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar_url, bio, company_name, company_logo, industry, location, company_website, company_description")
-        .in("user_id", recruiterIds as string[]);
-      console.log("Recruiter profiles:", profiles, "error:", error);
+        .in("user_id", recruiterIds as string[])
+        .not("full_name", "is", null);
 
       if (error) throw error;
       return profiles ?? [];
