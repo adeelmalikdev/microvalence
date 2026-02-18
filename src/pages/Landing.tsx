@@ -140,10 +140,10 @@ export default function Landing() {
                   </span>
                 </div>
                 <CardContent className="p-6 pt-8">
-                  <div className="mb-4">
+                  <div className="flex items-center gap-3 mb-3">
                     <Icon3D icon={item.icon} />
+                    <h3 className="font-semibold text-foreground">{item.title}</h3>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.description}</p>
                 </CardContent>
               </Card>
@@ -153,7 +153,7 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16">
+      <section className="pt-0 pb-16">
         <div className="container">
           <div className="grid md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
