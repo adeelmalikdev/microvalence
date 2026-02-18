@@ -4,9 +4,9 @@ import { Footer } from "@/components/Footer";
 
 export default function StudentLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10 bg-dots">
       <Navbar userRole="student" />
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className="flex-1 relative z-10">
         <Outlet />
       </main>
       <Footer />

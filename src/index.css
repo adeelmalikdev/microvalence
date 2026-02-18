@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -57,14 +57,23 @@
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
-   /* Glassmorphism */
-   --glass-bg: rgba(255, 255, 255, 0.7);
-   --glass-border: rgba(16, 185, 129, 0.2);
-   --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
+    /* Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(16, 185, 129, 0.2);
+    --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
 
-   /* Glow effects */
-   --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.3);
-   --glow-hover: 0 0 40px rgba(16, 185, 129, 0.5);
+    /* Glow effects */
+    --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.3);
+    --glow-hover: 0 0 40px rgba(16, 185, 129, 0.5);
+
+    /* Premium shadows */
+    --shadow-soft: 0 2px 20px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+    --shadow-hard: 0 20px 60px rgba(0, 0, 0, 0.12);
+    --shadow-emerald-glow: 0 8px 25px rgba(16, 185, 129, 0.15);
+
+    /* Subtle patterns */
+    --pattern-dots: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='0.8' fill='%2310b981' opacity='0.07'/%3E%3C/svg%3E");
   }
 
   .dark {
@@ -118,14 +127,22 @@
     --info: 199 89% 58%;
     --info-foreground: 0 0% 100%;
 
-   /* Glassmorphism - Dark mode */
-   --glass-bg: rgba(30, 41, 59, 0.7);
-   --glass-border: rgba(16, 185, 129, 0.3);
-   --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
+    /* Glassmorphism - Dark mode */
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(16, 185, 129, 0.3);
+    --glass-shadow: 0 8px 32px rgba(16, 185, 129, 0.2);
 
-   /* Glow effects - Dark mode */
-   --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.4);
-   --glow-hover: 0 0 40px rgba(16, 185, 129, 0.6);
+    /* Glow effects - Dark mode */
+    --glow-emerald: 0 0 20px rgba(16, 185, 129, 0.4);
+    --glow-hover: 0 0 40px rgba(16, 185, 129, 0.6);
+
+    /* Premium shadows - Dark mode */
+    --shadow-soft: 0 2px 20px rgba(0, 0, 0, 0.15);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.25);
+    --shadow-hard: 0 20px 60px rgba(0, 0, 0, 0.35);
+    --shadow-emerald-glow: 0 8px 25px rgba(16, 185, 129, 0.25);
+
+    --pattern-dots: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='0.8' fill='%2310b981' opacity='0.12'/%3E%3C/svg%3E");
   }
 }
 
@@ -135,8 +152,41 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  /* Custom focus ring */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)));
+  border-radius: 10px;
+  border: 2px solid hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
 }
 
 @layer utilities {
@@ -149,37 +199,103 @@
   }
 
   .shadow-card {
-    box-shadow: 0 2px 8px 0 hsl(159 100% 19% / 0.08);
+    box-shadow: var(--shadow-soft);
   }
 
   .shadow-card-hover {
-    box-shadow: 0 4px 16px 0 hsl(159 100% 19% / 0.12);
+    box-shadow: var(--shadow-medium);
   }
 
-   /* Glassmorphism utilities */
-   .glass-light {
-     background: var(--glass-bg);
-     backdrop-filter: blur(10px);
-     border: 1px solid rgba(255, 255, 255, 0.3);
-   }
+  /* Glassmorphism utilities */
+  .glass-light {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
 
-   .glass-emerald {
-     background: rgba(16, 185, 129, 0.1);
-     backdrop-filter: blur(10px);
-     border: 1px solid var(--glass-border);
-   }
+  .glass-emerald {
+    background: rgba(16, 185, 129, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+  }
 
-   .glass-medium {
-     background: rgba(255, 255, 255, 0.5);
-     backdrop-filter: blur(12px);
-     border: 1px solid var(--glass-border);
-   }
+  .glass-medium {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+  }
 
-   .glow-emerald {
-     box-shadow: var(--glow-emerald);
-   }
+  .glow-emerald {
+    box-shadow: var(--glow-emerald);
+  }
 
-   .glow-hover:hover {
-     box-shadow: var(--glow-hover);
-   }
+  .glow-hover:hover {
+    box-shadow: var(--glow-hover);
+  }
+
+  /* Premium card hover */
+  .card-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Background dot pattern overlay */
+  .bg-dots {
+    position: relative;
+  }
+
+  .bg-dots::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--pattern-dots);
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  /* Shimmer animation */
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.5) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite ease-in-out;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Accent bar for cards */
+  .accent-bar-top {
+    position: relative;
+  }
+
+  .accent-bar-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 999px 999px 0 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
