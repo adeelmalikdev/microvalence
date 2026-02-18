@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Users, Building2, CheckCircle, TrendingUp, Target, BookOpen, Award, Clock } from "lucide-react";
+import valenceLogo from "@/assets/valence-logo.jpeg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -70,7 +71,14 @@ const features = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted relative overflow-hidden">
+      {/* Watermark logo */}
+      <img
+        src={valenceLogo}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none select-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] object-contain opacity-[0.04] z-0"
+      />
       <Navbar />
 
       {/* Hero Section */}
