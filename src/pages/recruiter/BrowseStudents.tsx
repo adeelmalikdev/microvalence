@@ -27,8 +27,8 @@ export default function BrowseStudents() {
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select("user_id, full_name, avatar_url, bio, university, major, graduation_year, location")
-        .in("user_id", studentIds as string[]);
-      console.log("Profiles:", profiles, "error:", error);
+        .in("user_id", studentIds as string[])
+        .not("full_name", "is", null);
 
       if (error) throw error;
       return profiles ?? [];
