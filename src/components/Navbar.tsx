@@ -115,7 +115,7 @@ export function Navbar({ userRole }: NavbarProps) {
 
             {/* Desktop Navigation */}
             {userRole && (
-              <div className="hidden lg:flex items-center gap-0.5">
+              <div className="hidden lg:flex items-center gap-1.5">
                 {currentLinks.map((link) => {
                   const isActive = location.pathname === link.path ||
                     (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
