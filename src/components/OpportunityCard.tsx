@@ -32,7 +32,7 @@ export function OpportunityCard({
       
       <CardContent className="p-5 relative z-10">
         <div className="flex justify-between items-start mb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             {companyLogo && (
               <div className="shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-muted">
                 <img src={companyLogo} alt={company} className="w-full h-full object-cover" />

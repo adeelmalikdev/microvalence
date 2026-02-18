@@ -172,7 +172,7 @@ export default function PostOpportunity() {
           max_applicants: data.max_applicants || null,
           deadline: data.deadline ? new Date(data.deadline).toISOString() : null,
           status,
-          company_logo: profile?.company_logo || null,
+          company_logo: profile?.company_logo || profile?.avatar_url || null,
         },
         tasks: tasksWithAttachments,
       });
