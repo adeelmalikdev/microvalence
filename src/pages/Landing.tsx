@@ -115,7 +115,7 @@ export default function Landing() {
 
             <div className="hidden lg:grid grid-cols-2 gap-4">
               {features.map((feature) => (
-                <Card key={feature.label} className="bg-background/90 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
+                <Card key={feature.label} className="bg-background border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
                   <CardContent className="p-6 flex flex-col items-center text-center">
                     <div className="mb-3">
                       <Icon3D icon={feature.icon} />
@@ -141,7 +141,7 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {howItWorks.map((item) => (
-              <Card key={item.step} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1 relative">
+              <Card key={item.step} className="bg-background border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1 relative">
                 <div className="absolute -top-3 left-6">
                   <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg">
                     {item.step}
