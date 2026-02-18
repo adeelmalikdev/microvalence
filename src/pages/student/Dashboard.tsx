@@ -135,6 +135,7 @@ export default function StudentDashboard() {
                     key={opp.id}
                     title={opp.title}
                     company={opp.company_name}
+                    companyLogo={opp.company_logo}
                     skills={opp.skills_required}
                     duration={getDurationLabel(opp.duration_hours)}
                     level={capitalize(opp.level) as "Beginner" | "Intermediate" | "Advanced"}

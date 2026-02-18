@@ -7,6 +7,7 @@ import { SkillTag } from "./SkillTag";
 interface OpportunityCardProps {
   title: string;
   company: string;
+  companyLogo?: string | null;
   skills: string[];
   duration: string;
   level: "Beginner" | "Intermediate" | "Advanced";
@@ -17,6 +18,7 @@ interface OpportunityCardProps {
 export function OpportunityCard({
   title,
   company,
+  companyLogo,
   skills,
   duration,
   level,
@@ -30,11 +32,18 @@ export function OpportunityCard({
       
       <CardContent className="p-5 relative z-10">
         <div className="flex justify-between items-start mb-3">
-          <div>
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{title}</h3>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-              <Building2 className="h-4 w-4" />
-              <span>{company}</span>
+          <div className="flex items-center gap-3">
+            {companyLogo && (
+              <div className="shrink-0 w-10 h-10 rounded-lg overflow-hidden bg-muted">
+                <img src={companyLogo} alt={company} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div>
+              <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{title}</h3>
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+                <Building2 className="h-4 w-4" />
+                <span>{company}</span>
+              </div>
             </div>
           </div>
           {isRemote && <Badge variant="remote">Remote</Badge>}
