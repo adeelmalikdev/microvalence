@@ -43,6 +43,23 @@ const howItWorks = [
   },
 ];
 
+const benefits = [
+  {
+    icon: Target,
+    title: "Real Projects",
+    description: "Work on actual industry tasks that matter",
+  },
+  {
+    icon: Award,
+    title: "Earn Certificates",
+    description: "Get verified certificates for your portfolio",
+  },
+  {
+    icon: Clock,
+    title: "Flexible Schedule",
+    description: "Complete micro-internships around your classes",
+  },
+];
 
 const features = [
   { icon: Target, label: "Opportunities" },
@@ -135,8 +152,26 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Benefits Section */}
+      <section className="py-16">
+        <div className="container">
+          <div className="grid md:grid-cols-3 gap-8">
+            {benefits.map((benefit, index) => (
+              <Card key={index} className="bg-background/95 border-2 border-primary/50 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] transition-all duration-300 hover:-translate-y-1">
+                <CardContent className="p-6 text-center">
+                  <div className="flex justify-center mb-4">
+                    <Icon3D icon={benefit.icon} />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* CTA Section */}
+
       <section className="py-12 bg-gradient-to-r from-primary via-accent to-secondary rounded-xl mx-4 mb-8">
         <div className="container text-center relative z-10">
           <h2 className="text-3xl font-bold text-primary-foreground mb-3">
