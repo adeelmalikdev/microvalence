@@ -115,7 +115,7 @@ export function Navbar({ userRole }: NavbarProps) {
 
             {/* Desktop Navigation */}
             {userRole && (
-              <div className="hidden lg:flex items-center gap-1.5">
+              <div className="hidden lg:flex items-center gap-0.5">
                 {currentLinks.map((link) => {
                   const isActive = location.pathname === link.path ||
                     (link.path !== `/${userRole}/dashboard` && location.pathname.startsWith(link.path));
@@ -124,7 +124,7 @@ export function Navbar({ userRole }: NavbarProps) {
                       key={link.path}
                       to={link.path}
                       className={cn(
-                        "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
+                        "flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap",
                         isActive
                           ? "bg-primary text-primary-foreground shadow-[var(--shadow-emerald-glow)]"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
