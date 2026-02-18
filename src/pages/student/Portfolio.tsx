@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { BackButton } from "@/components/BackButton";
 import { useStudentPortfolio } from "@/hooks/useStudentPortfolio";
 import { useStudentProfile } from "@/features/profile/hooks/useStudentProfile";
@@ -23,6 +24,7 @@ import {
   Github,
   Link2,
   Linkedin,
+  Settings,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -194,7 +196,17 @@ export default function StudentPortfolio() {
 
   return (
     <div className="container px-4 py-8">
-      <BackButton fallbackPath="/student/dashboard" className="mb-6" />
+      <BackButton fallbackPath="/student/dashboard" className="mb-4" />
+
+      <div className="flex justify-center mb-6">
+        <Link
+          to="/settings"
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Settings className="h-4 w-4" />
+          Complete your portfolio from Settings &gt; Account
+        </Link>
+      </div>
 
       <div className="space-y-6 max-w-5xl">
         {/* Profile Card - always renders, shows skeleton when loading */}
