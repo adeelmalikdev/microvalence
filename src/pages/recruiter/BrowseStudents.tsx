@@ -17,14 +17,11 @@ export default function BrowseStudents() {
   const { data: students, isLoading } = useQuery({
     queryKey: ["browse-students"],
     queryFn: async () => {
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "student");
+      const { data: studentIds, error: rpcError } = await supabase
+        .rpc("get_users_by_role", { _role: "student" });
 
-      if (!roles || roles.length === 0) return [];
-
-      const studentIds = roles.map((r) => r.user_id);
+      if (rpcError) throw rpcError;
+      if (!studentIds || studentIds.length === 0) return [];
 
       const { data: profiles, error } = await supabase
         .from("profiles")

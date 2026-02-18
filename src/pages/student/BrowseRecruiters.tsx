@@ -17,15 +17,11 @@ export default function BrowseRecruiters() {
   const { data: recruiters, isLoading } = useQuery({
     queryKey: ["browse-recruiters"],
     queryFn: async () => {
-      // Get all recruiter user_ids
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id")
-        .eq("role", "recruiter");
+      const { data: recruiterIds, error: rpcError } = await supabase
+        .rpc("get_users_by_role", { _role: "recruiter" });
 
-      if (!roles || roles.length === 0) return [];
-
-      const recruiterIds = roles.map((r) => r.user_id);
+      if (rpcError) throw rpcError;
+      if (!recruiterIds || recruiterIds.length === 0) return [];
 
       const { data: profiles, error } = await supabase
         .from("profiles")
