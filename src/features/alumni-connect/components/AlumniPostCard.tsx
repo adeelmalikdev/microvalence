@@ -11,22 +11,31 @@ import {
   MoreHorizontal,
   Trash2,
   Link as LinkIcon,
+  Repeat2,
 } from "lucide-react";
- import { formatDistanceToNow } from "date-fns";
- import { supabase } from "@/integrations/supabase/client";
- import { useAuth } from "@/hooks/useAuth";
+import { formatDistanceToNow } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/integrations/supabase/types";
- import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
- import { Button } from "@/components/ui/button";
- import {
-   DropdownMenu,
-   DropdownMenuContent,
-   DropdownMenuItem,
-   DropdownMenuTrigger,
- } from "@/components/ui/dropdown-menu";
- import { toast } from "sonner";
- import { AlumniPost } from "../hooks/useAlumniPosts";
- import { AlumniComments } from "./AlumniComments";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { AlumniPost } from "../hooks/useAlumniPosts";
+import { AlumniComments } from "./AlumniComments";
  
 type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
 
@@ -56,9 +65,42 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
     (post.user_reaction as AlumniReactionType) || null
   );
    const [showReactions, setShowReactions] = useState(false);
-   const [showComments, setShowComments] = useState(false);
-   const [commentsCount, setCommentsCount] = useState(post.comments_count);
-   const { user } = useAuth();
+  const [showComments, setShowComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(post.comments_count);
+  const [showRepostDialog, setShowRepostDialog] = useState(false);
+  const [repostThoughts, setRepostThoughts] = useState("");
+  const [isReposting, setIsReposting] = useState(false);
+  const { user } = useAuth();
+
+  const handleRepost = async () => {
+    if (!user) {
+      toast.error("Please sign in to repost");
+      return;
+    }
+    setIsReposting(true);
+    try {
+      const repostContent = repostThoughts.trim()
+        ? `${repostThoughts.trim()}\n\n---\n🔁 Reposted from ${authorName}:\n\n${post.content}`
+        : `🔁 Reposted from ${authorName}:\n\n${post.content}`;
+
+      const { error } = await supabase.from("alumni_posts").insert({
+        author_id: user.id,
+        content: repostContent,
+        post_type: post.post_type,
+        media_urls: post.media_urls || [],
+        visibility: "public",
+      });
+      if (error) throw error;
+      toast.success("Reposted successfully!");
+      setShowRepostDialog(false);
+      setRepostThoughts("");
+    } catch (error) {
+      console.error("Error reposting:", error);
+      toast.error("Failed to repost");
+    } finally {
+      setIsReposting(false);
+    }
+  };
  
   const handleReaction = async (reactionType: AlumniReactionType) => {
      if (!user) {
@@ -275,20 +317,10 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
                 <LinkIcon className="h-4 w-4 mr-2" />
                 Copy Link
               </DropdownMenuItem>
-              {typeof navigator.share === "function" && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    navigator.share({
-                      title: `Post by ${authorName}`,
-                      text: post.content.slice(0, 100),
-                      url: `${window.location.origin}/student/alumni?post=${post.id}`,
-                    }).catch(() => {});
-                  }}
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share via...
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => setShowRepostDialog(true)}>
+                <Repeat2 className="h-4 w-4 mr-2" />
+                Repost with your thoughts
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
  
@@ -305,6 +337,38 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
            onCommentAdded={() => setCommentsCount((c) => c + 1)}
          />
        )}
-     </motion.div>
-   );
- }
+      {/* Repost Dialog */}
+      <Dialog open={showRepostDialog} onOpenChange={setShowRepostDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Repost with your thoughts</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            placeholder="Add your thoughts... (optional)"
+            value={repostThoughts}
+            onChange={(e) => setRepostThoughts(e.target.value)}
+            className="min-h-[100px]"
+          />
+          <div className="bg-muted/50 rounded-lg p-3 border border-border/50 text-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={post.author_profile?.avatar_url || undefined} />
+                <AvatarFallback className="text-xs">{authorInitials}</AvatarFallback>
+              </Avatar>
+              <span className="font-medium text-foreground">{authorName}</span>
+            </div>
+            <p className="text-muted-foreground line-clamp-3">{post.content}</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRepostDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRepost} disabled={isReposting}>
+              {isReposting ? "Reposting..." : "Repost"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </motion.div>
+  );
+}
