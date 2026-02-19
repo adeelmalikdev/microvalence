@@ -1,16 +1,17 @@
  import { useState } from "react";
  import { motion } from "framer-motion";
- import {
-   MessageCircle,
-   Share2,
-   Bookmark,
-   ThumbsUp,
-   PartyPopper,
-   Lightbulb,
-   Heart,
-   MoreHorizontal,
-   Trash2,
- } from "lucide-react";
+import {
+  MessageCircle,
+  Share2,
+  Bookmark,
+  ThumbsUp,
+  PartyPopper,
+  Lightbulb,
+  Heart,
+  MoreHorizontal,
+  Trash2,
+  Link as LinkIcon,
+} from "lucide-react";
  import { formatDistanceToNow } from "date-fns";
  import { supabase } from "@/integrations/supabase/client";
  import { useAuth } from "@/hooks/useAuth";
@@ -256,10 +257,40 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
              Comment
            </Button>
  
-           <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
-             <Share2 className="h-4 w-4" />
-             Share
-           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                <Share2 className="h-4 w-4" />
+                Share
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              <DropdownMenuItem
+                onClick={() => {
+                  const url = `${window.location.origin}/student/alumni?post=${post.id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Link copied to clipboard");
+                }}
+              >
+                <LinkIcon className="h-4 w-4 mr-2" />
+                Copy Link
+              </DropdownMenuItem>
+              {typeof navigator.share === "function" && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    navigator.share({
+                      title: `Post by ${authorName}`,
+                      text: post.content.slice(0, 100),
+                      url: `${window.location.origin}/student/alumni?post=${post.id}`,
+                    }).catch(() => {});
+                  }}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share via...
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
  
            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
              <Bookmark className="h-4 w-4" />
