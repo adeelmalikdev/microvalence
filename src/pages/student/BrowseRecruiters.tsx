@@ -41,7 +41,10 @@ export default function BrowseRecruiters() {
       r.full_name?.toLowerCase().includes(q) ||
       r.company_name?.toLowerCase().includes(q) ||
       r.industry?.toLowerCase().includes(q) ||
-      r.location?.toLowerCase().includes(q)
+      r.location?.toLowerCase().includes(q) ||
+      r.bio?.toLowerCase().includes(q) ||
+      r.company_description?.toLowerCase().includes(q) ||
+      r.company_website?.toLowerCase().includes(q)
     );
   });
 
