@@ -467,6 +467,17 @@ export default function Login() {
                 )}
               </div>
 
+              {!isSignUp && (
+                <div className="text-right">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              )}
+
               {/* reCAPTCHA Widget - only on production */}
               {requiresCaptcha && (
                 <div className="flex flex-col items-center gap-2">

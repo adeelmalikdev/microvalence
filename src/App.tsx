@@ -44,6 +44,8 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AboutUs from "./pages/AboutUs";
 import Feedback from "./pages/Feedback";
 import Settings from "./pages/Settings";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import DesignSystemDemo from "./pages/DesignSystemDemo";
 import StudentLayout from "./layouts/StudentLayout";
@@ -156,6 +158,9 @@ const AppRoutes = () => (
       {/* Public Pages */}
       <Route path="/about" element={<AboutUs />} />
       <Route path="/feedback" element={<Feedback />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/design-system" element={<DesignSystemDemo />} />
       <Route path="/design-system" element={<DesignSystemDemo />} />
 
       {/* Settings */}
