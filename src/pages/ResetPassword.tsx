@@ -88,12 +88,14 @@ export default function ResetPassword() {
         });
       } else {
         setIsSuccess(true);
-        // Sign out after password reset so they log in fresh
-        await supabase.auth.signOut();
         toast({
           title: "Password updated!",
           description: "You can now sign in with your new password.",
         });
+        // Wait for the update to fully propagate before signing out
+        setTimeout(async () => {
+          await supabase.auth.signOut();
+        }, 2000);
       }
     } catch {
       toast({
