@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { GraduationCap, Building2, Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -272,10 +273,28 @@ export default function Login() {
             description: error.message,
           });
         } else {
-          // Wait a moment for auth state to update then navigate
-          setTimeout(() => {
-            navigate(config.dashboardPath);
-          }, 100);
+          // Verify user role matches selected tab
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "")
+            .maybeSingle();
+
+          if (roleData?.role && roleData.role !== role) {
+            // Role mismatch - sign out and show error
+            await supabase.auth.signOut();
+            const correctPage = roleData.role === "student" ? "Student" : "Recruiter";
+            toast({
+              variant: "destructive",
+              title: "Wrong login page",
+              description: `This account is registered as a ${correctPage.toLowerCase()}. Please use the ${correctPage} tab to sign in.`,
+            });
+          } else {
+            // Role matches - navigate to dashboard
+            setTimeout(() => {
+              navigate(config.dashboardPath);
+            }, 100);
+          }
         }
       }
     } catch (error) {
