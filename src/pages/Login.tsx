@@ -265,36 +265,41 @@ export default function Login() {
           setIsSignUp(false);
         }
       } else {
-        const { error } = await signIn(email, password);
-        if (error) {
+        // First, sign in directly via supabase to check role before auth state propagates
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInError) {
           toast({
             variant: "destructive",
             title: "Sign in failed",
-            description: error.message,
+            description: signInError.message,
           });
-        } else {
-          // Verify user role matches selected tab
+        } else if (signInData.user) {
+          // Check role BEFORE auth state propagates to LoginRedirect
           const { data: roleData } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", (await supabase.auth.getUser()).data.user?.id ?? "")
+            .eq("user_id", signInData.user.id)
             .maybeSingle();
 
           if (roleData?.role && roleData.role !== role) {
-            // Role mismatch - sign out and show error
+            // Role mismatch - sign out immediately
             await supabase.auth.signOut();
             const correctPage = roleData.role === "student" ? "Student" : "Recruiter";
+            setFormError(`This account is registered as a ${correctPage.toLowerCase()}. Please use the ${correctPage} tab to sign in.`);
             toast({
               variant: "destructive",
               title: "Wrong login page",
               description: `This account is registered as a ${correctPage.toLowerCase()}. Please use the ${correctPage} tab to sign in.`,
             });
-          } else {
-            // Role matches - navigate to dashboard
-            setTimeout(() => {
-              navigate(config.dashboardPath);
-            }, 100);
+            return;
           }
+          
+          // Role matches - navigate to dashboard
+          navigate(config.dashboardPath, { replace: true });
         }
       }
     } catch (error) {
@@ -311,7 +316,7 @@ export default function Login() {
       }
       setRecaptchaToken(null);
     }
-  }, [isSignUp, email, password, fullName, role, signUp, signIn, toast, navigate, config.dashboardPath, requiresCaptcha]);
+  }, [isSignUp, email, password, fullName, role, signUp, toast, navigate, config.dashboardPath, requiresCaptcha]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
