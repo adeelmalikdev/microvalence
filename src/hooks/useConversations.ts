@@ -21,7 +21,7 @@ export function useConversations() {
   const { user, role } = useAuth();
 
   return useQuery({
-    queryKey: ["conversations", user?.id],
+    queryKey: ["conversations", user?.id, role],
     queryFn: async () => {
       if (!user) return [];
 
@@ -103,7 +103,7 @@ export function useConversations() {
         };
       });
     },
-    enabled: !!user,
+    enabled: !!user && !!role,
   });
 }
 
