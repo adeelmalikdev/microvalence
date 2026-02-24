@@ -658,6 +658,7 @@ export type Database = {
           graduation_year: number | null
           id: string
           industry: string | null
+          is_alumni: boolean | null
           is_deactivated: boolean | null
           language_preference: string | null
           linkedin_url: string | null
@@ -696,6 +697,7 @@ export type Database = {
           graduation_year?: number | null
           id?: string
           industry?: string | null
+          is_alumni?: boolean | null
           is_deactivated?: boolean | null
           language_preference?: string | null
           linkedin_url?: string | null
@@ -734,6 +736,7 @@ export type Database = {
           graduation_year?: number | null
           id?: string
           industry?: string | null
+          is_alumni?: boolean | null
           is_deactivated?: boolean | null
           language_preference?: string | null
           linkedin_url?: string | null

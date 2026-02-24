@@ -441,10 +441,32 @@ export default function Settings() {
                           <SelectItem value="sophomore">Sophomore (2nd Year)</SelectItem>
                           <SelectItem value="junior">Junior (3rd Year)</SelectItem>
                           <SelectItem value="senior">Senior (4th Year)</SelectItem>
-                          <SelectItem value="graduated">Graduated</SelectItem>
-                          <SelectItem value="alumni">Alumni</SelectItem>
+                          <SelectItem value="graduated">✓ Graduated (Alumni)</SelectItem>
                         </SelectContent>
                       </Select>
+                      {status === "graduated" && (
+                        <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                            <div className="text-sm">
+                              <p className="font-semibold text-foreground mb-0.5">
+                                Alumni Status Activated 🎓
+                              </p>
+                              <p className="text-muted-foreground">
+                                You'll be marked as an Alumni and gain access to the Alumni
+                                Network, mentorship features, and exclusive alumni opportunities.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {profile?.is_alumni && status !== "graduated" && (
+                        <div className="mt-2 flex items-center gap-2 text-sm text-primary">
+                          <span className="px-2 py-1 bg-primary/10 rounded-full font-semibold">
+                            Alumni Status Active
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Current Semester</Label>

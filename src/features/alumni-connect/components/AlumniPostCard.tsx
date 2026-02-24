@@ -184,13 +184,22 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
                  {authorInitials}
                </AvatarFallback>
              </Avatar>
-             <div>
-               <div className="flex items-center gap-2">
-                 <span className="font-semibold text-foreground">{authorName}</span>
-                 <span className={`text-xs px-2 py-0.5 rounded-full ${badge.color}`}>
-                   {badge.label}
-                 </span>
-               </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-foreground">{authorName}</span>
+                  {post.author_profile?.is_alumni ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/15 text-primary rounded-full text-xs font-semibold">
+                      🎓 Alumni
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted text-muted-foreground rounded-full text-xs font-semibold">
+                      📚 Student
+                    </span>
+                  )}
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${badge.color}`}>
+                    {badge.label}
+                  </span>
+                </div>
                <span className="text-sm text-muted-foreground">
                  {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                </span>
