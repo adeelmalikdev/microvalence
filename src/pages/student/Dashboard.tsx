@@ -239,7 +239,19 @@ function ProfileHeader({ displayName, initials, profile, linkedinUrl, customLink
 
           {/* Name + Bio + Links */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
+              {profile?.is_alumni ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-semibold rounded-full shadow-sm">
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  Alumni
+                </span>
+              ) : profile?.status ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-muted text-muted-foreground text-xs font-semibold rounded-full capitalize">
+                  {profile.status}
+                </span>
+              ) : null}
+            </div>
             <p className="text-sm text-muted-foreground mt-0.5">
               {profile?.bio || "Add your headline in Settings → Account"}
             </p>

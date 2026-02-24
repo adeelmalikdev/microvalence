@@ -42,6 +42,7 @@ export interface Profile {
   is_deactivated: boolean | null;
   deletion_requested_at: string | null;
   deletion_scheduled_for: string | null;
+  is_alumni: boolean | null;
 }
 
 interface AuthContextType {

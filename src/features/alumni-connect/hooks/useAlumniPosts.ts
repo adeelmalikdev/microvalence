@@ -17,10 +17,11 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
    visibility: "public" | "connections" | "private";
    created_at: string;
    updated_at: string;
-   author_profile?: {
-     full_name: string | null;
-     avatar_url: string | null;
-   };
+  author_profile?: {
+    full_name: string | null;
+    avatar_url: string | null;
+    is_alumni: boolean | null;
+  };
    user_reaction?: string | null;
  }
  
@@ -47,10 +48,10 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
        // Fetch author profiles separately
        if (postsData && postsData.length > 0) {
          const authorIds = [...new Set(postsData.map((p) => p.author_id))];
-         const { data: profiles } = await supabase
-           .from("profiles")
-           .select("user_id, full_name, avatar_url")
-           .in("user_id", authorIds);
+        const { data: profiles } = await supabase
+            .from("profiles")
+            .select("user_id, full_name, avatar_url, is_alumni")
+            .in("user_id", authorIds);
  
          // Fetch user's reactions if logged in
         let userReactions: Record<string, AlumniReactionType> = {};
@@ -100,11 +101,11 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
          async (payload) => {
           const newPostData = payload.new as AlumniPostRow;
            // Fetch the author profile for the new post
-           const { data: profile } = await supabase
-             .from("profiles")
-             .select("user_id, full_name, avatar_url")
-            .eq("user_id", newPostData.author_id)
-             .single();
+          const { data: profile } = await supabase
+              .from("profiles")
+              .select("user_id, full_name, avatar_url, is_alumni")
+             .eq("user_id", newPostData.author_id)
+              .single();
  
            const newPost = {
             ...newPostData,
