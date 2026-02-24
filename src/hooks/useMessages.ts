@@ -102,6 +102,7 @@ export function useMessages(conversationId: string | undefined) {
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
   });
