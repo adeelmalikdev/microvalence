@@ -70,9 +70,10 @@
   website: string | null;
   resume_url: string | null;
   linkedin_url: string | null;
-  custom_link: string | null;
-  phone: string | null;
-  company_name: string | null;
+   custom_link: string | null;
+   phone: string | null;
+   is_alumni: boolean | null;
+   company_name: string | null;
   company_logo: string | null;
   company_website: string | null;
   company_description: string | null;
