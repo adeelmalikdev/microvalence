@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Shield, ShieldCheck, ShieldOff, AlertTriangle, Loader2 } from "lucide-react";
+import { Shield, ShieldCheck, ShieldOff, AlertTriangle, Loader2, KeyRound, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -7,10 +7,13 @@ import {
   AlertDescription,
 } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Label } from "@/components/ui/label";
 import { useTwoFactor } from "@/hooks/useTwoFactor";
 import { TwoFactorSetup } from "@/components/auth/TwoFactorSetup";
 import { TwoFactorVerify } from "@/components/auth/TwoFactorVerify";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SecuritySettings() {
   const { toast } = useToast();
@@ -24,6 +27,37 @@ export function SecuritySettings() {
 
   const [showSetup, setShowSetup] = useState(false);
   const [showDisableVerify, setShowDisableVerify] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordSuccess(true);
+      toast({ title: "Password Updated", description: "Your password has been changed successfully." });
+      setTimeout(() => setPasswordSuccess(false), 3000);
+    } catch (err: any) {
+      toast({ title: "Failed", description: err.message || "Could not update password.", variant: "destructive" });
+    } finally {
+      setChangingPassword(false);
+    }
+  };
 
   const handleDisable2FA = async (code: string) => {
     try {
@@ -55,6 +89,53 @@ export function SecuritySettings() {
 
   return (
     <>
+      {/* Change Password Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRound className="h-5 w-5" />
+            Change Password
+          </CardTitle>
+          <CardDescription>
+            Update your account password
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="new-password">New Password</Label>
+            <PasswordInput
+              id="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm New Password</Label>
+            <PasswordInput
+              id="confirm-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+            />
+          </div>
+          <Button
+            onClick={handleChangePassword}
+            disabled={changingPassword || !newPassword || !confirmPassword}
+            className="gap-2"
+          >
+            {changingPassword ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : passwordSuccess ? (
+              <CheckCircle className="h-4 w-4" />
+            ) : (
+              <KeyRound className="h-4 w-4" />
+            )}
+            {passwordSuccess ? "Updated!" : "Update Password"}
+          </Button>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
