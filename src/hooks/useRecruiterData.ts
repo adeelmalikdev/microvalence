@@ -311,6 +311,9 @@ export function useUpdateApplicationStatus() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recruiter-opportunity-applicants"] });
       queryClient.invalidateQueries({ queryKey: ["recruiter-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["recruiter-opportunities"] });
+      queryClient.invalidateQueries({ queryKey: ["opportunities"] });
+      queryClient.invalidateQueries({ queryKey: ["recommended-opportunities"] });
     },
   });
 }
