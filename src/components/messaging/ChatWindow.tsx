@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MessageSquare, Pin, Ban, MoreVertical, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,8 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
+import { PollCreate } from "./PollCreate";
+import { PollDisplay } from "./PollDisplay";
 import { useMessages } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatWindowProps {
   conversationId: string | undefined;
@@ -26,6 +29,14 @@ interface ChatWindowProps {
   isBlocked?: boolean;
   onTogglePin?: (pinned: boolean) => void;
   onToggleBlock?: (blocked: boolean) => void;
+}
+
+interface Poll {
+  id: string;
+  question: string;
+  options: string[];
+  creator_id: string;
+  is_active: boolean;
 }
 
 export function ChatWindow({
@@ -41,10 +52,35 @@ export function ChatWindow({
   onToggleBlock,
 }: ChatWindowProps) {
   const { user } = useAuth();
-  const { messages, isLoading, sendMessage, markAsRead } = useMessages(conversationId);
+  const { messages, isLoading, sendMessage, markAsRead, pinMessage } = useMessages(conversationId);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
+  const [showPollCreate, setShowPollCreate] = useState(false);
+  const [polls, setPolls] = useState<Poll[]>([]);
+
+  // Fetch polls for this conversation
+  useEffect(() => {
+    if (!conversationId) return;
+    fetchPolls();
+    const channel = supabase
+      .channel(`dm-polls-${conversationId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "polls", filter: `conversation_id=eq.${conversationId}` }, () => {
+        fetchPolls();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [conversationId]);
+
+  const fetchPolls = async () => {
+    if (!conversationId) return;
+    const { data } = await supabase
+      .from("polls")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: false });
+    if (data) setPolls(data as any);
+  };
 
   // Mark messages as read when viewing
   useEffect(() => {
@@ -59,30 +95,21 @@ export function ChatWindow({
     });
   };
 
-  // Auto-scroll to bottom when opening conversation
   useEffect(() => {
-    if (conversationId) {
-      scrollToBottom("auto");
-    }
+    if (conversationId) scrollToBottom("auto");
   }, [conversationId]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
-    if (messages.length > 0 && !isLoading) {
-      scrollToBottom("smooth");
-    }
+    if (messages.length > 0 && !isLoading) scrollToBottom("smooth");
   }, [messages.length, isLoading]);
 
-  // Detect if user has scrolled up from bottom
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
     if (!viewport) return;
-
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = viewport;
       setShowScrollDown(scrollHeight - scrollTop - clientHeight > 100);
     };
-
     viewport.addEventListener("scroll", handleScroll);
     return () => viewport.removeEventListener("scroll", handleScroll);
   }, [conversationId]);
@@ -92,12 +119,8 @@ export function ChatWindow({
       <div className="flex-1 flex items-center justify-center bg-muted/30">
         <div className="text-center">
           <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-1">
-            Select a Conversation
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Choose a conversation from the list to start messaging
-          </p>
+          <h3 className="text-lg font-medium text-foreground mb-1">Select a Conversation</h3>
+          <p className="text-sm text-muted-foreground">Choose a conversation from the list to start messaging</p>
         </div>
       </div>
     );
@@ -109,16 +132,13 @@ export function ChatWindow({
       ? `${opportunityTitle || "Internship"} • ${companyName || "Valence"}`
       : "Internship conversation";
 
-  const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = displayName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+
+  const pinnedMessages = messages.filter((m) => m.is_pinned);
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-0">
-      {/* Header - always visible */}
+      {/* Header */}
       <div className="border-b px-4 py-3 shrink-0 bg-background z-10 flex items-center gap-3">
         <Avatar className="h-9 w-9 shrink-0">
           <AvatarImage src={otherUserAvatar || companyLogo || undefined} alt={displayName} />
@@ -130,9 +150,7 @@ export function ChatWindow({
             {isPinned && <Pin className="h-3 w-3 text-primary shrink-0" />}
             {isBlocked && <Ban className="h-3 w-3 text-destructive shrink-0" />}
           </div>
-          <p className="text-xs text-muted-foreground truncate">
-            {displaySubtitle}
-          </p>
+          <p className="text-xs text-muted-foreground truncate">{displaySubtitle}</p>
         </div>
 
         {(onTogglePin || onToggleBlock) && (
@@ -170,6 +188,25 @@ export function ChatWindow({
         </div>
       )}
 
+      {/* Pinned messages bar */}
+      {pinnedMessages.length > 0 && (
+        <div className="px-4 py-2 border-b bg-primary/5 flex items-center gap-2 shrink-0">
+          <Pin className="h-3 w-3 text-primary shrink-0" />
+          <span className="text-xs text-muted-foreground truncate">
+            📌 {pinnedMessages[pinnedMessages.length - 1]?.content}
+          </span>
+        </div>
+      )}
+
+      {/* Active polls */}
+      {polls.filter((p) => p.is_active).length > 0 && (
+        <div className="px-4 py-2 border-b max-h-48 overflow-y-auto shrink-0">
+          {polls.filter((p) => p.is_active).map((poll) => (
+            <PollDisplay key={poll.id} poll={poll} />
+          ))}
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 min-h-0 relative">
         <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
@@ -183,9 +220,7 @@ export function ChatWindow({
             </div>
           ) : messages.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                No messages yet. Start the conversation!
-              </p>
+              <p className="text-muted-foreground">No messages yet. Start the conversation!</p>
             </div>
           ) : (
             messages.map((message) => (
@@ -195,13 +230,16 @@ export function ChatWindow({
                 isOwn={message.sender_id === user?.id}
                 timestamp={message.created_at}
                 isRead={!!message.read_at}
+                mediaUrl={message.media_url}
+                isPinned={message.is_pinned}
+                showActions={message.sender_id === user?.id}
+                onPin={() => pinMessage.mutate({ messageId: message.id, pinned: !message.is_pinned })}
               />
             ))
           )}
           <div ref={scrollRef} />
         </ScrollArea>
 
-        {/* Scroll to bottom button */}
         {showScrollDown && (
           <Button
             variant="secondary"
@@ -214,11 +252,23 @@ export function ChatWindow({
         )}
       </div>
 
+      {/* Poll create */}
+      {showPollCreate && (
+        <div className="px-4 py-2 border-t shrink-0">
+          <PollCreate
+            conversationId={conversationId}
+            onCreated={() => { setShowPollCreate(false); fetchPolls(); }}
+            onCancel={() => setShowPollCreate(false)}
+          />
+        </div>
+      )}
+
       {/* Input */}
       <MessageInput
-        onSend={(text) => sendMessage.mutate(text)}
+        onSend={(text, mediaUrl) => sendMessage.mutate({ content: text, mediaUrl })}
         isLoading={sendMessage.isPending}
         disabled={isBlocked}
+        onPollCreate={() => setShowPollCreate(!showPollCreate)}
       />
     </div>
   );

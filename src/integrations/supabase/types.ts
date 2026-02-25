@@ -106,6 +106,38 @@ export type Database = {
         }
         Relationships: []
       }
+      alumni_group_join_requests: {
+        Row: {
+          created_at: string | null
+          group_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          group_id: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alumni_group_join_requests_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alumni_group_members: {
         Row: {
           group_id: string
@@ -143,6 +175,7 @@ export type Database = {
           created_at: string | null
           group_id: string
           id: string
+          is_pinned: boolean
           media_url: string | null
           message: string
           sender_id: string
@@ -151,6 +184,7 @@ export type Database = {
           created_at?: string | null
           group_id: string
           id?: string
+          is_pinned?: boolean
           media_url?: string | null
           message: string
           sender_id: string
@@ -159,6 +193,7 @@ export type Database = {
           created_at?: string | null
           group_id?: string
           id?: string
+          is_pinned?: boolean
           media_url?: string | null
           message?: string
           sender_id?: string
@@ -175,32 +210,38 @@ export type Database = {
       }
       alumni_groups: {
         Row: {
+          admin_only_messaging: boolean
           cover_image: string | null
           created_at: string | null
           created_by: string
           description: string | null
           field: string
           id: string
+          join_mode: string
           member_count: number | null
           name: string
         }
         Insert: {
+          admin_only_messaging?: boolean
           cover_image?: string | null
           created_at?: string | null
           created_by: string
           description?: string | null
           field: string
           id?: string
+          join_mode?: string
           member_count?: number | null
           name: string
         }
         Update: {
+          admin_only_messaging?: boolean
           cover_image?: string | null
           created_at?: string | null
           created_by?: string
           description?: string | null
           field?: string
           id?: string
+          join_mode?: string
           member_count?: number | null
           name?: string
         }
@@ -528,6 +569,8 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          is_pinned: boolean
+          media_url: string | null
           read_at: string | null
           sender_id: string
         }
@@ -536,6 +579,8 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
+          media_url?: string | null
           read_at?: string | null
           sender_id: string
         }
@@ -544,6 +589,8 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          is_pinned?: boolean
+          media_url?: string | null
           read_at?: string | null
           sender_id?: string
         }
@@ -649,6 +696,89 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      poll_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          option_index: number
+          poll_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          option_index?: number
+          poll_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      polls: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          creator_id: string
+          ends_at: string | null
+          group_id: string | null
+          id: string
+          is_active: boolean
+          options: Json
+          question: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          creator_id: string
+          ends_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          creator_id?: string
+          ends_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_active?: boolean
+          options?: Json
+          question?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "polls_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "polls_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "alumni_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
