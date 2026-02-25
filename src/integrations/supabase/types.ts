@@ -1068,6 +1068,7 @@ export type Database = {
           feedback: string | null
           id: string
           notes: string | null
+          rating: number | null
           reviewed_at: string | null
           status: Database["public"]["Enums"]["submission_status"]
           student_id: string
@@ -1080,6 +1081,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           notes?: string | null
+          rating?: number | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["submission_status"]
           student_id: string
@@ -1092,6 +1094,7 @@ export type Database = {
           feedback?: string | null
           id?: string
           notes?: string | null
+          rating?: number | null
           reviewed_at?: string | null
           status?: Database["public"]["Enums"]["submission_status"]
           student_id?: string

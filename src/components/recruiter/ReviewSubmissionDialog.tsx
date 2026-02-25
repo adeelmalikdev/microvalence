@@ -16,11 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { StarRating } from "@/components/ui/star-rating";
 import { useToast } from "@/hooks/use-toast";
 import { useReviewSubmission, type SubmissionWithDetails } from "@/hooks/useRecruiterSubmissions";
 
 const reviewSchema = z.object({
   status: z.enum(["approved", "needs_revision"]),
+  rating: z.number().min(1, "Please provide a rating").max(5),
   feedback: z.string().max(2000, "Feedback must be less than 2000 characters").optional().or(z.literal("")),
 }).refine(
   (data) => data.status === "approved" || (data.feedback && data.feedback.length > 0),
@@ -50,6 +52,7 @@ export function ReviewSubmissionDialog({ open, onOpenChange, submission }: Revie
     resolver: zodResolver(reviewSchema),
     defaultValues: {
       status: "approved",
+      rating: 0,
       feedback: "",
     },
   });
@@ -61,6 +64,7 @@ export function ReviewSubmissionDialog({ open, onOpenChange, submission }: Revie
     if (submission) {
       reset({
         status: submission.status === "needs_revision" ? "needs_revision" : "approved",
+        rating: (submission as any).rating || 0,
         feedback: submission.feedback || "",
       });
     }
@@ -73,6 +77,7 @@ export function ReviewSubmissionDialog({ open, onOpenChange, submission }: Revie
       await reviewMutation.mutateAsync({
         submissionId: submission.id,
         status: data.status,
+        rating: data.rating,
         feedback: data.feedback || undefined,
       });
 
@@ -181,6 +186,25 @@ export function ReviewSubmissionDialog({ open, onOpenChange, submission }: Revie
                 </Label>
               </div>
             </RadioGroup>
+          </div>
+
+          <div className="space-y-2">
+            <Label>
+              Rating <span className="text-destructive">*</span>
+            </Label>
+            <div className="flex items-center gap-3">
+              <StarRating
+                value={watch("rating")}
+                onChange={(val) => setValue("rating", val)}
+                size="lg"
+              />
+              <span className="text-sm text-muted-foreground">
+                {watch("rating") > 0 ? `${watch("rating")} of 5` : "Select rating"}
+              </span>
+            </div>
+            {errors.rating && (
+              <p className="text-sm text-destructive">{errors.rating.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
