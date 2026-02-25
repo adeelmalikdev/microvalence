@@ -473,7 +473,7 @@ export default function Login() {
                     to="/forgot-password"
                     className="text-sm text-primary hover:underline"
                   >
-                    Forgot password?
+                    Forgot password? Recover account
                   </Link>
                 </div>
               )}

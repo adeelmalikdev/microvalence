@@ -163,7 +163,6 @@ const AppRoutes = () => (
       <Route path="/about" element={<AboutUs />} />
       <Route path="/feedback" element={<Feedback />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/design-system" element={<DesignSystemDemo />} />
       <Route path="/design-system" element={<DesignSystemDemo />} />
 

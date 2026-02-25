@@ -1,48 +1,86 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
+import { ArrowLeft, HelpCircle, CheckCircle, Loader2, ShieldQuestion } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+type Step = "email" | "questions" | "success";
 
 export default function ForgotPassword() {
   const { toast } = useToast();
+  const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+  const [question1, setQuestion1] = useState("");
+  const [question2, setQuestion2] = useState("");
+  const [answer1, setAnswer1] = useState("");
+  const [answer2, setAnswer2] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFetchQuestions = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const { data, error } = await supabase.functions.invoke("get-security-questions", {
+        body: { email: email.trim() },
       });
-
-      if (error) {
+      if (error || data?.error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: error.message,
+          description: data?.error || "Could not find security questions for this account.",
         });
       } else {
-        setIsSent(true);
-        toast({
-          title: "Email sent!",
-          description: "Check your inbox for the password reset link.",
-        });
+        setQuestion1(data.question_1);
+        setQuestion2(data.question_2);
+        setStep("questions");
       }
     } catch {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred.",
+      toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyAndReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast({ variant: "destructive", title: "Error", description: "Password must be at least 6 characters." });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ variant: "destructive", title: "Error", description: "Passwords do not match." });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-security-questions", {
+        body: {
+          email: email.trim(),
+          answer_1: answer1,
+          answer_2: answer2,
+          new_password: newPassword,
+        },
       });
+      if (error || data?.error) {
+        toast({
+          variant: "destructive",
+          title: "Verification Failed",
+          description: data?.error || "Security answers are incorrect.",
+        });
+      } else {
+        setStep("success");
+        toast({ title: "Password Reset!", description: "You can now sign in with your new password." });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Error", description: "An unexpected error occurred." });
     } finally {
       setIsLoading(false);
     }
@@ -63,37 +101,32 @@ export default function ForgotPassword() {
         <Card className="w-full max-w-md glass-light animate-fade-in relative z-10">
           <CardHeader className="text-center space-y-2">
             <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-              {isSent ? (
+              {step === "success" ? (
                 <CheckCircle className="h-6 w-6 text-primary" />
+              ) : step === "questions" ? (
+                <ShieldQuestion className="h-6 w-6 text-primary" />
               ) : (
-                <Mail className="h-6 w-6 text-primary" />
+                <HelpCircle className="h-6 w-6 text-primary" />
               )}
             </div>
             <CardTitle className="text-2xl font-bold">
-              {isSent ? "Check Your Email" : "Forgot Password"}
+              {step === "success"
+                ? "Password Reset!"
+                : step === "questions"
+                ? "Answer Security Questions"
+                : "Recover Your Account"}
             </CardTitle>
             <CardDescription>
-              {isSent
-                ? `We've sent a password reset link to ${email}`
-                : "Enter your email and we'll send you a reset link."}
+              {step === "success"
+                ? "Your password has been successfully changed."
+                : step === "questions"
+                ? "Answer your security questions to reset your password."
+                : "Enter your email to recover your account using security questions."}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isSent ? (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground text-center">
-                  Didn't receive the email? Check your spam folder or try again.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setIsSent(false)}
-                >
-                  Try Again
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+            {step === "email" && (
+              <form onSubmit={handleFetchQuestions} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="reset-email">Email Address</Label>
                   <Input
@@ -106,11 +139,82 @@ export default function ForgotPassword() {
                     className="bg-muted"
                   />
                 </div>
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Reset Link"}
+                <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isLoading ? "Looking up..." : "Continue"}
                 </Button>
               </form>
+            )}
+
+            {step === "questions" && (
+              <form onSubmit={handleVerifyAndReset} className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{question1}</Label>
+                  <Input
+                    value={answer1}
+                    onChange={(e) => setAnswer1(e.target.value)}
+                    placeholder="Your answer"
+                    required
+                    className="bg-muted"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">{question2}</Label>
+                  <Input
+                    value={answer2}
+                    onChange={(e) => setAnswer2(e.target.value)}
+                    placeholder="Your answer"
+                    required
+                    className="bg-muted"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-pw">New Password</Label>
+                  <PasswordInput
+                    id="new-pw"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    required
+                    minLength={6}
+                    className="bg-muted"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-pw">Confirm New Password</Label>
+                  <PasswordInput
+                    id="confirm-pw"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    required
+                    className="bg-muted"
+                  />
+                </div>
+                <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+                  {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {isLoading ? "Verifying..." : "Reset Password"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => { setStep("email"); setAnswer1(""); setAnswer2(""); setNewPassword(""); setConfirmPassword(""); }}
+                >
+                  Use a different email
+                </Button>
+              </form>
+            )}
+
+            {step === "success" && (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  You can now sign in with your new password.
+                </p>
+                <Button asChild className="w-full">
+                  <Link to="/login">Go to Sign In</Link>
+                </Button>
+              </div>
             )}
 
             <div className="text-center">
