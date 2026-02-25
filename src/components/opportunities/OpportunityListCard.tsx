@@ -16,6 +16,7 @@ interface Opportunity {
   is_remote: boolean;
   location: string | null;
   created_at: string;
+  filled?: boolean;
 }
 
 interface OpportunityListCardProps {
@@ -80,13 +81,16 @@ export function OpportunityListCard({ opportunity, onViewDetails }: OpportunityL
                 </div>
               </div>
 
-              {/* Remote/On-site Badge */}
-              <Badge
-                variant="secondary"
-                className="shrink-0"
-              >
-                {opportunity.is_remote ? "Remote" : "On-site"}
-              </Badge>
+              <div className="flex items-center gap-2 shrink-0">
+                {opportunity.filled && (
+                  <Badge className="bg-destructive/10 text-destructive border-destructive/20">
+                    🔒 Filled
+                  </Badge>
+                )}
+                <Badge variant="secondary">
+                  {opportunity.is_remote ? "Remote" : "On-site"}
+                </Badge>
+              </div>
             </div>
 
             {/* Description */}

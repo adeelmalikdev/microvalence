@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Building2, Users, CheckCircle, Plus, FileText, TrendingUp, ClipboardCheck, ArrowRight } from "lucide-react";
+import { Building2, Users, CheckCircle, Plus, FileText, TrendingUp, ClipboardCheck, ArrowRight, Pencil } from "lucide-react";
 
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -157,22 +157,38 @@ export default function RecruiterDashboard() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <h3 className="font-semibold text-foreground">{posting.title}</h3>
-                        <Badge variant="secondary" className="bg-success/10 text-success">
-                          Active
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {posting.filled && (
+                            <Badge className="bg-destructive/10 text-destructive">🔒 Filled</Badge>
+                          )}
+                          <Badge variant="secondary" className={posting.filled ? "bg-muted text-muted-foreground" : "bg-success/10 text-success"}>
+                            {posting.filled ? "Closed" : "Active"}
+                          </Badge>
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">
                         {posting.company_name}
                       </p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full gap-2"
-                        onClick={() => navigate(`/recruiter/opportunities/${posting.id}/applicants`)}
-                      >
-                        <FileText className="h-4 w-4" />
-                        View Applicants
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 gap-2"
+                          onClick={() => navigate(`/recruiter/opportunities/${posting.id}/applicants`)}
+                        >
+                          <FileText className="h-4 w-4" />
+                          Applicants
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2"
+                          onClick={() => navigate(`/recruiter/opportunities/${posting.id}/edit`)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))
