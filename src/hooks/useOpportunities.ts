@@ -32,8 +32,7 @@ export function useOpportunities(filters: FilterState, sortBy: string = "recent"
       let query = supabase
         .from("opportunities")
         .select("*")
-        .eq("status", "published")
-        .eq("filled", false);
+        .eq("status", "published");
 
       // Apply search filter
       if (filters.search) {
@@ -56,7 +55,8 @@ export function useOpportunities(filters: FilterState, sortBy: string = "recent"
         }
       }
 
-      // Apply sorting
+      // Apply sorting - always show unfilled first
+      query = query.order("filled", { ascending: true });
       if (sortBy === "recent") {
         query = query.order("created_at", { ascending: false });
       } else if (sortBy === "oldest") {
