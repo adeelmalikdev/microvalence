@@ -924,6 +924,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_questions: {
+        Row: {
+          answer_1: string
+          answer_2: string
+          created_at: string
+          id: string
+          question_1: string
+          question_2: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_1: string
+          answer_2: string
+          created_at?: string
+          id?: string
+          question_1: string
+          question_2: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_1?: string
+          answer_2?: string
+          created_at?: string
+          id?: string
+          question_1?: string
+          question_2?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_certifications: {
         Row: {
           created_at: string | null
