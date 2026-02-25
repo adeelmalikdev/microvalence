@@ -20,6 +20,7 @@ import {
   Loader2,
   CheckCircle,
   Building2,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +36,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { DataExportButton } from "@/components/settings/DataExportButton";
+import { ResumeExportButton } from "@/components/settings/ResumeExportButton";
 import { AccountDeletionDialog } from "@/components/settings/AccountDeletionDialog";
 import { toast } from "sonner";
 
@@ -641,11 +643,35 @@ export default function Settings() {
 
           {/* Data Tab */}
           <TabsContent value="data" className="space-y-6">
+            {/* Resume / Report Download */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  {role === "recruiter" ? "Download Company Report" : "Download Resume"}
+                </CardTitle>
+                <CardDescription>
+                  {role === "recruiter"
+                    ? "Generate a professional report with your company details and all posted opportunities."
+                    : "Generate a professional Oxford-style resume using your portfolio information (skills, projects, experience, education)."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  {role === "recruiter"
+                    ? "The report includes company info, industry, and a summary of all your opportunities."
+                    : "Your resume will include your education, experience, projects, skills, and contact links. A print dialog will open — choose 'Save as PDF'."}
+                </p>
+                <ResumeExportButton />
+              </CardContent>
+            </Card>
+
+            {/* Raw Data Export */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Download className="h-5 w-5" />
-                  Export Your Data
+                  Export Raw Data
                 </CardTitle>
                 <CardDescription>
                   Download a copy of all your data (GDPR compliant)
