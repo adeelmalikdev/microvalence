@@ -100,6 +100,7 @@ export default function OpportunityDetails() {
   const applicationStatus = existingApplication && typeof existingApplication === 'object' 
     ? existingApplication.status 
     : null;
+  const isFilled = opportunity?.filled === true;
 
   return (
     <div className="container py-8">
@@ -216,6 +217,16 @@ export default function OpportunityDetails() {
             <CardContent className="pt-6">
               {checkingApplication ? (
                 <Skeleton className="h-10 w-full" />
+              ) : isFilled && !hasApplied ? (
+                <div className="text-center">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                    <span className="text-xl">🔒</span>
+                  </div>
+                  <p className="font-medium text-foreground mb-1">Position Filled</p>
+                  <p className="text-sm text-muted-foreground">
+                    This opportunity is no longer accepting applications.
+                  </p>
+                </div>
               ) : hasApplied ? (
                 <div className="text-center">
                   <div className="w-12 h-12 rounded-full bg-success/10 text-success flex items-center justify-center mx-auto mb-3">

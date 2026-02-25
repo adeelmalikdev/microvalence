@@ -32,7 +32,8 @@ export function useOpportunities(filters: FilterState, sortBy: string = "recent"
       let query = supabase
         .from("opportunities")
         .select("*")
-        .eq("status", "published");
+        .eq("status", "published")
+        .eq("filled", false);
 
       // Apply search filter
       if (filters.search) {
