@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Calendar, FileText, Check, X, MessageSquare, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Mail, Calendar, FileText, Check, X, MessageSquare, Download, Loader2, Edit2 } from "lucide-react";
 import { format } from "date-fns";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -108,6 +108,7 @@ export default function ManageApplicants() {
   }
 
   const { opportunity, applications } = data;
+  const isFilled = opportunity.filled;
   const pendingApplicants = applications.filter((a) => a.status === "pending");
   const activeApplicants = applications.filter((a) => 
     a.status === "accepted" || a.status === "in_progress"
@@ -133,16 +134,31 @@ export default function ManageApplicants() {
                 </h1>
                 <p className="text-muted-foreground">{opportunity.company_name}</p>
               </div>
-              <Badge
-                variant="secondary"
-                className={
-                  opportunity.status === "published"
-                    ? "bg-success/10 text-success"
-                    : "bg-muted text-muted-foreground"
-                }
-              >
-                {opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {!isFilled && opportunity.status === "published" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={() => navigate(`/recruiter/opportunities/${id}/edit`)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                    Edit
+                  </Button>
+                )}
+                <Badge
+                  variant="secondary"
+                  className={
+                    isFilled
+                      ? "bg-muted text-muted-foreground"
+                      : opportunity.status === "published"
+                      ? "bg-success/10 text-success"
+                      : "bg-muted text-muted-foreground"
+                  }
+                >
+                  {isFilled ? "🔒 Filled" : opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}
+                </Badge>
+              </div>
             </div>
             <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
               <span>{applications.length} Total Applicants</span>
@@ -160,6 +176,11 @@ export default function ManageApplicants() {
         {pendingApplicants.length > 0 && (
           <div className="mb-8">
             <h2 className="text-lg font-semibold mb-4">Pending Review ({pendingApplicants.length})</h2>
+            {isFilled && (
+              <div className="mb-4 p-3 rounded-lg bg-muted border text-sm text-muted-foreground">
+                🔒 This position is already filled. You cannot accept more applicants.
+              </div>
+            )}
             <div className="space-y-4">
               {pendingApplicants.map((application) => (
                 <ApplicantCard
@@ -172,6 +193,7 @@ export default function ManageApplicants() {
                   onAccept={() => handleUpdateStatus(application.id, "accepted")}
                   onReject={() => handleUpdateStatus(application.id, "rejected")}
                   isPending={updateStatus.isPending}
+                  showActions={!isFilled}
                 />
               ))}
             </div>

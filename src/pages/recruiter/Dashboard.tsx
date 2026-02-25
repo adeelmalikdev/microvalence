@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Building2, Users, CheckCircle, Plus, FileText, TrendingUp, ClipboardCheck, ArrowRight } from "lucide-react";
+import { Building2, Users, CheckCircle, Plus, FileText, TrendingUp, ClipboardCheck, ArrowRight, Edit2 } from "lucide-react";
 
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -165,15 +165,25 @@ export default function RecruiterDashboard() {
                       <p className="text-sm text-muted-foreground mb-3">
                         {posting.company_name}
                       </p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full gap-2"
-                        onClick={() => navigate(`/recruiter/opportunities/${posting.id}/applicants`)}
-                      >
-                        <FileText className="h-4 w-4" />
-                        View Applicants
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 gap-2"
+                          onClick={() => navigate(`/recruiter/opportunities/${posting.id}/applicants`)}
+                        >
+                          <FileText className="h-4 w-4" />
+                          View Applicants
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() => navigate(`/recruiter/opportunities/${posting.id}/edit`)}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))
