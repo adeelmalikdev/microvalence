@@ -53,17 +53,17 @@ export function ChatWindow({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
-      {/* Header */}
-      <div className="border-b p-4">
-        <h2 className="font-semibold text-foreground">{otherUserName}</h2>
-        <p className="text-sm text-muted-foreground">
+    <div className="flex-1 flex flex-col bg-background min-h-0">
+      {/* Header - always visible */}
+      <div className="border-b p-4 shrink-0 bg-background z-10">
+        <h2 className="font-semibold text-foreground truncate">{otherUserName}</h2>
+        <p className="text-sm text-muted-foreground truncate">
           {opportunityTitle} • {companyName}
         </p>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 min-h-0 p-4">
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (

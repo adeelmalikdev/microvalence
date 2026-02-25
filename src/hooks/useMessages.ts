@@ -89,7 +89,7 @@ export function useMessages(conversationId: string | undefined) {
     };
   }, [conversationId, user, queryClient]);
 
-  // Send message mutation
+  // Send message mutation with optimistic update
   const sendMessage = useMutation({
     mutationFn: async (content: string) => {
       if (!conversationId || !user) throw new Error("Not authenticated");
@@ -101,7 +101,39 @@ export function useMessages(conversationId: string | undefined) {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onMutate: async (content: string) => {
+      if (!conversationId || !user) return;
+
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["messages", conversationId] });
+
+      // Snapshot previous messages
+      const previous = queryClient.getQueryData<Message[]>(["messages", conversationId]);
+
+      // Optimistically add the new message
+      const optimisticMessage: Message = {
+        id: `temp-${Date.now()}`,
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content,
+        read_at: null,
+        created_at: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData<Message[]>(
+        ["messages", conversationId],
+        (old = []) => [...old, optimisticMessage]
+      );
+
+      return { previous };
+    },
+    onError: (_err, _content, context) => {
+      // Rollback on error
+      if (context?.previous && conversationId) {
+        queryClient.setQueryData(["messages", conversationId], context.previous);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },
