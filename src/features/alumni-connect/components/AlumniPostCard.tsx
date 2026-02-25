@@ -1,4 +1,5 @@
  import { useState } from "react";
+ import { useNavigate } from "react-router-dom";
  import { motion } from "framer-motion";
 import {
   MessageCircle,
@@ -70,7 +71,8 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
   const [showRepostDialog, setShowRepostDialog] = useState(false);
   const [repostThoughts, setRepostThoughts] = useState("");
   const [isReposting, setIsReposting] = useState(false);
-  const { user } = useAuth();
+   const { user } = useAuth();
+   const navigate = useNavigate();
 
   const handleRepost = async () => {
     if (!user) {
@@ -178,25 +180,35 @@ type AlumniReactionType = Database["public"]["Enums"]["alumni_reaction_type"];
          {/* Author Header */}
          <div className="flex items-start justify-between mb-3">
            <div className="flex gap-3">
-             <Avatar className="h-12 w-12 border-2 border-primary/30">
-               <AvatarImage src={post.author_profile?.avatar_url || undefined} />
-               <AvatarFallback className="bg-primary/20 text-primary font-semibold">
-                 {authorInitials}
-               </AvatarFallback>
-             </Avatar>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-foreground">{authorName}</span>
-                  {post.author_profile?.is_alumni ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/15 text-primary rounded-full text-xs font-semibold">
-                      🎓 Alumni
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted text-muted-foreground rounded-full text-xs font-semibold">
-                      📚 Student
-                    </span>
-                  )}
-                </div>
+              <button
+                onClick={() => navigate(`/student/profile/${post.author_id}`)}
+                className="focus:outline-none"
+              >
+                <Avatar className="h-12 w-12 border-2 border-primary/30 hover:ring-2 hover:ring-primary/50 transition-all cursor-pointer">
+                  <AvatarImage src={post.author_profile?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-primary/20 text-primary font-semibold">
+                    {authorInitials}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+               <div>
+                 <div className="flex items-center gap-2 flex-wrap">
+                   <button
+                     onClick={() => navigate(`/student/profile/${post.author_id}`)}
+                     className="font-semibold text-foreground hover:text-primary hover:underline transition-colors cursor-pointer"
+                   >
+                     {authorName}
+                   </button>
+                   {post.author_profile?.is_alumni ? (
+                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/15 text-primary rounded-full text-xs font-semibold">
+                       🎓 Alumni
+                     </span>
+                   ) : (
+                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-muted text-muted-foreground rounded-full text-xs font-semibold">
+                       📚 Student
+                     </span>
+                   )}
+                 </div>
                <span className="text-sm text-muted-foreground">
                  {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                </span>
