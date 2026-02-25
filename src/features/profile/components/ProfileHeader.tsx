@@ -75,7 +75,7 @@ export function ProfileHeader({ profile, isOwnProfile, onSave, isSaving }: Profi
        </div>
 
        {/* Profile Image Section */}
-       <div className="relative p-6 -mt-12">
+       <div className="relative p-6 -mt-12 z-10">
          {/* Edit Button - Top Right */}
          {isOwnProfile && (
            <div className="absolute top-4 right-4 flex gap-2">
