@@ -1,0 +1,1 @@
+ALTER TABLE public.task_submissions ADD COLUMN rating integer NULL;

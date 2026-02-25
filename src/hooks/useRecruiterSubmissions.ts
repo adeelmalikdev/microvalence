@@ -183,10 +183,12 @@ export function useReviewSubmission() {
     mutationFn: async ({
       submissionId,
       status,
+      rating,
       feedback,
     }: {
       submissionId: string;
       status: "approved" | "needs_revision";
+      rating?: number;
       feedback?: string;
     }) => {
       const { data, error } = await supabase
@@ -194,8 +196,9 @@ export function useReviewSubmission() {
         .update({
           status,
           feedback: feedback || null,
+          rating: rating || null,
           reviewed_at: new Date().toISOString(),
-        })
+        } as any)
         .eq("id", submissionId)
         .select()
         .single();
