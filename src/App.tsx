@@ -9,6 +9,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipLink } from "@/components/accessibility/SkipLink";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { A11yChecker } from "@/components/accessibility/A11yChecker";
 import { initializeErrorTracking } from "@/lib/sentry";
@@ -97,6 +98,7 @@ function LoginRedirect() {
 const AppRoutes = () => (
   <>
     <SkipLink />
+    <ScrollToTop />
     <SessionTimeoutWarning />
     <Routes>
       <Route path="/" element={<AuthenticatedRedirect />} />
