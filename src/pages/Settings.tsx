@@ -460,13 +460,6 @@ export default function Settings() {
                           </div>
                         </div>
                       )}
-                      {profile?.is_alumni && status !== "graduated" && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-primary">
-                          <span className="px-2 py-1 bg-primary/10 rounded-full font-semibold">
-                            Alumni Status Active
-                          </span>
-                        </div>
-                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Current Semester</Label>
