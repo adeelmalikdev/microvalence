@@ -76,9 +76,9 @@ export function Footer() {
             <div className="mt-4">
               <p className="text-xs text-background/50 mb-2">Scan to visit</p>
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent("https://microvalence.lovable.app")}&bgcolor=transparent&color=ffffff&format=png`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent("https://microvalence.lovable.app")}&color=1a1a1a&bgcolor=ffffff&format=png`}
                 alt="QR code to visit Valence"
-                className="w-20 h-20 rounded border border-background/20"
+                className="w-20 h-20 rounded"
                 loading="lazy"
               />
             </div>
