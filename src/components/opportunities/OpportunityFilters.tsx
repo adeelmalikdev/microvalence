@@ -68,7 +68,7 @@ export function OpportunityFilters({ filters, onFilterChange }: OpportunityFilte
   const hasFilters = Object.values(filters).some((arr) => arr.length > 0);
 
   return (
-    <aside className="w-64 shrink-0">
+    <aside className="w-full lg:w-64 shrink-0">
       <div className="sticky top-24 rounded-lg border bg-card p-4 shadow-card">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="h-4 w-4 text-primary" />
