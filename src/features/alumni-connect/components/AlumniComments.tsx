@@ -1,5 +1,5 @@
- import { useState, useEffect } from "react";
- import { Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Send, Trash2 } from "lucide-react";
  import { formatDistanceToNow } from "date-fns";
  import { supabase } from "@/integrations/supabase/client";
  import { useAuth } from "@/hooks/useAuth";
@@ -125,7 +125,23 @@ type CommentRow = Database["public"]["Tables"]["alumni_comments"]["Row"];
      } finally {
        setIsLoading(false);
      }
-   };
+    };
+
+    const handleDeleteComment = async (commentId: string) => {
+      try {
+        const { error } = await supabase
+          .from("alumni_comments")
+          .delete()
+          .eq("id", commentId);
+        if (error) throw error;
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
+        onCommentAdded?.();
+        toast.success("Comment deleted");
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+        toast.error("Failed to delete comment");
+      }
+    };
  
    const userInitials = profile?.full_name
      ?.split(" ")
@@ -142,39 +158,52 @@ type CommentRow = Database["public"]["Tables"]["alumni_comments"]["Row"];
              No comments yet. Be the first to comment!
            </p>
          ) : (
-           comments.map((comment) => {
-             const authorName =
-               comment.author_profile?.full_name ||
-               `User ${comment.author_id.slice(0, 8)}`;
-             const initials = authorName
-               .split(" ")
-               .map((n) => n[0])
-               .join("")
-               .toUpperCase()
-               .slice(0, 2);
- 
-             return (
-               <div key={comment.id} className="flex gap-2">
-                 <Avatar className="h-8 w-8">
-                   <AvatarImage src={comment.author_profile?.avatar_url || undefined} />
-                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                     {initials}
-                   </AvatarFallback>
-                 </Avatar>
-                 <div className="flex-1">
-                   <div className="bg-background/80 rounded-xl px-3 py-2">
-                     <span className="font-medium text-sm">{authorName}</span>
-                     <p className="text-sm text-foreground">{comment.content}</p>
-                   </div>
-                   <span className="text-xs text-muted-foreground ml-2">
-                     {formatDistanceToNow(new Date(comment.created_at), {
-                       addSuffix: true,
-                     })}
-                   </span>
-                 </div>
-               </div>
-             );
-           })
+            comments.map((comment) => {
+              const authorName =
+                comment.author_profile?.full_name ||
+                `User ${comment.author_id.slice(0, 8)}`;
+              const initials = authorName
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2);
+              const isOwn = user?.id === comment.author_id;
+
+              return (
+                <div key={comment.id} className="flex gap-2 group">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={comment.author_profile?.avatar_url || undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="bg-background/80 rounded-xl px-3 py-2 flex items-start justify-between gap-2">
+                      <div>
+                        <span className="font-medium text-sm">{authorName}</span>
+                        <p className="text-sm text-foreground">{comment.content}</p>
+                      </div>
+                      {isOwn && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteComment(comment.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground ml-2">
+                      {formatDistanceToNow(new Date(comment.created_at), {
+                        addSuffix: true,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
          )}
        </div>
  
