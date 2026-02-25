@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import { EnhancedProfile } from "@/features/profile/EnhancedProfile";
+import { FullPortfolioView } from "@/components/portfolio/FullPortfolioView";
 
 export default function StudentProfileView() {
   const { userId } = useParams<{ userId: string }>();
-  return <EnhancedProfile userId={userId} />;
+  return <FullPortfolioView userId={userId} backPath="/recruiter/browse-students" />;
 }
