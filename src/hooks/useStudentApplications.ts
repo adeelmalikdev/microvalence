@@ -92,6 +92,7 @@ export function useWithdrawApplication() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["student-applications"] });
       queryClient.invalidateQueries({ queryKey: ["student-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["has-applied"] });
     },
   });
 }
@@ -109,6 +110,7 @@ export function useHasApplied(opportunityId: string) {
         .select("id, status")
         .eq("student_id", user.id)
         .eq("opportunity_id", opportunityId)
+        .not("status", "eq", "withdrawn")
         .maybeSingle();
 
       if (error) throw error;
