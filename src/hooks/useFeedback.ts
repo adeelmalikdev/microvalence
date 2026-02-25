@@ -138,6 +138,11 @@ export function useSubmitFeedback() {
       queryClient.invalidateQueries({ queryKey: ["recruiter-opportunity"] });
       queryClient.invalidateQueries({ queryKey: ["recruiter-stats"] });
       queryClient.invalidateQueries({ queryKey: ["application-completion"] });
+      // Invalidate student-side queries for immediate portfolio/task sync
+      queryClient.invalidateQueries({ queryKey: ["student-portfolio"] });
+      queryClient.invalidateQueries({ queryKey: ["student-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["student-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["student-applications"] });
     },
   });
 }

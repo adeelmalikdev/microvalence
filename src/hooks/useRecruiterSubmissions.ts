@@ -210,6 +210,12 @@ export function useReviewSubmission() {
       queryClient.invalidateQueries({ queryKey: ["recruiter-submissions"] });
       queryClient.invalidateQueries({ queryKey: ["pending-submissions-count"] });
       queryClient.invalidateQueries({ queryKey: ["recruiter-stats"] });
+      // Invalidate student-side queries so portfolio/tasks update immediately
+      queryClient.invalidateQueries({ queryKey: ["student-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["student-portfolio"] });
+      queryClient.invalidateQueries({ queryKey: ["student-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["application-completion"] });
+      queryClient.invalidateQueries({ queryKey: ["student-applications"] });
     },
   });
 }

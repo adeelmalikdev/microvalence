@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
@@ -24,7 +25,44 @@ interface PortfolioData {
 
 export function useStudentPortfolio(targetUserId?: string) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const resolvedId = targetUserId || user?.id;
+
+  // Realtime: refresh portfolio when applications or feedback change for this student
+  useEffect(() => {
+    if (!resolvedId) return;
+
+    const channel = supabase
+      .channel(`portfolio-sync-${resolvedId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'applications',
+          filter: `student_id=eq.${resolvedId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["student-portfolio", resolvedId] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'feedback',
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["student-portfolio", resolvedId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [resolvedId, queryClient]);
 
   return useQuery({
     queryKey: ["student-portfolio", resolvedId],
