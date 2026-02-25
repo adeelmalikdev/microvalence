@@ -1366,6 +1366,7 @@ export type Database = {
     Functions: {
       cancel_account_deletion: { Args: never; Returns: undefined }
       cleanup_expired_rate_limits: { Args: never; Returns: undefined }
+      get_student_portfolio: { Args: { _student_id: string }; Returns: Json }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
