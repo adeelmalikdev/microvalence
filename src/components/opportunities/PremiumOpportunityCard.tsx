@@ -13,6 +13,7 @@ interface PremiumOpportunityCardProps {
   duration: string;
   level: "beginner" | "intermediate" | "advanced";
   isRemote?: boolean;
+  isFilled?: boolean;
   location?: string;
   matchScore?: number;
   onViewDetails?: () => void;
@@ -34,6 +35,7 @@ export function PremiumOpportunityCard({
   duration,
   level,
   isRemote = false,
+  isFilled = false,
   location,
   matchScore,
   onViewDetails,
@@ -96,8 +98,13 @@ export function PremiumOpportunityCard({
             </div>
           </div>
 
+          {/* Filled Badge */}
+          {isFilled && (
+            <Badge className="bg-destructive/10 text-destructive border-destructive/20">🔒 Filled</Badge>
+          )}
+
           {/* Match Score Badge */}
-          {matchScore !== undefined && matchScore >= 70 && (
+          {matchScore !== undefined && matchScore >= 70 && !isFilled && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}

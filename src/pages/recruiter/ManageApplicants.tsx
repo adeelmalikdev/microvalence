@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Mail, Calendar, FileText, Check, X, MessageSquare, Download, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Mail, Calendar, FileText, Check, X, MessageSquare, Download, Loader2, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -133,16 +133,30 @@ export default function ManageApplicants() {
                 </h1>
                 <p className="text-muted-foreground">{opportunity.company_name}</p>
               </div>
-              <Badge
-                variant="secondary"
-                className={
-                  opportunity.status === "published"
-                    ? "bg-success/10 text-success"
-                    : "bg-muted text-muted-foreground"
-                }
-              >
-                {opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}
-              </Badge>
+              <div className="flex items-center gap-2">
+                {opportunity.filled && (
+                  <Badge className="bg-destructive/10 text-destructive">🔒 Filled</Badge>
+                )}
+                <Badge
+                  variant="secondary"
+                  className={
+                    opportunity.status === "published"
+                      ? "bg-success/10 text-success"
+                      : "bg-muted text-muted-foreground"
+                  }
+                >
+                  {opportunity.status.charAt(0).toUpperCase() + opportunity.status.slice(1)}
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => navigate(`/recruiter/opportunities/${id}/edit`)}
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </Button>
+              </div>
             </div>
             <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
               <span>{applications.length} Total Applicants</span>

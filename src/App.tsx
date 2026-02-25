@@ -31,6 +31,7 @@ import StudentBrowseRecruiters from "./pages/student/BrowseRecruiters";
 import StudentRecruiterProfile from "./pages/student/RecruiterProfile";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import RecruiterPostOpportunity from "./pages/recruiter/PostOpportunity";
+import RecruiterEditOpportunity from "./pages/recruiter/EditOpportunity";
 import RecruiterManageApplicants from "./pages/recruiter/ManageApplicants";
 import RecruiterSubmissions from "./pages/recruiter/Submissions";
 import RecruiterMessages from "./pages/recruiter/Messages";
@@ -146,6 +147,7 @@ const AppRoutes = () => (
       }>
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
         <Route path="/recruiter/post" element={<RecruiterPostOpportunity />} />
+        <Route path="/recruiter/opportunities/:id/edit" element={<RecruiterEditOpportunity />} />
         <Route path="/recruiter/opportunities/:id/applicants" element={<RecruiterManageApplicants />} />
         <Route path="/recruiter/submissions" element={<RecruiterSubmissions />} />
         <Route path="/recruiter/messages" element={<RecruiterMessages />} />
