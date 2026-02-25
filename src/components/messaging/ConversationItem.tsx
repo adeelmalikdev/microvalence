@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { Pin, Ban, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -52,27 +51,20 @@ export function ConversationItem({
         </Avatar>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-0.5">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-medium text-foreground truncate text-sm">
-                {conversation.other_user_name}
-              </span>
-              {conversation.is_pinned && (
-                <Pin className="h-3 w-3 text-primary shrink-0" />
-              )}
-              {conversation.is_blocked && (
-                <Ban className="h-3 w-3 text-destructive shrink-0" />
-              )}
-              {conversation.unread_count > 0 && (
-                <Badge variant="default" className="h-5 min-w-5 p-0 flex items-center justify-center text-xs shrink-0">
-                  {conversation.unread_count}
-                </Badge>
-              )}
-            </div>
-            {conversation.last_message_at && (
-              <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0">
-                {formatDistanceToNow(new Date(conversation.last_message_at), { addSuffix: true })}
-              </span>
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="font-medium text-foreground truncate text-sm">
+              {conversation.other_user_name}
+            </span>
+            {conversation.is_pinned && (
+              <Pin className="h-3 w-3 text-primary shrink-0" />
+            )}
+            {conversation.is_blocked && (
+              <Ban className="h-3 w-3 text-destructive shrink-0" />
+            )}
+            {conversation.unread_count > 0 && (
+              <Badge variant="default" className="h-5 min-w-5 p-0 flex items-center justify-center text-xs shrink-0">
+                {conversation.unread_count}
+              </Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground truncate">
