@@ -51,10 +51,25 @@ export function ChatWindow({
     }
   }, [conversationId, messages.length]);
 
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollIntoView({ behavior, block: "end" });
+    });
+  };
+
+  // Auto-scroll to bottom when opening conversation
+  useEffect(() => {
+    if (conversationId) {
+      scrollToBottom("auto");
+    }
+  }, [conversationId]);
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (messages.length > 0 && !isLoading) {
+      scrollToBottom("smooth");
+    }
+  }, [messages.length, isLoading]);
 
   if (!conversationId) {
     return (
@@ -72,7 +87,13 @@ export function ChatWindow({
     );
   }
 
-  const initials = otherUserName
+  const displayName = otherUserName.trim() || "Unknown user";
+  const displaySubtitle =
+    opportunityTitle.trim() || companyName.trim()
+      ? `${opportunityTitle || "Internship"} • ${companyName || "Valence"}`
+      : "Internship conversation";
+
+  const initials = displayName
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -84,17 +105,17 @@ export function ChatWindow({
       {/* Header - always visible */}
       <div className="border-b px-4 py-3 shrink-0 bg-background z-10 flex items-center gap-3">
         <Avatar className="h-9 w-9 shrink-0">
-          <AvatarImage src={otherUserAvatar || companyLogo || undefined} alt={otherUserName} />
+          <AvatarImage src={otherUserAvatar || companyLogo || undefined} alt={displayName} />
           <AvatarFallback className="text-xs">{initials}</AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-foreground truncate text-sm">{otherUserName}</h2>
+            <h2 className="font-semibold text-foreground truncate text-sm">{displayName}</h2>
             {isPinned && <Pin className="h-3 w-3 text-primary shrink-0" />}
             {isBlocked && <Ban className="h-3 w-3 text-destructive shrink-0" />}
           </div>
           <p className="text-xs text-muted-foreground truncate">
-            {opportunityTitle} • {companyName}
+            {displaySubtitle}
           </p>
         </div>
 

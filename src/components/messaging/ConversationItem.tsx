@@ -37,7 +37,7 @@ export function ConversationItem({
   return (
     <div
       className={cn(
-        "relative w-full text-left p-4 border-b transition-colors hover:bg-muted/50 cursor-pointer",
+        "group relative w-full text-left p-4 border-b transition-colors hover:bg-muted/50 cursor-pointer",
         isSelected && "bg-muted",
         conversation.is_blocked && "opacity-50"
       )}
@@ -94,7 +94,7 @@ export function ConversationItem({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
+              className="absolute top-2 right-2 h-6 w-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:opacity-100 focus:opacity-100"
               style={{ opacity: isSelected ? 1 : undefined }}
               onClick={(e) => e.stopPropagation()}
             >
