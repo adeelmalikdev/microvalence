@@ -227,7 +227,7 @@ export default function StudentPortfolio() {
             <>
               <StatCard 
                 icon={Briefcase} 
-                label="Completed Internships" 
+                label="Completed Micro-Internships" 
                 value={portfolio?.internships.length || 0} 
               />
               <StatCard 
@@ -282,7 +282,7 @@ export default function StudentPortfolio() {
         <div>
           <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
             <Award className="h-6 w-6 text-primary" />
-            Completed Internships
+            Completed Micro-Internships
           </h2>
           
           {portfolioLoading ? (
@@ -303,7 +303,7 @@ export default function StudentPortfolio() {
                   <Briefcase className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">No Completed Internships Yet</h3>
+                  <h3 className="font-semibold text-lg">No Completed Micro-Internships Yet</h3>
                   <p className="text-muted-foreground mt-1">
                     Complete your first micro-internship to build your portfolio!
                   </p>
