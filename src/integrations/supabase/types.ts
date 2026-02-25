@@ -586,6 +586,7 @@ export type Database = {
           deadline: string | null
           description: string
           duration_hours: number
+          filled: boolean
           id: string
           is_remote: boolean
           level: Database["public"]["Enums"]["opportunity_level"]
@@ -604,6 +605,7 @@ export type Database = {
           deadline?: string | null
           description: string
           duration_hours?: number
+          filled?: boolean
           id?: string
           is_remote?: boolean
           level?: Database["public"]["Enums"]["opportunity_level"]
@@ -622,6 +624,7 @@ export type Database = {
           deadline?: string | null
           description?: string
           duration_hours?: number
+          filled?: boolean
           id?: string
           is_remote?: boolean
           level?: Database["public"]["Enums"]["opportunity_level"]

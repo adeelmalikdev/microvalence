@@ -27,6 +27,7 @@ export function useRecommendedOpportunities(limit = 3) {
         .from("opportunities")
         .select("*")
         .eq("status", "published")
+        .eq("filled", false)
         .order("created_at", { ascending: false })
         .limit(limit);
 
