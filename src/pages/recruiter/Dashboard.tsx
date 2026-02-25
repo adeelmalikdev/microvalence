@@ -53,7 +53,8 @@ export default function RecruiterDashboard() {
     },
   ];
 
-  const activePostings = opportunities?.filter(o => o.status === "published") || [];
+  const activePostings = opportunities?.filter(o => o.status === "published" && !o.filled) || [];
+  const filledPostings = opportunities?.filter(o => o.status === "published" && o.filled) || [];
   
   return (
     <div className="bg-muted/30">
@@ -183,6 +184,39 @@ export default function RecruiterDashboard() {
                     Create Your First Opportunity
                   </Button>
                 </div>
+              )}
+
+              {/* Filled Postings */}
+              {filledPostings.length > 0 && (
+                <>
+                  <div className="pt-2 border-t">
+                    <p className="text-sm font-medium text-muted-foreground mb-3">Filled Positions</p>
+                  </div>
+                  {filledPostings.slice(0, 3).map((posting) => (
+                    <Card key={posting.id} className="shadow-sm opacity-75">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <h3 className="font-semibold text-foreground">{posting.title}</h3>
+                          <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                            🔒 Filled
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          {posting.company_name}
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full gap-2"
+                          onClick={() => navigate(`/recruiter/opportunities/${posting.id}/applicants`)}
+                        >
+                          <FileText className="h-4 w-4" />
+                          View Applicants
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </>
               )}
             </CardContent>
           </Card>
