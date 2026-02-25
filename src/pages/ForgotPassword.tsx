@@ -8,8 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, HelpCircle, CheckCircle, Loader2, ShieldQuestion } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-
 type Step = "email" | "questions" | "success";
 
 export default function ForgotPassword() {
@@ -24,18 +22,43 @@ export default function ForgotPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const functionsBaseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+  const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  const ensurePublicKey = () => {
+    if (!anonKey) {
+      toast({
+        variant: "destructive",
+        title: "Configuration Error",
+        description: "Missing publishable key configuration.",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleFetchQuestions = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!ensurePublicKey()) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("get-security-questions", {
-        body: { email: email.trim() },
+      const response = await fetch(`${functionsBaseUrl}/get-security-questions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ email: email.trim() }),
       });
-      if (error || data?.error) {
+
+      const data = await response.json();
+
+      if (!response.ok || data?.error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: data?.error || error?.message || "Could not find security questions for this account.",
+          description: data?.error || "Could not find security questions for this account.",
         });
       } else {
         setQuestion1(data.question_1);
@@ -59,17 +82,27 @@ export default function ForgotPassword() {
       toast({ variant: "destructive", title: "Error", description: "Passwords do not match." });
       return;
     }
+    if (!ensurePublicKey()) return;
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("verify-security-questions", {
-        body: {
+      const response = await fetch(`${functionsBaseUrl}/verify-security-questions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({
           email: email.trim(),
           answer_1: answer1,
           answer_2: answer2,
           new_password: newPassword,
-        },
+        }),
       });
-      if (error || data?.error) {
+
+      const data = await response.json();
+
+      if (!response.ok || data?.error) {
         toast({
           variant: "destructive",
           title: "Verification Failed",
