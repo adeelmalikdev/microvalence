@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
@@ -16,6 +17,35 @@ export interface TaskWithSubmission extends Task {
 
 export function useStudentTasks() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Realtime subscription for instant updates when recruiter reviews submissions
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel('student-task-submissions')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'task_submissions',
+          filter: `student_id=eq.${user.id}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["student-tasks"] });
+          queryClient.invalidateQueries({ queryKey: ["student-stats"] });
+          queryClient.invalidateQueries({ queryKey: ["student-portfolio"] });
+          queryClient.invalidateQueries({ queryKey: ["application-completion"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
 
   return useQuery({
     queryKey: ["student-tasks", user?.id],
