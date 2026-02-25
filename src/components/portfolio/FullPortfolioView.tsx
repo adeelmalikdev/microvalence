@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { BackButton } from "@/components/BackButton";
 import { useStudentProfile } from "@/features/profile/hooks/useStudentProfile";
+import { useStudentPortfolio } from "@/hooks/useStudentPortfolio";
 import { PortfolioProfileCard } from "@/components/portfolio/PortfolioProfileCard";
 import { PortfolioAchievements } from "@/components/portfolio/PortfolioAchievements";
 import { AboutSection } from "@/features/profile/components/AboutSection";
@@ -9,7 +10,11 @@ import { ProjectsSection } from "@/features/profile/components/ProjectsSection";
 import { ExperienceSection } from "@/features/profile/components/ExperienceSection";
 import { LoadingSpinner } from "@/components/animations/LoadingSpinner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, Github, Link2, Linkedin, Settings } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Globe, Github, Link2, Linkedin, Settings, Award, Briefcase, Clock, Star, CheckCircle2, Download } from "lucide-react";
+import { format } from "date-fns";
 
 interface FullPortfolioViewProps {
   userId?: string;
@@ -32,6 +37,7 @@ export function FullPortfolioView({ userId, backPath = "/student/dashboard" }: F
     addExperience,
     removeExperience,
   } = useStudentProfile(userId);
+  const { data: portfolio, isLoading: portfolioLoading } = useStudentPortfolio(userId);
 
   if (isLoading) {
     return (
@@ -104,7 +110,139 @@ export function FullPortfolioView({ userId, backPath = "/student/dashboard" }: F
           onRemove={(expId) => removeExperience.mutate(expId)}
         />
 
-        {/* Social Links Section */}
+        {/* Micro-Internship Stats */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {portfolioLoading ? (
+            <>
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+              <Skeleton className="h-24" />
+            </>
+          ) : (
+            <>
+              <Card className="border-primary/20 bg-card/80 backdrop-blur">
+                <CardContent className="flex items-center gap-4 p-6">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                    <Briefcase className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{portfolio?.internships.length || 0}</p>
+                    <p className="text-sm text-muted-foreground">Completed Micro-Internships</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-primary/20 bg-card/80 backdrop-blur">
+                <CardContent className="flex items-center gap-4 p-6">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                    <Clock className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{portfolio?.totalHours || 0}</p>
+                    <p className="text-sm text-muted-foreground">Total Hours</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-primary/20 bg-card/80 backdrop-blur">
+                <CardContent className="flex items-center gap-4 p-6">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                    <Star className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{portfolio?.averageRating?.toFixed(1) || "N/A"}</p>
+                    <p className="text-sm text-muted-foreground">Average Rating</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
+
+        {/* Completed Micro-Internships */}
+        <div>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Award className="h-6 w-6 text-primary" />
+            Completed Micro-Internships
+          </h2>
+
+          {portfolioLoading ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              <Skeleton className="h-48" />
+              <Skeleton className="h-48" />
+            </div>
+          ) : portfolio?.internships && portfolio.internships.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2">
+              {portfolio.internships.map((internship) => (
+                <Card key={internship.id} className="overflow-hidden border-primary/20">
+                  <CardHeader className="bg-muted/30">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg">{internship.opportunityTitle}</CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-1">
+                          <Briefcase className="h-4 w-4" />
+                          {internship.companyName}
+                        </CardDescription>
+                      </div>
+                      {internship.rating && (
+                        <div className="flex items-center gap-1 rounded-full bg-warning/10 px-3 py-1">
+                          <Star className="h-4 w-4 fill-warning text-warning" />
+                          <span className="font-semibold text-warning">{internship.rating.toFixed(1)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {internship.durationHours} hours
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="h-4 w-4 text-success" />
+                        Completed {format(new Date(internship.completedAt), "MMM yyyy")}
+                      </div>
+                    </div>
+
+                    {internship.skills.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium mb-2">Skills Demonstrated</p>
+                        <div className="flex flex-wrap gap-2">
+                          {internship.skills.map((skill) => (
+                            <Badge key={skill} variant="secondary">{skill}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {internship.feedback && (
+                      <div className="rounded-lg bg-muted/50 p-4">
+                        <p className="text-sm font-medium mb-1">Recruiter Feedback</p>
+                        <p className="text-sm text-muted-foreground italic">"{internship.feedback}"</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="p-8 text-center border-primary/20">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
+                  <Briefcase className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">No Completed Micro-Internships Yet</h3>
+                  <p className="text-muted-foreground mt-1">
+                    {isOwnProfile
+                      ? "Complete your first micro-internship to build your portfolio!"
+                      : "This student hasn't completed any micro-internships yet."}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+
+
         <Card className="border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

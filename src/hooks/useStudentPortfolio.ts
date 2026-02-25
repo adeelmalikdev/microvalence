@@ -22,13 +22,14 @@ interface PortfolioData {
   averageRating: number | null;
 }
 
-export function useStudentPortfolio() {
+export function useStudentPortfolio(targetUserId?: string) {
   const { user } = useAuth();
+  const resolvedId = targetUserId || user?.id;
 
   return useQuery({
-    queryKey: ["student-portfolio", user?.id],
+    queryKey: ["student-portfolio", resolvedId],
     queryFn: async (): Promise<PortfolioData> => {
-      if (!user?.id) throw new Error("User not authenticated");
+      if (!resolvedId) throw new Error("User not authenticated");
 
       // Fetch completed applications first
       const { data: applications, error: appError } = await supabase
@@ -39,7 +40,7 @@ export function useStudentPortfolio() {
           updated_at,
           opportunity_id
         `)
-        .eq("student_id", user.id)
+        .eq("student_id", resolvedId)
         .eq("status", "completed");
 
       if (appError) throw appError;
@@ -119,6 +120,6 @@ export function useStudentPortfolio() {
         averageRating,
       };
     },
-    enabled: !!user?.id,
+    enabled: !!resolvedId,
   });
 }
