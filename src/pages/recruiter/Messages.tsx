@@ -35,7 +35,7 @@ export default function RecruiterMessages() {
     }
   }, [conversations, isMobile, selectedId]);
 
-  const selectedConversation = conversations.find((c) => c.id === selectedId);
+  const selectedConversation = conversations.find((c) => c.id === selectedId) ?? conversations[0];
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: ["conversations"] });
