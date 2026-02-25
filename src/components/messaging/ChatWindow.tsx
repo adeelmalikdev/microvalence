@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { MessageSquare, Pin, Ban, MoreVertical } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { MessageSquare, Pin, Ban, MoreVertical, ChevronDown } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -43,6 +43,8 @@ export function ChatWindow({
   const { user } = useAuth();
   const { messages, isLoading, sendMessage, markAsRead } = useMessages(conversationId);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [showScrollDown, setShowScrollDown] = useState(false);
 
   // Mark messages as read when viewing
   useEffect(() => {
@@ -70,6 +72,20 @@ export function ChatWindow({
       scrollToBottom("smooth");
     }
   }, [messages.length, isLoading]);
+
+  // Detect if user has scrolled up from bottom
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    if (!viewport) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = viewport;
+      setShowScrollDown(scrollHeight - scrollTop - clientHeight > 100);
+    };
+
+    viewport.addEventListener("scroll", handleScroll);
+    return () => viewport.removeEventListener("scroll", handleScroll);
+  }, [conversationId]);
 
   if (!conversationId) {
     return (
@@ -155,34 +171,48 @@ export function ChatWindow({
       )}
 
       {/* Messages */}
-      <ScrollArea className="flex-1 min-h-0 p-4">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}>
-                <Skeleton className="h-16 w-48 rounded-lg" />
-              </div>
-            ))}
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No messages yet. Start the conversation!
-            </p>
-          </div>
-        ) : (
-          messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              content={message.content}
-              isOwn={message.sender_id === user?.id}
-              timestamp={message.created_at}
-              isRead={!!message.read_at}
-            />
-          ))
+      <div className="flex-1 min-h-0 relative">
+        <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}>
+                  <Skeleton className="h-16 w-48 rounded-lg" />
+                </div>
+              ))}
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                No messages yet. Start the conversation!
+              </p>
+            </div>
+          ) : (
+            messages.map((message) => (
+              <MessageBubble
+                key={message.id}
+                content={message.content}
+                isOwn={message.sender_id === user?.id}
+                timestamp={message.created_at}
+                isRead={!!message.read_at}
+              />
+            ))
+          )}
+          <div ref={scrollRef} />
+        </ScrollArea>
+
+        {/* Scroll to bottom button */}
+        {showScrollDown && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute bottom-3 right-5 h-8 w-8 rounded-full shadow-md z-20"
+            onClick={() => scrollToBottom("smooth")}
+          >
+            <ChevronDown className="h-4 w-4" />
+          </Button>
         )}
-        <div ref={scrollRef} />
-      </ScrollArea>
+      </div>
 
       {/* Input */}
       <MessageInput
