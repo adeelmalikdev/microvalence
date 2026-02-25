@@ -65,10 +65,17 @@ export function ProfileHeader({ profile, isOwnProfile, onSave, isSaving }: Profi
      setIsEditing(false);
    };
  
-   return (
-     <GlassContainer className="overflow-hidden">
-      {/* Profile Image Section - Left Aligned */}
-      <div className="relative p-6">
+    return (
+      <GlassContainer className="overflow-hidden">
+       {/* Cover Image */}
+       <div className="w-full h-40 sm:h-52 bg-gradient-to-r from-primary/20 to-primary/5 overflow-hidden">
+         {profile.cover_image && (
+           <img src={profile.cover_image} alt="Cover" className="w-full h-full object-cover" />
+         )}
+       </div>
+
+       {/* Profile Image Section */}
+       <div className="relative p-6 -mt-12">
          {/* Edit Button - Top Right */}
          {isOwnProfile && (
            <div className="absolute top-4 right-4 flex gap-2">
