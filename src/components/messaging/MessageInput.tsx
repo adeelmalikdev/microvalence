@@ -6,14 +6,15 @@ import { Textarea } from "@/components/ui/textarea";
 interface MessageInputProps {
   onSend: (message: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
-export function MessageInput({ onSend, isLoading }: MessageInputProps) {
+export function MessageInput({ onSend, isLoading, disabled }: MessageInputProps) {
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
-    if (trimmedMessage && !isLoading) {
+    if (trimmedMessage && !isLoading && !disabled) {
       onSend(trimmedMessage);
       setMessage("");
     }
@@ -26,8 +27,18 @@ export function MessageInput({ onSend, isLoading }: MessageInputProps) {
     }
   };
 
+  if (disabled) {
+    return (
+      <div className="border-t p-3 shrink-0 bg-background">
+        <p className="text-sm text-muted-foreground text-center py-2">
+          This conversation is blocked
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex gap-2 p-4 border-t bg-background">
+    <div className="flex gap-2 p-4 border-t bg-background shrink-0">
       <Textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}

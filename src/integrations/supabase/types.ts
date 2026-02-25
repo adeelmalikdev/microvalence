@@ -415,6 +415,10 @@ export type Database = {
           application_id: string
           created_at: string
           id: string
+          is_blocked_by_recruiter: boolean
+          is_blocked_by_student: boolean
+          is_pinned_recruiter: boolean
+          is_pinned_student: boolean
           recruiter_id: string
           student_id: string
           updated_at: string
@@ -423,6 +427,10 @@ export type Database = {
           application_id: string
           created_at?: string
           id?: string
+          is_blocked_by_recruiter?: boolean
+          is_blocked_by_student?: boolean
+          is_pinned_recruiter?: boolean
+          is_pinned_student?: boolean
           recruiter_id: string
           student_id: string
           updated_at?: string
@@ -431,6 +439,10 @@ export type Database = {
           application_id?: string
           created_at?: string
           id?: string
+          is_blocked_by_recruiter?: boolean
+          is_blocked_by_student?: boolean
+          is_pinned_recruiter?: boolean
+          is_pinned_student?: boolean
           recruiter_id?: string
           student_id?: string
           updated_at?: string

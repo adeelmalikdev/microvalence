@@ -1,7 +1,15 @@
 import { useEffect, useRef } from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Pin, Ban, MoreVertical } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
 import { useMessages } from "@/hooks/useMessages";
@@ -10,15 +18,27 @@ import { useAuth } from "@/hooks/useAuth";
 interface ChatWindowProps {
   conversationId: string | undefined;
   otherUserName: string;
+  otherUserAvatar?: string | null;
   opportunityTitle: string;
   companyName: string;
+  companyLogo?: string | null;
+  isPinned?: boolean;
+  isBlocked?: boolean;
+  onTogglePin?: (pinned: boolean) => void;
+  onToggleBlock?: (blocked: boolean) => void;
 }
 
 export function ChatWindow({
   conversationId,
   otherUserName,
+  otherUserAvatar,
   opportunityTitle,
   companyName,
+  companyLogo,
+  isPinned,
+  isBlocked,
+  onTogglePin,
+  onToggleBlock,
 }: ChatWindowProps) {
   const { user } = useAuth();
   const { messages, isLoading, sendMessage, markAsRead } = useMessages(conversationId);
@@ -52,15 +72,66 @@ export function ChatWindow({
     );
   }
 
+  const initials = otherUserName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <div className="flex-1 flex flex-col bg-background min-h-0">
       {/* Header - always visible */}
-      <div className="border-b p-4 shrink-0 bg-background z-10">
-        <h2 className="font-semibold text-foreground truncate">{otherUserName}</h2>
-        <p className="text-sm text-muted-foreground truncate">
-          {opportunityTitle} • {companyName}
-        </p>
+      <div className="border-b px-4 py-3 shrink-0 bg-background z-10 flex items-center gap-3">
+        <Avatar className="h-9 w-9 shrink-0">
+          <AvatarImage src={otherUserAvatar || companyLogo || undefined} alt={otherUserName} />
+          <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-foreground truncate text-sm">{otherUserName}</h2>
+            {isPinned && <Pin className="h-3 w-3 text-primary shrink-0" />}
+            {isBlocked && <Ban className="h-3 w-3 text-destructive shrink-0" />}
+          </div>
+          <p className="text-xs text-muted-foreground truncate">
+            {opportunityTitle} • {companyName}
+          </p>
+        </div>
+
+        {(onTogglePin || onToggleBlock) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {onTogglePin && (
+                <DropdownMenuItem onClick={() => onTogglePin(!isPinned)}>
+                  <Pin className="h-4 w-4 mr-2" />
+                  {isPinned ? "Unpin Chat" : "Pin Chat"}
+                </DropdownMenuItem>
+              )}
+              {onToggleBlock && (
+                <DropdownMenuItem
+                  onClick={() => onToggleBlock(!isBlocked)}
+                  className={isBlocked ? "" : "text-destructive"}
+                >
+                  <Ban className="h-4 w-4 mr-2" />
+                  {isBlocked ? "Unblock" : "Block User"}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
+
+      {/* Blocked banner */}
+      {isBlocked && (
+        <div className="px-4 py-2 bg-destructive/10 text-destructive text-xs text-center shrink-0">
+          This conversation is blocked. You won't receive new messages.
+        </div>
+      )}
 
       {/* Messages */}
       <ScrollArea className="flex-1 min-h-0 p-4">
@@ -96,6 +167,7 @@ export function ChatWindow({
       <MessageInput
         onSend={(text) => sendMessage.mutate(text)}
         isLoading={sendMessage.isPending}
+        disabled={isBlocked}
       />
     </div>
   );

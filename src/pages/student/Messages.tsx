@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConversationList } from "@/components/messaging/ConversationList";
 import { ChatWindow } from "@/components/messaging/ChatWindow";
-import { useConversations, useConversationByApplication } from "@/hooks/useConversations";
+import { useConversations, useConversationByApplication, useConversationActions } from "@/hooks/useConversations";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -18,6 +18,7 @@ export default function StudentMessages() {
 
   const { data: conversations = [], isLoading, isFetching } = useConversations();
   const { data: conversationByApp } = useConversationByApplication(applicationId ?? undefined);
+  const { togglePin, toggleBlock } = useConversationActions();
 
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [showChat, setShowChat] = useState(false);
@@ -75,6 +76,8 @@ export default function StudentMessages() {
               selectedId={selectedId}
               onSelect={(id) => { setSelectedId(id); setShowChat(true); }}
               isLoading={isLoading}
+              onTogglePin={(id, pinned) => togglePin.mutate({ conversationId: id, pinned })}
+              onToggleBlock={(id, blocked) => toggleBlock.mutate({ conversationId: id, blocked })}
             />
           </div>
 
@@ -90,8 +93,14 @@ export default function StudentMessages() {
             <ChatWindow
               conversationId={selectedId}
               otherUserName={selectedConversation?.other_user_name ?? ""}
+              otherUserAvatar={selectedConversation?.other_user_avatar}
               opportunityTitle={selectedConversation?.opportunity_title ?? ""}
               companyName={selectedConversation?.company_name ?? ""}
+              companyLogo={selectedConversation?.company_logo}
+              isPinned={selectedConversation?.is_pinned}
+              isBlocked={selectedConversation?.is_blocked}
+              onTogglePin={(pinned) => selectedId && togglePin.mutate({ conversationId: selectedId, pinned })}
+              onToggleBlock={(blocked) => selectedId && toggleBlock.mutate({ conversationId: selectedId, blocked })}
             />
           </div>
         </div>
