@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { toast } from "sonner";
 
 export interface Message {
   id: string;
@@ -10,24 +11,23 @@ export interface Message {
   content: string;
   read_at: string | null;
   created_at: string;
+  media_url?: string | null;
+  is_pinned?: boolean;
 }
 
 export function useMessages(conversationId: string | undefined) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch messages
   const query = useQuery({
     queryKey: ["messages", conversationId],
     queryFn: async () => {
       if (!conversationId) return [];
-
       const { data, error } = await supabase
         .from("messages")
         .select("*")
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
-
       if (error) throw error;
       return data as Message[];
     },
@@ -40,77 +40,67 @@ export function useMessages(conversationId: string | undefined) {
 
     const channel = supabase
       .channel(`messages:${conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        (payload) => {
-          queryClient.setQueryData(
-            ["messages", conversationId],
-            (old: Message[] = []) => {
-              // Avoid duplicates
-              if (old.some((m) => m.id === (payload.new as Message).id)) {
-                return old;
-              }
-              return [...old, payload.new as Message];
-            }
-          );
-          // Invalidate unread count
-          queryClient.invalidateQueries({ queryKey: ["unread-count"] });
-          queryClient.invalidateQueries({ queryKey: ["conversations"] });
-        }
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        (payload) => {
-          queryClient.setQueryData(
-            ["messages", conversationId],
-            (old: Message[] = []) =>
-              old.map((m) =>
-                m.id === (payload.new as Message).id ? (payload.new as Message) : m
-              )
-          );
-        }
-      )
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload) => {
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (old: Message[] = []) => {
+            if (old.some((m) => m.id === (payload.new as Message).id)) return old;
+            return [...old, payload.new as Message];
+          }
+        );
+        queryClient.invalidateQueries({ queryKey: ["unread-count"] });
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      })
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload) => {
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (old: Message[] = []) =>
+            old.map((m) => m.id === (payload.new as Message).id ? (payload.new as Message) : m)
+        );
+      })
+      .on("postgres_changes", {
+        event: "DELETE",
+        schema: "public",
+        table: "messages",
+        filter: `conversation_id=eq.${conversationId}`,
+      }, (payload) => {
+        queryClient.setQueryData(
+          ["messages", conversationId],
+          (old: Message[] = []) => old.filter((m) => m.id !== (payload.old as any).id)
+        );
+      })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, [conversationId, user, queryClient]);
 
   // Send message mutation with optimistic update
   const sendMessage = useMutation({
-    mutationFn: async (content: string) => {
+    mutationFn: async ({ content, mediaUrl }: { content: string; mediaUrl?: string }) => {
       if (!conversationId || !user) throw new Error("Not authenticated");
-
-      const { error } = await supabase.from("messages").insert({
+      const insertData: any = {
         conversation_id: conversationId,
         sender_id: user.id,
-        content,
-      });
+        content: content || "",
+      };
+      if (mediaUrl) insertData.media_url = mediaUrl;
+      const { error } = await supabase.from("messages").insert(insertData);
       if (error) throw error;
     },
-    onMutate: async (content: string) => {
+    onMutate: async ({ content, mediaUrl }) => {
       if (!conversationId || !user) return;
-
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["messages", conversationId] });
-
-      // Snapshot previous messages
       const previous = queryClient.getQueryData<Message[]>(["messages", conversationId]);
-
-      // Optimistically add the new message
       const optimisticMessage: Message = {
         id: `temp-${Date.now()}`,
         conversation_id: conversationId,
@@ -118,17 +108,16 @@ export function useMessages(conversationId: string | undefined) {
         content,
         read_at: null,
         created_at: new Date().toISOString(),
+        media_url: mediaUrl || null,
+        is_pinned: false,
       };
-
       queryClient.setQueryData<Message[]>(
         ["messages", conversationId],
         (old = []) => [...old, optimisticMessage]
       );
-
       return { previous };
     },
-    onError: (_err, _content, context) => {
-      // Rollback on error
+    onError: (_err, _vars, context) => {
       if (context?.previous && conversationId) {
         queryClient.setQueryData(["messages", conversationId], context.previous);
       }
@@ -139,18 +128,35 @@ export function useMessages(conversationId: string | undefined) {
     },
   });
 
+  // Pin message
+  const pinMessage = useMutation({
+    mutationFn: async ({ messageId, pinned }: { messageId: string; pinned: boolean }) => {
+      const { error } = await supabase
+        .from("messages")
+        .update({ is_pinned: pinned } as any)
+        .eq("id", messageId);
+      if (error) throw error;
+    },
+    onSuccess: (_, { pinned }) => {
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
+      toast.success(pinned ? "Message pinned" : "Message unpinned");
+    },
+  });
+
+  // Delete message (own messages only for now - no RLS policy for delete on messages table)
+  // Note: Messages table doesn't have DELETE policy, so this won't work via client
+  // We mark it as a stub for future use
+
   // Mark as read mutation
   const markAsRead = useMutation({
     mutationFn: async () => {
       if (!conversationId || !user) return;
-
       const { error } = await supabase
         .from("messages")
         .update({ read_at: new Date().toISOString() })
         .eq("conversation_id", conversationId)
         .neq("sender_id", user.id)
         .is("read_at", null);
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -164,5 +170,6 @@ export function useMessages(conversationId: string | undefined) {
     isLoading: query.isLoading,
     sendMessage,
     markAsRead,
+    pinMessage,
   };
 }
