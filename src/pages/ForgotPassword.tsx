@@ -35,7 +35,7 @@ export default function ForgotPassword() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: data?.error || "Could not find security questions for this account.",
+          description: data?.error || error?.message || "Could not find security questions for this account.",
         });
       } else {
         setQuestion1(data.question_1);
