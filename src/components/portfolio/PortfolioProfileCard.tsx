@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, GraduationCap, Github, Globe, Link, FileText, Linkedin } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
-import { CoverImageUpload } from "@/components/profile/CoverImageUpload";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ExtendedProfile } from "@/features/profile/hooks/useStudentProfile";
@@ -23,18 +22,13 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
     queryClient.invalidateQueries({ queryKey: ["student-profile", user?.id] });
   };
 
-  const handleCoverUpload = () => {
-    queryClient.invalidateQueries({ queryKey: ["student-profile", user?.id] });
-  };
-
   if (isLoading) {
     return (
       <Card className="border-primary/20 overflow-hidden">
-        <Skeleton className="h-40 sm:h-52 w-full" />
         <CardContent className="p-6">
-          <div className="flex items-center gap-6 -mt-14">
-            <Skeleton className="h-24 w-24 rounded-full flex-shrink-0 border-4 border-background" />
-            <div className="space-y-2 flex-1 mt-14">
+          <div className="flex items-center gap-6">
+            <Skeleton className="h-24 w-24 rounded-full flex-shrink-0" />
+            <div className="space-y-2 flex-1">
               <Skeleton className="h-7 w-48" />
               <Skeleton className="h-4 w-64" />
               <Skeleton className="h-4 w-40" />
@@ -60,22 +54,8 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
 
   return (
     <Card className="border-primary/20 overflow-hidden">
-      {/* Cover Image */}
-      {isOwnProfile ? (
-        <CoverImageUpload
-          currentUrl={profile.cover_image}
-          onUpload={handleCoverUpload}
-        />
-      ) : (
-        <div className="w-full h-40 sm:h-52 bg-gradient-to-r from-primary/20 to-primary/5 overflow-hidden">
-          {profile.cover_image && (
-            <img src={profile.cover_image} alt="Cover" className="w-full h-full object-cover" />
-          )}
-        </div>
-      )}
-
       <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row items-start gap-5 -mt-16 sm:-mt-18">
+        <div className="flex flex-col sm:flex-row items-start gap-5">
           {/* Avatar */}
           {isOwnProfile ? (
             <div className="flex-shrink-0 z-10">
@@ -100,7 +80,7 @@ export function PortfolioProfileCard({ profile, isLoading }: PortfolioProfileCar
           )}
 
           {/* Info */}
-          <div className="flex-1 min-w-0 mt-4 sm:mt-10">
+          <div className="flex-1 min-w-0 mt-2">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold text-foreground truncate">
                 {profile.full_name || "Student"}
