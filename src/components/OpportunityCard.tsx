@@ -12,7 +12,6 @@ interface OpportunityCardProps {
   duration: string;
   level: "Beginner" | "Intermediate" | "Advanced";
   isRemote?: boolean;
-  isFilled?: boolean;
   onViewDetails?: () => void;
 }
 
@@ -24,7 +23,6 @@ export function OpportunityCard({
   duration,
   level,
   isRemote = true,
-  isFilled = false,
   onViewDetails,
 }: OpportunityCardProps) {
   return (
@@ -48,12 +46,7 @@ export function OpportunityCard({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {isFilled && (
-              <Badge className="bg-destructive/10 text-destructive border-destructive/20">🔒 Filled</Badge>
-            )}
-            {isRemote && <Badge variant="remote">Remote</Badge>}
-          </div>
+          {isRemote && <Badge variant="remote">Remote</Badge>}
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
@@ -74,7 +67,7 @@ export function OpportunityCard({
             </span>
           </div>
           <Button size="sm" onClick={onViewDetails} className="group/btn gap-1.5 rounded-full shadow-[var(--shadow-emerald-glow)] hover:shadow-[var(--glow-hover)] transition-all duration-300">
-            {isFilled ? "View" : "Apply"}
+            Apply
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
           </Button>
         </div>
