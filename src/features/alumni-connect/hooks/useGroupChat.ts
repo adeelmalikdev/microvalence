@@ -145,7 +145,10 @@ export function useGroupChat(groupId: string) {
             if (prev.some((m) => m.id === newMessage.id)) return prev;
             return [...prev, enrichedMessage];
           });
-          setTimeout(scrollToBottom, 100);
+          // Only auto-scroll if the new message is from the current user
+          if (newMessage.sender_id === user?.id) {
+            setTimeout(scrollToBottom, 100);
+          }
         }
       )
       .on(
@@ -167,9 +170,7 @@ export function useGroupChat(groupId: string) {
     };
   }, [groupId]);
 
-  useEffect(() => {
-    if (!isLoading) scrollToBottom();
-  }, [isLoading]);
+  // Removed auto-scroll on load so the chat doesn't jump to bottom when opened
 
   return {
     messages,
