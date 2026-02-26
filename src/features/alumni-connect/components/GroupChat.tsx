@@ -35,9 +35,19 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [polls, setPolls] = useState<Poll[]>([]);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const { messages, isLoading, isSending, sendMessage, deleteMessage, pinMessage, messagesEndRef } =
     useGroupChat(groupId);
   const { user, profile } = useAuth();
+
+  // Track when initial load is complete to prevent animations from scrolling
+  useEffect(() => {
+    if (!isLoading && messages.length >= 0) {
+      // Small delay to let the DOM settle before enabling animations
+      const timer = setTimeout(() => setInitialLoadDone(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   const canSendMessage = !adminOnlyMessaging || isAdmin;
 
@@ -163,7 +173,7 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
               return (
                 <motion.div
                   key={msg.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={initialLoadDone ? { opacity: 0, y: 10 } : false}
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex gap-3 group ${isOwn ? "flex-row-reverse" : ""}`}
                 >
