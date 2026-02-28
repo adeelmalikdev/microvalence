@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent } from "react";
-import { Send, Image as ImageIcon, BarChart3, X } from "lucide-react";
+import { Send, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +9,9 @@ interface MessageInputProps {
   onSend: (message: string, mediaUrl?: string) => void;
   isLoading?: boolean;
   disabled?: boolean;
-  onPollCreate?: () => void;
 }
 
-export function MessageInput({ onSend, isLoading, disabled, onPollCreate }: MessageInputProps) {
+export function MessageInput({ onSend, isLoading, disabled }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
@@ -108,17 +107,6 @@ export function MessageInput({ onSend, isLoading, disabled, onPollCreate }: Mess
         >
           <ImageIcon className="h-4 w-4" />
         </Button>
-        {onPollCreate && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0"
-            onClick={onPollCreate}
-            disabled={isLoading}
-          >
-            <BarChart3 className="h-4 w-4" />
-          </Button>
-        )}
         <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}

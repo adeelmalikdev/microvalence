@@ -12,11 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MessageBubble } from "./MessageBubble";
 import { MessageInput } from "./MessageInput";
-import { PollCreate } from "./PollCreate";
-import { PollDisplay } from "./PollDisplay";
 import { useMessages } from "@/hooks/useMessages";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ChatWindowProps {
   conversationId: string | undefined;
@@ -31,13 +28,6 @@ interface ChatWindowProps {
   onToggleBlock?: (blocked: boolean) => void;
 }
 
-interface Poll {
-  id: string;
-  question: string;
-  options: string[];
-  creator_id: string;
-  is_active: boolean;
-}
 
 export function ChatWindow({
   conversationId,
@@ -56,31 +46,6 @@ export function ChatWindow({
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
-  const [showPollCreate, setShowPollCreate] = useState(false);
-  const [polls, setPolls] = useState<Poll[]>([]);
-
-  // Fetch polls for this conversation
-  useEffect(() => {
-    if (!conversationId) return;
-    fetchPolls();
-    const channel = supabase
-      .channel(`dm-polls-${conversationId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "polls", filter: `conversation_id=eq.${conversationId}` }, () => {
-        fetchPolls();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [conversationId]);
-
-  const fetchPolls = async () => {
-    if (!conversationId) return;
-    const { data } = await supabase
-      .from("polls")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: false });
-    if (data) setPolls(data as any);
-  };
 
   // Mark messages as read when viewing
   useEffect(() => {
@@ -198,14 +163,6 @@ export function ChatWindow({
         </div>
       )}
 
-      {/* Active polls */}
-      {polls.filter((p) => p.is_active).length > 0 && (
-        <div className="px-4 py-2 border-b max-h-48 overflow-y-auto shrink-0">
-          {polls.filter((p) => p.is_active).map((poll) => (
-            <PollDisplay key={poll.id} poll={poll} />
-          ))}
-        </div>
-      )}
 
       {/* Messages */}
       <div className="flex-1 min-h-0 relative">
@@ -252,23 +209,12 @@ export function ChatWindow({
         )}
       </div>
 
-      {/* Poll create */}
-      {showPollCreate && (
-        <div className="px-4 py-2 border-t shrink-0">
-          <PollCreate
-            conversationId={conversationId}
-            onCreated={() => { setShowPollCreate(false); fetchPolls(); }}
-            onCancel={() => setShowPollCreate(false)}
-          />
-        </div>
-      )}
 
       {/* Input */}
       <MessageInput
         onSend={(text, mediaUrl) => sendMessage.mutate({ content: text, mediaUrl })}
         isLoading={sendMessage.isPending}
         disabled={isBlocked}
-        onPollCreate={() => setShowPollCreate(!showPollCreate)}
       />
     </div>
   );
