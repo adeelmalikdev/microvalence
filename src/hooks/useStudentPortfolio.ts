@@ -102,9 +102,5 @@ export function useStudentPortfolio(targetUserId?: string) {
       return { internships, allSkills, totalHours, averageRating };
     },
     enabled: !!resolvedId,
-    refetchInterval: 10000,
-    refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
-    staleTime: 5000,
   });
 }

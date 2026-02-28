@@ -33,7 +33,6 @@ export function useUnreadCount() {
       return count ?? 0;
     },
     enabled: !!user,
-    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Subscribe to new messages for real-time badge updates
