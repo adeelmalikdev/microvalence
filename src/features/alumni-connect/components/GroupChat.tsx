@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Send, Trash2, Pin, BarChart3, Image as ImageIcon, X } from "lucide-react";
+import { Send, Trash2, Pin, Image as ImageIcon, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { useGroupChat } from "../hooks/useGroupChat";
@@ -10,8 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { PollCreate } from "@/components/messaging/PollCreate";
-import { PollDisplay } from "@/components/messaging/PollDisplay";
 import { toast } from "sonner";
 
 interface GroupChatProps {
@@ -20,21 +18,11 @@ interface GroupChatProps {
   adminOnlyMessaging?: boolean;
 }
 
-interface Poll {
-  id: string;
-  question: string;
-  options: string[];
-  creator_id: string;
-  is_active: boolean;
-  created_at: string;
-}
 
 export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatProps) {
   const [newMessage, setNewMessage] = useState("");
-  const [showPollCreate, setShowPollCreate] = useState(false);
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [polls, setPolls] = useState<Poll[]>([]);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const { messages, isLoading, isSending, sendMessage, deleteMessage, pinMessage, messagesEndRef } =
     useGroupChat(groupId);
@@ -51,25 +39,6 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
 
   const canSendMessage = !adminOnlyMessaging || isAdmin;
 
-  useEffect(() => {
-    fetchPolls();
-    const channel = supabase
-      .channel(`group-polls-${groupId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "polls", filter: `group_id=eq.${groupId}` }, () => {
-        fetchPolls();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [groupId]);
-
-  const fetchPolls = async () => {
-    const { data } = await supabase
-      .from("polls")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: false });
-    if (data) setPolls(data as any);
-  };
 
   const handleSend = async () => {
     if (!newMessage.trim() && !mediaFile) return;
@@ -134,14 +103,6 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
         </div>
       )}
 
-      {/* Active polls */}
-      {polls.filter((p) => p.is_active).length > 0 && (
-        <div className="px-4 py-2 border-b max-h-48 overflow-y-auto shrink-0">
-          {polls.filter((p) => p.is_active).map((poll) => (
-            <PollDisplay key={poll.id} poll={poll} />
-          ))}
-        </div>
-      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -252,16 +213,6 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Poll create */}
-      {showPollCreate && (
-        <div className="px-4 py-2 border-t shrink-0">
-          <PollCreate
-            groupId={groupId}
-            onCreated={() => { setShowPollCreate(false); fetchPolls(); }}
-            onCancel={() => setShowPollCreate(false)}
-          />
-        </div>
-      )}
 
       {/* Media preview */}
       {mediaPreview && (
@@ -312,16 +263,6 @@ export function GroupChat({ groupId, isAdmin, adminOnlyMessaging }: GroupChatPro
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>
-              {(isAdmin) && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowPollCreate(!showPollCreate)}
-                  title="Create poll"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                </Button>
-              )}
               <Button
                 onClick={handleSend}
                 disabled={(!newMessage.trim() && !mediaFile) || isSending || !user}
