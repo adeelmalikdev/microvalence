@@ -37,7 +37,7 @@ export function useStudentPortfolio(targetUserId?: string) {
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'applications',
           filter: `student_id=eq.${resolvedId}`,
@@ -49,11 +49,12 @@ export function useStudentPortfolio(targetUserId?: string) {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'feedback',
         },
         () => {
+          // Feedback table doesn't have student_id, so we always invalidate
           queryClient.invalidateQueries({ queryKey: ["student-portfolio", resolvedId] });
         }
       )
@@ -101,5 +102,7 @@ export function useStudentPortfolio(targetUserId?: string) {
       return { internships, allSkills, totalHours, averageRating };
     },
     enabled: !!resolvedId,
+    refetchInterval: 15000, // Poll every 15s as fallback for missed realtime events
+    refetchIntervalInBackground: false,
   });
 }
