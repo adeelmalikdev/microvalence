@@ -39,7 +39,7 @@ export function TaskSubmissionDialog({ open, onOpenChange, task }: TaskSubmissio
   const updateSubmission = useUpdateSubmission();
 
   const hasExistingSubmission = !!task?.submission;
-  const isReadOnly = task?.submission?.status === "approved" || task?.submission?.status === "pending";
+  const isReadOnly = task?.submission?.status === "approved";
 
   const {
     register,

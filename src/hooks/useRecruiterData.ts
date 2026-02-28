@@ -157,9 +157,10 @@ export function useRecruiterOpportunityWithApplicants(opportunityId: string) {
         .select("*")
         .eq("id", opportunityId)
         .eq("recruiter_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (oppError) throw oppError;
+      if (!opportunity) throw new Error("Opportunity not found");
 
       // Get applications
       const { data: applications, error: appError } = await supabase
@@ -168,7 +169,10 @@ export function useRecruiterOpportunityWithApplicants(opportunityId: string) {
         .eq("opportunity_id", opportunityId)
         .order("created_at", { ascending: false });
 
-      if (appError) throw appError;
+      if (appError) {
+        console.error("Error fetching applications:", appError);
+        throw appError;
+      }
 
       // Get profiles for these students
       const studentIds = applications?.map((app) => app.student_id) || [];
