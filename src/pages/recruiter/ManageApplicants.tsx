@@ -114,6 +114,7 @@ export default function ManageApplicants() {
     a.status === "accepted" || a.status === "in_progress"
   );
   const completedApplicants = applications.filter((a) => a.status === "completed");
+  const rejectedApplicants = applications.filter((a) => a.status === "rejected" || a.status === "withdrawn");
 
   return (
     <div className="bg-muted/30">
@@ -160,7 +161,7 @@ export default function ManageApplicants() {
                 </Badge>
               </div>
             </div>
-            <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
               <span>{applications.length} Total Applicants</span>
               <span>•</span>
               <span>{pendingApplicants.length} Pending Review</span>
@@ -168,6 +169,12 @@ export default function ManageApplicants() {
               <span>{activeApplicants.length} Active</span>
               <span>•</span>
               <span>{completedApplicants.length} Completed</span>
+              {rejectedApplicants.length > 0 && (
+                <>
+                  <span>•</span>
+                  <span>{rejectedApplicants.length} Rejected</span>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -248,7 +255,30 @@ export default function ManageApplicants() {
           </div>
         )}
 
-        {/* All Applications */}
+        {/* Rejected / Withdrawn */}
+        {rejectedApplicants.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4 text-muted-foreground">Rejected / Withdrawn ({rejectedApplicants.length})</h2>
+            <div className="space-y-4 opacity-60">
+              {rejectedApplicants.map((application) => (
+                <ApplicantCard
+                  key={application.id}
+                  application={application}
+                  opportunityId={opportunity.id}
+                  opportunityTitle={opportunity.title}
+                  companyName={opportunity.company_name}
+                  opportunitySkills={opportunity.skills_required}
+                  onAccept={() => {}}
+                  onReject={() => {}}
+                  isPending={false}
+                  showActions={false}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* No Applications */}
         {applications.length === 0 && (
           <Card>
             <CardContent className="py-12 text-center">
