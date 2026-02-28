@@ -298,29 +298,29 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                 />
 
                 {/* Actions */}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50">
-                  <div className="flex gap-1">
+                <div className="flex flex-wrap items-center justify-between gap-2 mt-4 pt-3 border-t border-border/50">
+                  <div className="flex flex-wrap gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-muted-foreground hover:text-primary"
+                      className="text-muted-foreground hover:text-primary text-xs sm:text-sm"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={mediaFiles.length >= 4 || isLoading}
                     >
-                      <Image className="h-4 w-4 mr-2" />
+                      <Image className="h-4 w-4 mr-1 sm:mr-2" />
                       {mediaFiles.length > 0
-                        ? `${mediaFiles.length}/4 Media`
-                        : "Add Media"}
+                        ? `${mediaFiles.length}/4`
+                        : "Media"}
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-muted-foreground hover:text-primary"
+                      className="text-muted-foreground hover:text-primary text-xs sm:text-sm"
                       onClick={() => coverInputRef.current?.click()}
                       disabled={!!coverFile || isLoading}
                     >
-                      <PanelTop className="h-4 w-4 mr-2" />
-                      {coverFile ? "Cover Added" : "Add Cover"}
+                      <PanelTop className="h-4 w-4 mr-1 sm:mr-2" />
+                      {coverFile ? "Cover ✓" : "Cover"}
                     </Button>
                   </div>
 
@@ -328,6 +328,7 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="text-xs sm:text-sm"
                       onClick={() => {
                         setIsExpanded(false);
                         setContent("");
@@ -345,16 +346,17 @@ export function CreatePostForm({ onPostCreated }: CreatePostFormProps) {
                     <Button
                       onClick={handleSubmit}
                       disabled={!content.trim() || isLoading || isUploading}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_hsl(var(--primary)/0.3)]"
+                      size="sm"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_hsl(var(--primary)/0.3)] text-xs sm:text-sm"
                     >
                       {isLoading || isUploading ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                           {isUploading ? "Uploading..." : "Posting..."}
                         </>
                       ) : (
                         <>
-                          <Send className="h-4 w-4 mr-2" />
+                          <Send className="h-4 w-4 mr-1" />
                           Post
                         </>
                       )}
