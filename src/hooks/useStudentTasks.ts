@@ -162,6 +162,7 @@ export function useUpdateSubmission() {
         .update({
           submission_url: submissionUrl,
           notes: notes,
+          status: "pending" as any,
           submitted_at: new Date().toISOString(),
         })
         .eq("id", submissionId)
